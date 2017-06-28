@@ -7,6 +7,8 @@ import os
 
 from nlp_functions import *
 
+from nltk import sent_tokenize
+
 # ===========================================================================================
 
 username = os.environ['BOT_USERNAME'] 
@@ -42,13 +44,19 @@ def incoming():
             statement = statement.lower()
             statement = expand_contractions(statement)             
 
-            kik.send_messages([
-                TextMessage(
-                    to=message.from_user,
-                    chat_id=message.chat_id,
-                    body=statement
-                )
-            ])
+            print "Step 1: " + statement 
+
+            sentences = sent_tokenize(statement)
+
+            for sentence in sentences:
+
+                kik.send_messages([
+                    TextMessage(
+                        to=message.from_user,
+                        chat_id=message.chat_id,
+                        body=sentence
+                    )
+                ])
 
     return Response(status=200)
 

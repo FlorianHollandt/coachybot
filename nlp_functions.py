@@ -110,6 +110,8 @@ def expand_contractions(text):
         (r"he'll've", "he will have"),
         (r"he's", "he is"),
         (r"hes", "he is"),
+        (r"here's", "here is"),
+        (r"heres", "here is"),
         (r"how'd", "how did"),
         (r"how'd'y", "how do you"),
         (r"how'll", "how will"),
