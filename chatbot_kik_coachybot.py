@@ -5,6 +5,10 @@ from kik.messages import messages_from_json, TextMessage
 
 import os 
 
+from nlp_functions import *
+
+# ===========================================================================================
+
 username = os.environ['BOT_USERNAME'] 
 api_key = os.environ['BOT_API_KEY']
 
@@ -13,6 +17,8 @@ kik = KikApi(username, api_key)
 
 config = Configuration(webhook=os.environ['WEBHOOK'])
 kik.set_configuration(config)
+
+# ===========================================================================================
 
 @app.route('/', methods=['POST'])
 def incoming():
@@ -26,13 +32,21 @@ def incoming():
     print messages
 
     for message in messages:
-        print message
         if isinstance(message, TextMessage):
+
+            print message.from_user + ": " + message.body
+
+            # Statement normalization
+
+            statement = message.body
+            statement = statement.lower()
+            statement = expand_contractions(statement)             
+
             kik.send_messages([
                 TextMessage(
                     to=message.from_user,
                     chat_id=message.chat_id,
-                    body=message.body
+                    body=statement
                 )
             ])
 
