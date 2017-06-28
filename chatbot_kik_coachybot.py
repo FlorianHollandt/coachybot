@@ -6,7 +6,7 @@ from kik.messages import messages_from_json, TextMessage
 import os 
 
 from nlp_functions import *
-
+from ngrams import corrections
 from nltk import sent_tokenize
 
 # ===========================================================================================
@@ -48,7 +48,12 @@ def incoming():
 
             sentences = sent_tokenize(statement)
 
-            for sentence in sentences:
+            for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
+
+                print "Step 2." + str(sentence_counter) + ": " + sentence
+                sentence = corrections(sentence)
+                sentence = remove_fluff(sentence)
+                print "Step 3." + str(sentence_counter) + ": " + sentence
 
                 kik.send_messages([
                     TextMessage(
