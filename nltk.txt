@@ -1,0 +1,8 @@
+stopwords
+punkt
+names
+universal_tagset
+verbnet
+wordnet
+wordnet_ic
+words
