@@ -61,11 +61,11 @@ def incoming():
             if message.from_user not in history.keys():
                 history[message.from_user] = defaultdict(bool)
                 history[message.from_user].update({"dialogue_count" : 1,
-                                      "dialogue_start" : message.timestamp
+                                      "dialogue_start" : message.timestamp,
+                                      "message_last" : message.timestamp
                                       })
             else:
                 history[message.from_user]["dialogue_count"] += 1
-                history[message.from_user]["message_last"] = message.timestamp
 
             # Searching for keywords and assembling an answer
 
@@ -107,11 +107,11 @@ def incoming():
 
                         print "Current time for greeting: " + str(current_time)
 
-                        if current_time >= 0 and current_time < 11:
+                        if current_time >= 22 or current_time < 9:
                             greeting = "Good morning"
-                        elif current_time >= 18 and current_time < 24:   
+                        elif current_time >= 16 and current_time < 22:   
                             greeting = "Good evening"
-                        elif current_time >= 14 and current_time < 18:   
+                        elif current_time >= 12 and current_time < 16:   
                             greeting = "Good afternoon"
                         else:
                             greeting = "Hello"  
@@ -145,6 +145,37 @@ def incoming():
                             ]))
                         answer_facts.append("has_greeting")  
                         history[message.from_user]["greeting_last"] = message.timestamp
+
+                #--------------------------------------------------------------------
+                #--   Greet again after long inactivity
+                #-------------------------------------------------------------------
+
+                if(
+                    message.timestamp - history[message.from_user]["message_last"] > (8*60*60*1000)
+                    ):
+
+
+                    current_time = int(str(datetime.now().time())[:2])
+
+                    print "Current time for greeting: " + str(current_time)
+
+                    if current_time >= 22 or current_time < 9:
+                        greeting = "Good morning"
+                    elif current_time >= 16 and current_time < 22:   
+                        greeting = "Good evening"
+                    elif current_time >= 12 and current_time < 16:   
+                        greeting = "Good afternoon"
+                    else:
+                        greeting = "Hello"  
+
+                    answer.append(choice([
+                        greeting + " " + message.from_user + "!\nI've just been thinking of you! :)",
+                        greeting + "!\nGood to see you again, " + message.from_user + ". :)",
+                        "Ah, " + message.from_user + "!\nSo nice to see you again!",
+                        "Hey " + message.from_user + "!\n" + greeting,
+                        ]))
+                    answer_facts.append("has_greeting")  
+                    history[message.from_user]["greeting_last"] = message.timestamp
 
                 #####################################################################
                 ###     "How are you" from user
