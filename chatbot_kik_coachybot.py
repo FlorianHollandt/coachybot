@@ -80,8 +80,8 @@ def incoming():
                 sentence = remove_fluff(sentence)
                 print "Step 3." + str(sentence_counter) + ": " + sentence
 
-                sentence_tree = list(parser.raw_parse(sentence))[0][0]
-                sentence_type = str(sentence_tree.label())
+                #sentence_tree = list(parser.raw_parse(sentence))[0][0]
+                #sentence_type = str(sentence_tree.label())
 
                 if (
 
