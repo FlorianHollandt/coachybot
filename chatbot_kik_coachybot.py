@@ -9,6 +9,10 @@ from nlp_functions import *
 from ngrams import corrections
 from nltk import sent_tokenize
 
+from datetime import datetime
+from collections import defaultdict
+from random import choice
+
 # ===========================================================================================
 
 username = os.environ['BOT_USERNAME'] 
@@ -35,18 +39,34 @@ def incoming():
 
     for message in messages:
         if isinstance(message, TextMessage):
-
             print message.from_user + ": " + message.body
 
             # Statement normalization
 
             statement = message.body
             statement = statement.lower()
-            statement = expand_contractions(statement)             
+            statement = expand_contractions(statement) 
 
             print "Step 1: " + statement 
 
             sentences = sent_tokenize(statement)
+
+            # Check if there is a history entry for user -> Create if not
+
+            if message.from_user not in history.keys():
+                history[message.from_user] = defaultdict(bool)
+                history[message.from_user].update({"dialogue_count" : 1,
+                                      "dialogue_start" : message.timestamp
+                                      })
+            else:
+                history[message.from_user]["dialogue_count"] += 1
+                history[message.from_user]["message_last"] = message.timestamp
+
+            # Searching for keywords and assembling an answer
+
+            answer = []
+            message_facts = []
+            answer_facts = []
 
             for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
 
@@ -55,16 +75,202 @@ def incoming():
                 sentence = remove_fluff(sentence)
                 print "Step 3." + str(sentence_counter) + ": " + sentence
 
-                kik.send_messages([
-                    TextMessage(
-                        to=message.from_user,
-                        chat_id=message.chat_id,
-                        body=sentence
-                    )
-                ])
+                sentence_tree = list(parser.raw_parse(sentence))[0][0]
+                sentence_type = str(sentence_tree.label())
+
+                if (
+
+                #####################################################################
+                ###     Greeting
+                #####################################################################
+
+                    is_greeting(sentence) 
+                    and "has_greeting" not in answer_facts
+                    ):    
+
+                    print "Has greeting, and answer does not include other greeting yet."
+
+                    message_facts.append("has_greeting")   
+
+                    if(
+                        not history[message.from_user]["greeting_last"]
+                        or message.timestamp - history[message.from_user]["greeting_last"] > (3*60*60*1000)
+                        ):
+
+
+                        current_time = int(str(datetime.now().time())[:2])
+
+                        print "Current time for greeting: " + str(current_time)
+
+                        if current_time >= 0 and current_time < 11:
+                            greeting = "Good morning"
+                        elif current_time >= 18 and current_time < 24:   
+                            greeting = "Good evening"
+                        elif current_time >= 14 and current_time < 18:   
+                            greeting = "Good afternoon"
+                        else:
+                            greeting = "Hello"  
+
+                        answer.append(choice([
+                            greeting + " " + message.from_user + "!",
+                            greeting + "!\nGood to see you, " + message.from_user + ". :)" 
+                            ]))
+                        answer_facts.append("has_greeting")  
+                        history[message.from_user]["greeting_last"] = message.timestamp
+
+                    elif (
+                        message.timestamp - history[message.from_user]["greeting_last"] < (10*60*1000)
+                        and message.timestamp - history[message.from_user]["greeting_last"] >= (2*60*1000)
+                        ):
+                        answer.append(choice([
+                            "Hello again... We've done this recently.",
+                            "This is getting ridiculous. Are you obsessed with greetings? :D",
+                            "Is this some kind of 'Hello' game that you want to play? ;)"
+                            ]))                        
+                        answer_facts.append("has_greeting")  
+                        history[message.from_user]["greeting_last"] = message.timestamp                       
+
+                    elif message.timestamp - history[message.from_user]["greeting_last"] < (2*60*1000):
+                        history[message.from_user]["greeting_last"] = message.timestamp     
+
+                    else:
+                        answer.append(choice([
+                            "Hello again, " + message.from_user + "!",
+                            "Well... Hello again! :D"
+                            ]))
+                        answer_facts.append("has_greeting")  
+                        history[message.from_user]["greeting_last"] = message.timestamp
+
+                #####################################################################
+                ###     "How are you" from user
+                #####################################################################
+
+                if (
+                    is_how_are_you(sentence)
+                    ): 
+
+                    print "Contains question like 'How are you?'."
+
+                    if(
+                        not history[message.from_user]["how_are_you_last"]
+                        or message.timestamp - history[message.from_user]["how_are_you_last"] > (3*60*60*1000)
+                        ):
+
+                        answer.append(choice([
+                            "I'm doing fine, thanks! :)",
+                            "I'm doing well, thank you!",
+                            "Quite fine actually, thanks for asking!",
+                            "Yeah, I'm pretty good."
+                            ]))    
+
+                        message_facts.append("has_question_how_are_you")       
+                        answer_facts.append("has_answer_how_are_you")  
+                        history[message.from_user]["how_are_you_last"] = message.timestamp
+
+                    elif message.timestamp - history[message.from_user]["how_are_you_last"] < (5*60*1000):
+                        message_facts.append("has_question_how_are_you")       
+                        answer_facts.append("suppress_answer_how_are_you")     # To prevent repetition
+                        answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
+                        history[message.from_user]["how_are_you_last"] = message.timestamp   
+                        continue  
+
+                    else:
+                        answer.append(choice([
+                            "Jup... Still doing fine.",
+                            "Pretty much the same as some minutes ago. :D"
+                            ]))
+                        message_facts.append("has_question_how_are_you")       
+                        answer_facts.append("has_answer_how_are_you")  
+                        answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
+                        history[message.from_user]["how_are_you_last"] = message.timestamp   
+                        continue                     
+
+                #####################################################################
+                ###     "How are you" to user
+                #####################################################################
+
+                if (
+                    "has_question_how_are_you" in message_facts 
+                    and "has_question_how_are_you" not in answer_facts
+                    and "suppress_question_how_are_you" not in answer_facts
+                    ): 
+
+                    print "Contains question like 'How are you?', and no such question in return yet."
+
+                    answer.append(choice([
+                        "How has your day been so far?",
+                        "How are you today?",
+                        "What's on your mind?"
+                    ])) 
+                    answer_facts.append("has_question_how_are_you")   
+                    history[message.from_user].update({
+                        "question_open_topic" : "how_are_you",
+                        "question_open_start" : message.timestamp
+                        })      
+                    continue            
+
+                #####################################################################
+                ###     Yes-No-Question from user
+                #####################################################################
+
+                if (
+                    "has_question_how_are_you" not in message_facts 
+                    #and sentence_type == "SQ"
+                    and False
+                    ):
+
+                    print "Y/N-question!"
+
+                    answer.append(choice([
+                        "Well... It depends, right?",
+                        "What does your heart tell you?",
+                        "It's all about definitions, right?\nCan you be more specific?"
+                    ]))   
+                    message_facts.append("has_yn_question")                        
+                    answer_facts.append("has_answer_to_yn_question")   
+
+
+                #####################################################################
+                ###     Open Question from user
+                #####################################################################
+
+                if (
+                    "has_question_how_are_you" not in message_facts 
+                    #and sentence_type == "SBARQ"
+                    and False
+                    ):
+
+                    print "Open question!"
+
+                    answer.append(choice([
+                        "Haha, sorry... Currently, I don't do open questions. ;)",
+                        "Enough questions for now. Let's get out and play!"
+                    ]))   
+                    message_facts.append("has_open_question")                        
+                    answer_facts.append("has_answer_to_open_question")  
+
+            if not answer:
+
+                answer.append("Hmmm....")
+
+            print history[message.from_user]
+            print "Message: " + ", ".join(message_facts)
+            print "Answer: " + ", ".join(answer_facts)
+            print " | ".join(answer)
+
+            kik.send_messages([
+                TextMessage(
+                    to = message.from_user,
+                    chat_id = message.chat_id,
+                    body = line
+                ) for line in answer
+            ])                 
+
+    history[message.from_user]["message_last"] = message.timestamp
 
     return Response(status=200)
 
+# ===========================================================================================
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
