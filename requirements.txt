@@ -9,6 +9,7 @@ Jinja2==2.9.6
 kik==1.5.0
 MarkupSafe==1.0
 nltk==3.2.4
+psycopg2==2.7.1
 pytz==2017.2
 requests==2.18.1
 six==1.10.0

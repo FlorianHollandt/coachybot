@@ -1,5 +1,6 @@
 import re
 
+
 greetings = [
     re.compile('^good morning'),
     re.compile('^good afternoon'),
@@ -41,31 +42,45 @@ def stemmer(word,pos):
     else:
         return word
 
-def remove_fluff(text):
+fluffs = [
+    re.compile(r"^[\s\.\,\;\-\!\?]"), 
+    re.compile(r"\s$"), 
+    re.compile(r"^well\W"), 
+    re.compile(r"^so\W"), 
+    re.compile(r"^alright\W"), 
+    re.compile(r"^anyways?\W"), 
+    re.compile(r"^lol\w?\W"), 
+    re.compile(r"^wow\W"), 
+    re.compile(r"^cool\W"),         
+    re.compile(r"^sorry\W"),         
+    re.compile(r"^great\W"),         
+    re.compile(r"finally"), 
+    re.compile(r"honestly"),
+    re.compile(r"actually"),
+    re.compile(r"quite"),    
+    re.compile(r"really"),    
+    re.compile(r"literally"),    
+    re.compile(r"in fact"),
+    re.compile(r"just")
+]
+
+def contains_fluff(text, fluffs=fluffs):
     "Remove words that don't contribute to the meaning of a statement." 
-    fluff = [
-        r'^[\.\,\s\:\-\)\(]+',
-        r'^well\W', 
-        r'^so\W', 
-        r'^alright\W', 
-        r'^anyways?\W', 
-        r'^lol\w?\W', 
-        r'^wow\W', 
-        r'^cool\W',         
-        r'^sorry',         
-        r'^great',         
-        r'finally', 
-        r'honestly',
-        r'actually'
-    ]
+
     # Create a regular expression  from the fluff list
-    fluff_regex = '|'.join(fluff)
+    if any(fluff.search(text) for fluff in fluffs):
+        return True
+    else:
+        return False  
 
-    while re.match(fluff_regex,text):
-        text = re.sub(fluff_regex, '', text)
+def remove_fluff(text, fluffs=fluffs):
+    "Remove words that don't contribute to the meaning of a statement." 
+
+    while any(fluff.search(text) for fluff in fluffs):
+        for fluff in fluffs:
+            text = fluff.sub('', text)
         
-    return text    
-
+    return text   
 
 def expand_contractions(text):
     "Replace contractions of pronoun and auxiliary verb with their expanded versions." 
@@ -83,6 +98,7 @@ def expand_contractions(text):
         (r"    " , " "),
         (r"   " , " "),
         (r"  " , " "),
+        (r"^ " , ""),
         (r"ain't", "is not"),
         (r"aren't", "are not"),
         (r"can't", "can not"),
@@ -98,6 +114,7 @@ def expand_contractions(text):
         (r"doesnt", "does not"),
         (r"don't", "do not"),
         (r"dont", "do not"),
+        (r"gonna", "going to"),
         (r"hadn't", "had not"),
         (r"hadn't've", "had not have"),
         (r"hasn't", "has not"),
@@ -125,6 +142,7 @@ def expand_contractions(text):
         (r"i'll've", "i will have"),
         (r"i'm", "i am"),
         (r"im", "i am"),
+        (r"ima", "i am going to"),        
         (r"i've", "I have"),     
         (r"ive", "I have"),     
         (r"isn't", "is not"),
@@ -181,6 +199,7 @@ def expand_contractions(text):
         (r"they've", "they have"),
         (r"theyve", "they have"),
         (r"to've", "to have"),
+        (r"wanna", "want to"),
         (r"wasn't", "was not"),
         (r"wasnt", "was not"),
         (r"we'd", "we would"),
@@ -217,6 +236,7 @@ def expand_contractions(text):
         (r"would've", "would have"),
         (r"wouldn't", "would not"),
         (r"wouldn't've", "would not have"),
+        (r"ya", "you"),
         (r"y'all", "you all"),
         (r"y'all'd", "you all would"),
         (r"y'all'd've", "you all would have"),
@@ -238,3 +258,5 @@ def expand_contractions(text):
         text = re.sub(r"(^|\W)"+before+r"($|\W)", r"\1"+after+r"\2", text)
 
     return text
+
+

@@ -13,6 +13,9 @@ from datetime import datetime
 from collections import defaultdict
 from random import choice
 
+import psycopg2
+import urlparse
+
 # ===========================================================================================
 
 username = os.environ['BOT_USERNAME'] 
@@ -23,6 +26,17 @@ kik = KikApi(username, api_key)
 
 config = Configuration(webhook=os.environ['WEBHOOK'])
 kik.set_configuration(config)
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
 
 # ===========================================================================================
 

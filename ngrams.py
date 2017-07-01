@@ -212,12 +212,15 @@ punct = re.compile(r"^[\.\,\!\?\(\)\:\;]+$")
 
 def correct(w): 
     "Return the word that is the most likely spell correction of w." 
-    if punct.match(w):
+    if punct.match(w) or len(w)==1:
         return w
     else:
         candidates = edits(w).items() 
-        c, edit = max(candidates, key=lambda (c,e): Pedit(e) * Pw(c) * Pw(c)) 
-        return c 
+        if not candidates:
+            return w
+        else:
+            c, edit = max(candidates, key=lambda (c,e): Pedit(e) * Pw(c) * Pw(c)) 
+            return c 
 
 def Pedit(edit): 
     "The probability of an edit; can be '' or 'a|b' or 'a|b+c|d'." 
