@@ -62,8 +62,24 @@ def incoming():
 
 #--------------------------------------------------------
 
-            db.execute("SELECT name FROM users WHERE kik_id = %s;", (message.from_user,))
+            kik.send_messages([
+                TextMessage(
+                    to = message.from_user,
+                    chat_id = message.chat_id,
+                    body = "Looking you up,  " + message.from_user, + "!\n" + str(type(db))
+                )
+            ]) 
+
+            db.execute("SELECT name FROM users WHERE kik_id = %s;", message.from_user)
             user_name = db.fetchone()
+
+            kik.send_messages([
+                TextMessage(
+                    to = message.from_user,
+                    chat_id = message.chat_id,
+                    body = "Processing... \n" + str(user_name)
+                )
+            ]) 
 
             kik.send_messages([
                 TextMessage(
