@@ -70,7 +70,7 @@ def incoming():
                 )
             ]) 
 
-            db.execute("SELECT * FROM users WHERE kik_id = %s;", (message.from_user,))
+            db.execute("SELECT name, kik_username FROM users WHERE kik_id = %s;", (message.from_user,))
             user_name = db.fetchone()
 
             kik.send_messages([
