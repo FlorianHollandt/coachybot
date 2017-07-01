@@ -37,6 +37,7 @@ conn = psycopg2.connect(
     host=url.hostname,
     port=url.port
 )
+db = conn.cursor()
 
 # ===========================================================================================
 
@@ -58,6 +59,21 @@ def incoming():
 
     for message in messages:
         if isinstance(message, TextMessage):
+
+#--------------------------------------------------------
+
+            db.execute("SELECT name FROM users WHERE kik_id = %s;", message.from_user)
+            user_name = db.fetchone
+
+            kik.send_messages([
+                TextMessage(
+                    to = message.from_user,
+                    chat_id = message.chat_id,
+                    body = "I found you in my database, dear " + user_name[0] + "!"
+                ) for line in answer
+            ]) 
+#--------------------------------------------------------            
+
             print message.from_user + ": " + message.body
 
             # Statement normalization
