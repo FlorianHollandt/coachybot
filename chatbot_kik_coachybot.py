@@ -66,20 +66,14 @@ def incoming():
                 TextMessage(
                     to = message.from_user,
                     chat_id = message.chat_id,
-                    body = "Looking you up,  " + message.from_user + "!\n" + str(type(db))
+                    body = "Looking you up,  " + message.from_user + "!\n"
                 )
             ]) 
 
             db.execute("SELECT name FROM users WHERE kik_id = %s;", (message.from_user,))
             user_name = db.fetchone()
 
-            kik.send_messages([
-                TextMessage(
-                    to = message.from_user,
-                    chat_id = message.chat_id,
-                    body = "Processing... \n" + str(user_name)
-                )
-            ]) 
+            print user_name
 
             kik.send_messages([
                 TextMessage(
@@ -88,6 +82,11 @@ def incoming():
                     body = "I found you in my database, dear " + user_name[0] + "!"
                 )
             ]) 
+
+            db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+            db.commit()
+
+
 #--------------------------------------------------------            
 
             print message.from_user + ": " + message.body
