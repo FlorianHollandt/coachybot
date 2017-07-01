@@ -66,7 +66,7 @@ def incoming():
                 TextMessage(
                     to = message.from_user,
                     chat_id = message.chat_id,
-                    body = "Looking you up,  " + message.from_user, + "!\n" + str(type(db))
+                    body = "Looking you up,  " + message.from_user + "!\n" + str(type(db))
                 )
             ]) 
 
