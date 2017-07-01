@@ -69,7 +69,7 @@ def incoming():
                 TextMessage(
                     to = message.from_user,
                     chat_id = message.chat_id,
-                    body = "I found you in my database, dear " + user_name[0] + "!"
+                    body = "I found you in my database, dear " + user_name + "!"
                 )
             ]) 
 #--------------------------------------------------------            
