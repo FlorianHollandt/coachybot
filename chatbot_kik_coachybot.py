@@ -84,8 +84,6 @@ def incoming():
             ]) 
 
             db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
-            db.commit()
-
 
 #--------------------------------------------------------            
 
@@ -348,6 +346,14 @@ def incoming():
             ])                 
 
     history[message.from_user]["message_last"] = message.timestamp
+
+#--------------------------------------------------------            
+
+    conn.commit()
+    db.close()
+    conn.close()
+
+#--------------------------------------------------------            
 
     return Response(status=200)
 
