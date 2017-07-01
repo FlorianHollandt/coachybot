@@ -70,7 +70,7 @@ def incoming():
                     to = message.from_user,
                     chat_id = message.chat_id,
                     body = "I found you in my database, dear " + user_name[0] + "!"
-                ) for line in answer
+                )
             ]) 
 #--------------------------------------------------------            
 
