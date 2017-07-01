@@ -63,13 +63,13 @@ def incoming():
 #--------------------------------------------------------
 
             db.execute("SELECT name FROM users WHERE kik_id = %s;", (message.from_user,))
-            user_name = db.fetchone
+            user_name = db.fetchone()
 
             kik.send_messages([
                 TextMessage(
                     to = message.from_user,
                     chat_id = message.chat_id,
-                    body = "I found you in my database, dear " + user_name + "!"
+                    body = "I found you in my database, dear " + user_name[0] + "!"
                 )
             ]) 
 #--------------------------------------------------------            
