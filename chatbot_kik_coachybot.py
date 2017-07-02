@@ -390,8 +390,8 @@ def incoming():
 
         user_values = (
             message.from_user,
-            user.first_name,
-            user.last_name,
+            kik_user.first_name,
+            kik_user.last_name,
             message.timestamp
         )      
 
