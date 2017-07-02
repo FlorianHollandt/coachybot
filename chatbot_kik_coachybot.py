@@ -87,28 +87,33 @@ def incoming():
             db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE kik_id = %s;", (message.from_user,))
             user_values = db.fetchone()
 
-            print "Found user data: " + str(user_values)
+            if user_values:
 
+                print "Found user data: " + str(user_values)
 
-            # Check if there is a history entry for user -> Create if not
+                user = 
 
-            if message.from_user not in history.keys():
-                history[message.from_user] = defaultdict(bool)
-                history[message.from_user].update({"dialogue_count" : 1,
-                                      "dialogue_start" : message.timestamp,
-                                      "message_last" : message.timestamp
-                                      })
+                # Check if there is a history entry for user -> Create if not
+
+                if message.from_user not in history.keys():
+                    history[message.from_user] = defaultdict(bool)
+                    history[message.from_user].update({"dialogue_count" : 1,
+                                          "dialogue_start" : message.timestamp,
+                                          "message_last" : message.timestamp
+                                          })
+                else:
+                    history[message.from_user]["dialogue_count"] += 1
+
             else:
-                history[message.from_user]["dialogue_count"] += 1
 
-            # Get User attributes from Kik
+               # Get User attributes from Kik
 
-            kik_user = kik.get_user(message.from_user)
+                kik_user = kik.get_user(message.from_user)
 
-            print "Got user class object for user " + message.from_user
-            print "User firstname: " + kik_user.first_name
-            print "User lastname: " + kik_user.last_name
-            print "User timezone: " + kik_user.timezone
+                print "Got user class object for user " + message.from_user
+                print "User firstname: " + str(kik_user.first_name)
+                print "User lastname: " + str(kik_user.last_name)
+                print "User timezone: " + str(kik_user.timezone)
 
             #####################################################################
             ###     Statement normalization
@@ -367,8 +372,24 @@ def incoming():
 
         history[message.from_user]["message_last"] = message.timestamp
 
-        db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+        user_attributes = [
+            "kik_id" ,
+            "kik_firstname", 
+            "kik_lastname", 
+            "message_last"
+        ]
 
+        user_values = (
+            message.from_user,
+            user.first_name,
+            user.last_name,
+            message.timestamp
+        )      
+
+        #db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+        #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
+
+        db.execute("INSERT INTO users (" + ', '.join(user_attributes) +") VALUES %s;", user_values)
 
     #####################################################################
     ###     Finishing activity on database and app
