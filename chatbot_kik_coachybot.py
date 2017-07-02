@@ -398,7 +398,7 @@ def incoming():
         #db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
         #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
 
-        db.execute("INSERT INTO users (" + ', '.join(user_attributes) +") VALUES %s;", ", ".join(list(user_values)))
+        db.execute("INSERT INTO users (" + ', '.join(user_attributes) +") VALUES %s;", (", ".join(list(user_values)),))
 
     #####################################################################
     ###     Finishing activity on database and app
