@@ -1,6 +1,6 @@
 from flask import Flask, request, Response
 
-from kik import KikApi, Configuration
+from kik import KikApi, Configuration, KikUser
 from kik.messages import messages_from_json, TextMessage
 
 import os 
@@ -67,12 +67,20 @@ def incoming():
 
             user_attributes = [
                 "kik_id" ,
-                "kik_username", 
+                "kik_firstname", 
+                "kik_lastname", 
+                "kik_timezone",                 
                 "name", 
                 "gender", 
                 "dialogue_count", 
                 "dialogue_start", 
-                "message_last"
+                "message_last",
+                "greeting_last",
+                "how_are_you_last"
+                "topic_current",
+                "topic_start",
+                "question_open_start",
+                "question_open_topic"
             ]
 
             #db.execute("SELECT %s FROM users WHERE kik_id = %s;", (",".join(user_attributes), message.from_user))
@@ -93,6 +101,14 @@ def incoming():
             else:
                 history[message.from_user]["dialogue_count"] += 1
 
+            # Get User attributes from Kik
+
+            kik_user = kik.get_user(message.from_user)
+
+            print "Got user class object for user " + message.from_user
+            print "User firstname: " + kik_user.firstname
+            print "User lastname: " + kik_user.lastname
+            print "User timezone: " + kik_user.timezone
 
             #####################################################################
             ###     Statement normalization
