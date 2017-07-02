@@ -392,7 +392,7 @@ def incoming():
             message.from_user,
             kik_user.first_name,
             kik_user.last_name,
-            message.timestamp
+            str(message.timestamp)
         )      
 
         #db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
