@@ -106,8 +106,8 @@ def incoming():
             kik_user = kik.get_user(message.from_user)
 
             print "Got user class object for user " + message.from_user
-            print "User firstname: " + kik_user.firstname
-            print "User lastname: " + kik_user.lastname
+            print "User firstname: " + kik_user.first_name
+            print "User lastname: " + kik_user.last_name
             print "User timezone: " + kik_user.timezone
 
             #####################################################################
