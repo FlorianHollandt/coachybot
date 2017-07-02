@@ -30,14 +30,6 @@ kik.set_configuration(config)
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
-
 # ===========================================================================================
 
 global history
@@ -51,6 +43,14 @@ def incoming():
     if not kik.verify_signature(request.headers.get('X-Kik-Signature'), request.get_data()):
 
         return Response(status=403)
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
 
     db = conn.cursor()   
 
@@ -360,7 +360,7 @@ def incoming():
 
     conn.commit()
     db.close()
-    #conn.close()
+    conn.close()
 
     return Response(status=200)
 
