@@ -76,7 +76,7 @@ def incoming():
                 "dialogue_start", 
                 "message_last",
                 "greeting_last",
-                "how_are_you_last"
+                "how_are_you_last",
                 "topic_current",
                 "topic_start",
                 "question_open_start",
