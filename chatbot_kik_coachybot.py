@@ -91,7 +91,7 @@ def incoming():
 
                 print "Found user data: " + str(user_values)
 
-                user = 
+                user = dict(zip(user_attributes, user_values))
 
                 # Check if there is a history entry for user -> Create if not
 
@@ -105,6 +105,15 @@ def incoming():
                     history[message.from_user]["dialogue_count"] += 1
 
             else:
+
+                if message.from_user not in history.keys():
+                    history[message.from_user] = defaultdict(bool)
+                    history[message.from_user].update({"dialogue_count" : 1,
+                                          "dialogue_start" : message.timestamp,
+                                          "message_last" : message.timestamp
+                                          })
+                else:
+                    history[message.from_user]["dialogue_count"] += 1
 
                # Get User attributes from Kik
 
