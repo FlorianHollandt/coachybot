@@ -63,6 +63,8 @@ def incoming():
             ###     Retrieving and checking user history
             #####################################################################
 
+            kik_user = kik.get_user(message.from_user)
+
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
             user_attributes = [
@@ -117,7 +119,6 @@ def incoming():
 
                # Get User attributes from Kik
 
-                kik_user = kik.get_user(message.from_user)
 
                 print "Got user class object for user " + message.from_user
                 print "User firstname: " + str(kik_user.first_name)
@@ -398,7 +399,10 @@ def incoming():
         #db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
         #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
 
-        db.execute("INSERT INTO users (" + ', '.join(user_attributes) + ") VALUES (%s, %s, %s, %s );", [item for item in user_values])
+        db.execute(
+            "INSERT INTO users (" + ', '.join(user_attributes) + ") VALUES (%s, %s, %s, %s );", 
+            [item for item in user_values]
+            )
         #db.execute("INSERT INTO users (kik_id, dialogue_count, dialogue_start) VALUES ('chombatant', 1, 1498501222392);")
 
     #####################################################################
