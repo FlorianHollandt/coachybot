@@ -78,7 +78,7 @@ def incoming():
             user_attributes = "kik_name"
 
             #db.execute("SELECT %s FROM users WHERE kik_id = %s;", (",".join(user_attributes), message.from_user))
-            db.execute("SELECT kik_name FROM users WHERE kik_id = %s;", (message.from_user,))
+            db.execute("SELECT name FROM users WHERE kik_id = %s;", (message.from_user,))
             user_values = db.fetchone()
 
             print "Found user data: " + str(user_values)
