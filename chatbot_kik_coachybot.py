@@ -37,7 +37,6 @@ conn = psycopg2.connect(
     host=url.hostname,
     port=url.port
 )
-db = conn.cursor()
 
 # ===========================================================================================
 
@@ -53,9 +52,9 @@ def incoming():
 
         return Response(status=403)
 
-    messages = messages_from_json(request.json['messages'])
+    db = conn.cursor()   
 
-    print messages
+    messages = messages_from_json(request.json['messages'])
 
     for message in messages:
         if isinstance(message, TextMessage):
@@ -63,7 +62,6 @@ def incoming():
             #####################################################################
             ###     Retrieving and checking user history
             #####################################################################
-
 
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
@@ -361,7 +359,7 @@ def incoming():
 
     conn.commit()
     db.close()
-    conn.close()
+    #conn.close()
 
     return Response(status=200)
 
@@ -369,6 +367,6 @@ def incoming():
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
-    print('HI') 
+    print('Starting the app...') 
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
