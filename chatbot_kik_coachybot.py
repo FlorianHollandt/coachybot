@@ -60,44 +60,28 @@ def incoming():
     for message in messages:
         if isinstance(message, TextMessage):
 
-#--------------------------------------------------------
+            #####################################################################
+            ###     Retrieving and checking user history
+            #####################################################################
 
-            kik.send_messages([
-                TextMessage(
-                    to = message.from_user,
-                    chat_id = message.chat_id,
-                    body = "Looking you up,  " + message.from_user + "!\n"
-                )
-            ]) 
 
-            db.execute("SELECT name FROM users WHERE kik_id = %s;", (message.from_user,))
-            user_name = db.fetchone()
+            print "Looking up Kik user '" + message.from_user + "' in database..."
 
-            print user_name
+            user_attributes = [
+                "kik_id" ,
+                "kik_name", 
+                "name", 
+                "gender", 
+                "dialogue_count", 
+                "dialogue_start", 
+                "message_last"
+            ]
 
-            kik.send_messages([
-                TextMessage(
-                    to = message.from_user,
-                    chat_id = message.chat_id,
-                    body = "I found you in my database, dear " + user_name[0] + "!"
-                )
-            ]) 
+            db.execute("SELECT %s FROM users WHERE kik_id = %s;", (",".join(user_attributes, message.from_user))
+            user_values = db.fetchone()
 
-            db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+            print "Found user data: " + str(user_values)
 
-#--------------------------------------------------------            
-
-            print message.from_user + ": " + message.body
-
-            # Statement normalization
-
-            statement = message.body
-            statement = statement.lower()
-            statement = expand_contractions(statement) 
-
-            print "Step 1: " + statement 
-
-            sentences = sent_tokenize(statement)
 
             # Check if there is a history entry for user -> Create if not
 
@@ -110,7 +94,20 @@ def incoming():
             else:
                 history[message.from_user]["dialogue_count"] += 1
 
-            # Searching for keywords and assembling an answer
+
+            #####################################################################
+            ###     Statement normalization
+            #####################################################################            
+
+            print message.from_user + ": " + message.body
+
+            statement = message.body
+            statement = statement.lower()
+            statement = expand_contractions(statement) 
+
+            print "Step 1: " + statement 
+
+            sentences = sent_tokenize(statement)
 
             answer = []
             message_facts = []
@@ -126,12 +123,12 @@ def incoming():
                 #sentence_tree = list(parser.raw_parse(sentence))[0][0]
                 #sentence_type = str(sentence_tree.label())
 
-                if (
 
                 #####################################################################
                 ###     Greeting
                 #####################################################################
 
+                if (
                     is_greeting(sentence) 
                     and "has_greeting" not in answer_facts
                     ):    
@@ -220,6 +217,7 @@ def incoming():
                     answer_facts.append("has_greeting")  
                     history[message.from_user]["greeting_last"] = message.timestamp
 
+
                 #####################################################################
                 ###     "How are you" from user
                 #####################################################################
@@ -264,6 +262,7 @@ def incoming():
                         history[message.from_user]["how_are_you_last"] = message.timestamp   
                         continue                     
 
+
                 #####################################################################
                 ###     "How are you" to user
                 #####################################################################
@@ -287,6 +286,7 @@ def incoming():
                         "question_open_start" : message.timestamp
                         })      
                     continue            
+
 
                 #####################################################################
                 ###     Yes-No-Question from user
@@ -332,6 +332,11 @@ def incoming():
 
                 answer.append("Hmmm....")
 
+
+            #####################################################################
+            ###     Sending the message and updating database
+            #####################################################################
+
             print history[message.from_user]
             print "Message: " + ", ".join(message_facts)
             print "Answer: " + ", ".join(answer_facts)
@@ -345,15 +350,18 @@ def incoming():
                 ) for line in answer
             ])                 
 
-    history[message.from_user]["message_last"] = message.timestamp
+        history[message.from_user]["message_last"] = message.timestamp
 
-#--------------------------------------------------------            
+        db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+
+
+    #####################################################################
+    ###     Finishing activity on database and app
+    #####################################################################
 
     conn.commit()
     db.close()
     conn.close()
-
-#--------------------------------------------------------            
 
     return Response(status=200)
 
