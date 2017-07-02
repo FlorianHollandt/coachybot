@@ -59,6 +59,8 @@ def incoming():
     for message in messages:
         if isinstance(message, TextMessage):
 
+            message_facts = []
+
             #####################################################################
             ###     Retrieving and checking user history
             #####################################################################
@@ -85,13 +87,13 @@ def incoming():
                 "question_open_topic"
             ]
 
-            #db.execute("SELECT %s FROM users WHERE kik_id = %s;", (",".join(user_attributes), message.from_user))
             db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE kik_id = %s;", (message.from_user,))
             user_values = db.fetchone()
 
             if user_values:
 
                 print "Found user data: " + str(user_values)
+                message_facts.append("known_user") 
 
                 user = dict(zip(user_attributes, user_values))
 
@@ -107,6 +109,8 @@ def incoming():
                     history[message.from_user]["dialogue_count"] += 1
 
             else:
+
+                message_facts.append("known_user") 
 
                 if message.from_user not in history.keys():
                     history[message.from_user] = defaultdict(bool)
@@ -140,7 +144,6 @@ def incoming():
             sentences = sent_tokenize(statement)
 
             answer = []
-            message_facts = []
             answer_facts = []
 
             for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
@@ -394,15 +397,25 @@ def incoming():
             kik_user.first_name,
             kik_user.last_name,
             str(message.timestamp)
-        )      
+        )     
 
-        #db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
+        if (
+            "unknown_user" in answer_facts
+            ):  
+
+            db.execute(
+                "INSERT INTO users (" + ', '.join(user_attributes) + ") VALUES (%s, %s, %s, %s );", 
+                [item for item in user_values]
+                )
+
+        else:
+
+            # for loop with key-value pairs from dictionary and constant kik_id
+
+            db.execute("UPDATE users SET message_last = %s WHERE kik_id = %s;", (message.timestamp, message.from_user))
         #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
 
-        db.execute(
-            "INSERT INTO users (" + ', '.join(user_attributes) + ") VALUES (%s, %s, %s, %s );", 
-            [item for item in user_values]
-            )
+
         #db.execute("INSERT INTO users (kik_id, dialogue_count, dialogue_start) VALUES ('chombatant', 1, 1498501222392);")
 
     #####################################################################
