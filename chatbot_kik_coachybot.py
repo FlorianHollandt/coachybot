@@ -88,13 +88,15 @@ def incoming():
             db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE kik_id = %s;", (message.from_user,))
             user_values = db.fetchone()
 
+            user = defaultdict(bool)
+
             if user_values:
 
                 print "Found user data: " + str(user_values)
                 message_facts.append("known_user") 
 
                 # ! I might need to initiate user as a defaultdict here...
-                user = dict(zip(user_attributes, user_values))
+                user.update(dict(zip(user_attributes, user_values)))
                 user["message_count"] =+ 1
 
                 # Check if there is a history entry for user -> Create if not
