@@ -406,7 +406,7 @@ def incoming():
         ###     Updating database
         #####################################################################
 
-        history[message.from_user]["message_last"] = message.timestamp
+        user["message_last"] = message.timestamp
 
         user_attributes = user.keys()
         user_values = user.values()
@@ -414,16 +414,11 @@ def incoming():
         if (
             "unknown_user" in answer_facts
             ):  
+            db.execute( "INSERT INTO users (kik_id) VALUES (%s );", (message.from_user,))
 
-            db.execute(
-                "INSERT INTO users (" + ', '.join(user_attributes) + ") VALUES (%s, %s, %s, %s );", 
-                [item for item in user_values]
-                )
-
-        else:
-            for key in user.keys():
-                    if user[key]:
-                        db.execute("UPDATE users SET " + key + " = %s WHERE kik_id = %s;", (user[key], message.from_user))
+        for key in user.keys():
+            if user[key]:
+                db.execute("UPDATE users SET " + key + " = %s WHERE kik_id = %s;", (user[key], message.from_user))
 
         #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
 
