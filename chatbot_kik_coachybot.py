@@ -414,7 +414,7 @@ def incoming():
         user_values = user.values()
 
         if (
-            "unknown_user" in answer_facts
+            "unknown_user" in message_facts
             ):  
             db.execute( "INSERT INTO users (kik_id) VALUES (%s );", (message.from_user,))
 
