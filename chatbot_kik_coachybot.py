@@ -65,8 +65,6 @@ def incoming():
             ###     Retrieving and checking user history
             #####################################################################
 
-            kik_user = kik.get_user(message.from_user)
-
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
             user_attributes = [
@@ -95,10 +93,13 @@ def incoming():
                 print "Found user data: " + str(user_values)
                 message_facts.append("known_user") 
 
+                # ! I might need to initiate user as a defaultdict here...
                 user = dict(zip(user_attributes, user_values))
+                user["message_count"] =+ 1
 
                 # Check if there is a history entry for user -> Create if not
 
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 if message.from_user not in history.keys():
                     history[message.from_user] = defaultdict(bool)
                     history[message.from_user].update({"dialogue_count" : 1,
@@ -107,11 +108,32 @@ def incoming():
                                           })
                 else:
                     history[message.from_user]["dialogue_count"] += 1
+                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             else:
 
-                message_facts.append("known_user") 
+                message_facts.append("unknown_user") 
+                print "No user data in database. Looking up " + message.from_user + "in Kik..."
 
+                kik_user = kik.get_user(message.from_user)
+                print "User firstname: " + str(kik_user.first_name)
+                print "User lastname: " + str(kik_user.last_name)
+                print "User timezone: " + str(kik_user.timezone)                
+
+                user.update({
+                    "kik_id" : message.from_user,
+                    "kik_firstname" : str(kik_user.first_name),
+                    "kik_lastname" : str(kik_user.last_name),
+                    "kik_timezone" : str(kik_user.timezone),
+                    "message_count" : 1,
+                    "message_first" : message.timestamp,
+                    "message_last" : message.timestamp,
+                    "dialogue_start" : message.timestamp,
+                    "dialogue_count" : 1
+                    })
+
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 if message.from_user not in history.keys():
                     history[message.from_user] = defaultdict(bool)
                     history[message.from_user].update({"dialogue_count" : 1,
@@ -120,14 +142,8 @@ def incoming():
                                           })
                 else:
                     history[message.from_user]["dialogue_count"] += 1
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-               # Get User attributes from Kik
-
-
-                print "Got user class object for user " + message.from_user
-                print "User firstname: " + str(kik_user.first_name)
-                print "User lastname: " + str(kik_user.last_name)
-                print "User timezone: " + str(kik_user.timezone)
 
             #####################################################################
             ###     Statement normalization
@@ -367,7 +383,7 @@ def incoming():
 
 
             #####################################################################
-            ###     Sending the message and updating database
+            ###     Sending the message
             #####################################################################
 
             print history[message.from_user]
@@ -383,21 +399,15 @@ def incoming():
                 ) for line in answer
             ])                 
 
+
+        #####################################################################
+        ###     Updating database
+        #####################################################################
+
         history[message.from_user]["message_last"] = message.timestamp
 
-        user_attributes = [
-            "kik_id" ,
-            "kik_firstname", 
-            "kik_lastname", 
-            "message_last"
-        ]
-
-        user_values = (
-            message.from_user,
-            kik_user.first_name,
-            kik_user.last_name,
-            str(message.timestamp)
-        )     
+        user_attributes = user.keys()
+        user_values = user.values()
 
         if (
             "unknown_user" in answer_facts
