@@ -420,7 +420,8 @@ def incoming():
 
         else:
             for key in user.keys():
-                db.execute("UPDATE users SET %s = %s WHERE kik_id = %s;", (key, user[key], message.from_user))
+                    if user[key]:
+                        db.execute("UPDATE users SET %s = %s WHERE kik_id = %s;", (key, user[key], message.from_user))
 
         #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
 
