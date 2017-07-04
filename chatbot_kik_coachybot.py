@@ -115,7 +115,7 @@ def incoming():
             else:
 
                 message_facts.append("unknown_user") 
-                print "No user data in database. Looking up " + message.from_user + "in Kik..."
+                print "No user data in database. Looking up " + message.from_user + " in Kik..."
 
                 kik_user = kik.get_user(message.from_user)
                 print "User firstname: " + str(kik_user.first_name)
@@ -407,6 +407,8 @@ def incoming():
         #####################################################################
 
         user["message_last"] = message.timestamp
+
+        print user
 
         user_attributes = user.keys()
         user_values = user.values()
