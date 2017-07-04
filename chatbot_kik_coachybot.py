@@ -99,19 +99,6 @@ def incoming():
                 user.update(dict(zip(user_attributes, user_values)))
                 user["message_count"] =+ 1
 
-                # Check if there is a history entry for user -> Create if not
-
-                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                if message.from_user not in history.keys():
-                    history[message.from_user] = defaultdict(bool)
-                    history[message.from_user].update({"dialogue_count" : 1,
-                                          "dialogue_start" : message.timestamp,
-                                          "message_last" : message.timestamp
-                                          })
-                else:
-                    history[message.from_user]["dialogue_count"] += 1
-                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
             else:
 
                 message_facts.append("unknown_user") 
@@ -133,18 +120,6 @@ def incoming():
                     "dialogue_start" : message.timestamp,
                     "dialogue_count" : 1
                     })
-
-
-                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                if message.from_user not in history.keys():
-                    history[message.from_user] = defaultdict(bool)
-                    history[message.from_user].update({"dialogue_count" : 1,
-                                          "dialogue_start" : message.timestamp,
-                                          "message_last" : message.timestamp
-                                          })
-                else:
-                    history[message.from_user]["dialogue_count"] += 1
-                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
             #####################################################################
@@ -174,6 +149,11 @@ def incoming():
                 #sentence_tree = list(parser.raw_parse(sentence))[0][0]
                 #sentence_type = str(sentence_tree.label())
 
+                if is_greeting(sentence):
+                    message_facts.append("has_greeting")  
+                    
+                if is_how_are_you(sentence):
+                    message_facts.append("has_question_how_are_you")
 
                 #####################################################################
                 ###     Greeting
@@ -190,7 +170,7 @@ def incoming():
 
                     if(
                         not user["greeting_last"]
-                        or message.timestamp - history[message.from_user]["greeting_last"] > (3*60*60*1000)
+                        or message.timestamp - user["greeting_last"] > (3*60*60*1000)
                         ):
 
 
@@ -216,7 +196,7 @@ def incoming():
 
                     elif (
                         message.timestamp - user["greeting_last"] < (10*60*1000)
-                        and message.timestamp - history[message.from_user]["greeting_last"] >= (2*60*1000)
+                        and message.timestamp - user["greeting_last"] >= (2*60*1000)
                         ):
                         answer.append(choice([
                             "Hello again... We've done this recently.",
@@ -280,8 +260,8 @@ def incoming():
                     print "Contains question like 'How are you?'."
 
                     if(
-                        not history[message.from_user]["how_are_you_last"]
-                        or message.timestamp - history[message.from_user]["how_are_you_last"] > (3*60*60*1000)
+                        not user["how_are_you_last"]
+                        or message.timestamp - user["how_are_you_last"] > (3*60*60*1000)
                         ):
 
                         answer.append(choice([
@@ -293,13 +273,13 @@ def incoming():
 
                         message_facts.append("has_question_how_are_you")       
                         answer_facts.append("has_answer_how_are_you")  
-                        history[message.from_user]["how_are_you_last"] = message.timestamp
+                        user["how_are_you_last"] = message.timestamp
 
-                    elif message.timestamp - history[message.from_user]["how_are_you_last"] < (5*60*1000):
+                    elif message.timestamp - user["how_are_you_last"] < (5*60*1000):
                         message_facts.append("has_question_how_are_you")       
                         answer_facts.append("suppress_answer_how_are_you")     # To prevent repetition
                         answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
-                        history[message.from_user]["how_are_you_last"] = message.timestamp   
+                        user["how_are_you_last"] = message.timestamp   
                         continue  
 
                     else:
@@ -310,7 +290,7 @@ def incoming():
                         message_facts.append("has_question_how_are_you")       
                         answer_facts.append("has_answer_how_are_you")  
                         answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
-                        history[message.from_user]["how_are_you_last"] = message.timestamp   
+                        user["how_are_you_last"] = message.timestamp   
                         continue                     
 
 
@@ -332,7 +312,7 @@ def incoming():
                         "What's on your mind?"
                     ])) 
                     answer_facts.append("has_question_how_are_you")   
-                    history[message.from_user].update({
+                    user.update({
                         "question_open_topic" : "how_are_you",
                         "question_open_start" : message.timestamp
                         })      
@@ -388,7 +368,8 @@ def incoming():
             ###     Sending the message
             #####################################################################
 
-            print history[message.from_user]
+            for key in user.keys():
+                print("{:12}: {}".format(key,str(user[key])))
             print "Message: " + ", ".join(message_facts)
             print "Answer: " + ", ".join(answer_facts)
             print " | ".join(answer)
@@ -422,10 +403,6 @@ def incoming():
             if user[key]:
                 db.execute("UPDATE users SET " + key + " = %s WHERE kik_id = %s;", (user[key], message.from_user))
 
-        #db.execute("UPDATE users SET " + ', '.join(user_attributes) + " WHERE kik_id = %s;", (message.from_user,))
-
-
-        #db.execute("INSERT INTO users (kik_id, dialogue_count, dialogue_start) VALUES ('chombatant', 1, 1498501222392);")
 
     #####################################################################
     ###     Finishing activity on database and app
