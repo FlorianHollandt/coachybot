@@ -187,7 +187,7 @@ def incoming():
                     message_facts.append("has_greeting")   
 
                     if(
-                        not history[message.from_user]["greeting_last"]
+                        not user["greeting_last"]
                         or message.timestamp - history[message.from_user]["greeting_last"] > (3*60*60*1000)
                         ):
 
@@ -210,10 +210,10 @@ def incoming():
                             greeting + "!\nGood to see you, " + message.from_user + ". :)" 
                             ]))
                         answer_facts.append("has_greeting")  
-                        history[message.from_user]["greeting_last"] = message.timestamp
+                        user["greeting_last"] = message.timestamp
 
                     elif (
-                        message.timestamp - history[message.from_user]["greeting_last"] < (10*60*1000)
+                        message.timestamp - user["greeting_last"] < (10*60*1000)
                         and message.timestamp - history[message.from_user]["greeting_last"] >= (2*60*1000)
                         ):
                         answer.append(choice([
@@ -222,10 +222,10 @@ def incoming():
                             "Is this some kind of 'Hello' game that you want to play? ;)"
                             ]))                        
                         answer_facts.append("has_greeting")  
-                        history[message.from_user]["greeting_last"] = message.timestamp                       
+                        user["greeting_last"] = message.timestamp                       
 
-                    elif message.timestamp - history[message.from_user]["greeting_last"] < (2*60*1000):
-                        history[message.from_user]["greeting_last"] = message.timestamp     
+                    elif message.timestamp - user["greeting_last"] < (2*60*1000):
+                        user["greeting_last"] = message.timestamp     
 
                     else:
                         answer.append(choice([
@@ -233,14 +233,14 @@ def incoming():
                             "Well... Hello again! :D"
                             ]))
                         answer_facts.append("has_greeting")  
-                        history[message.from_user]["greeting_last"] = message.timestamp
+                        user["greeting_last"] = message.timestamp
 
                 #--------------------------------------------------------------------
                 #--   Greet again after long inactivity
                 #-------------------------------------------------------------------
 
                 if(
-                    message.timestamp - history[message.from_user]["message_last"] > (8*60*60*1000)
+                    message.timestamp - user["message_last"] > (2*60*60*1000)
                     ):
 
 
@@ -264,7 +264,7 @@ def incoming():
                         "Hey " + message.from_user + "!\n" + greeting,
                         ]))
                     answer_facts.append("has_greeting")  
-                    history[message.from_user]["greeting_last"] = message.timestamp
+                    user["greeting_last"] = message.timestamp
 
 
                 #####################################################################
