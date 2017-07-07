@@ -114,7 +114,7 @@ def incoming():
                     "kik_id" : message.from_user,
                     "kik_firstname" : str(kik_user.first_name),
                     "kik_lastname" : str(kik_user.last_name),
-                    "kik_timezone" : kik_user.timezone,
+                    "kik_timezone" : str(kik_user.timezone),
                     "message_count" : 1,
                     "message_first" : message.timestamp,
                     "message_last" : message.timestamp,
@@ -122,7 +122,7 @@ def incoming():
                     "dialogue_count" : 1
                     })
 
-                if not user["kik_timezone"]:
+                if user["kik_timezone"]=="None":
                     user["kik_timezone"] = "Europe/Berlin"
 
 
