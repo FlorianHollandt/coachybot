@@ -122,8 +122,8 @@ def incoming():
                     "dialogue_count" : 1
                     })
 
-                if user["kik_timezone"]=="None":
-                    user["kik_timezone"] = "Europe/Berlin"
+            if user["kik_timezone"]=="None":
+                user["kik_timezone"] = "Europe/Berlin"
 
 
             #####################################################################
