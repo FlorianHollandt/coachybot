@@ -2,28 +2,26 @@ import re
 
 
 greetings = [
-    re.compile('^good morning'),
-    re.compile('^good afternoon'),
-    re.compile('^good evening'),
-    re.compile('^hello'),
-    re.compile('^hi\W*'),
-    re.compile('^howdy'),
-    re.compile('^hey there\s*[\.\!\:\(\)\-]'),
-    re.compile('^hey\W+there\s*[\.\!\:\(\)\-]'),
-    re.compile('^hey\s*[youm]*\s+\w+[\.\!\:\(\)\-]+')   
+    re.compile(r'^good morning'),
+    re.compile(r'^good afternoon'),
+    re.compile(r'^good evening'),
+    re.compile(r'^hello'),
+    re.compile(r'^hi\W*'),
+    re.compile(r'^howdy'),
+    re.compile(r'^hey\W+((there)|((\s|\w)*coachy)|((\s|\w)*bot))'),
+    re.compile(r'^hey\s*[youm]*\s+\w+[\.\!]+')   
 ]
 
 def is_greeting(sentence, greetings=greetings):
-    if any(greeting.match(sentence) for greeting in greetings):
+    if any(greeting.search(sentence) for greeting in greetings):
         return True
     else:
         return False
 
 how_are_yous = [
-    re.compile('^how are you[\s\,]?\w*'),
-    re.compile('^how is it going[\s\,]?\w*'),    
-    re.compile('^what is up[\s\,]?\w*')    
-
+    re.compile('(?:^|,|;|-\s*)how are you[\s\,]?\w*'),
+    re.compile('[^,;]how is it going[\s\,]?\w*'),    
+    re.compile('[^,;]what is up[\s\,]?\w*')    
 ]
 
 def is_how_are_you(sentence, how_are_yous=how_are_yous):
@@ -43,17 +41,19 @@ def stemmer(word,pos):
         return word
 
 fluffs = [
-    re.compile(r"^[\s\.\,\;\-\!\?]"), 
+    #re.compile(r"^[\s\.\,\;\-\!\?]"), 
+    re.compile(r"(?:^|\W)(?::|;|=|B|8)(?:-|\^)?(?:\)|\(|D|P|\||\[|\]|>|\$|3)+(?:$|\W)"), 
+    re.compile(r"^\W"), 
     re.compile(r"\s$"), 
     re.compile(r"^well\W"), 
     re.compile(r"^so\W"), 
     re.compile(r"^alright\W"), 
     re.compile(r"^anyways?\W"), 
     re.compile(r"^lol\w?\W"), 
-    re.compile(r"^wow\W"), 
-    re.compile(r"^cool\W"),         
-    re.compile(r"^sorry\W"),         
-    re.compile(r"^great\W"),         
+    re.compile(r"^wo+w\W"), 
+    re.compile(r"^cool[\.\,\!]+"),         
+    re.compile(r"^sorry[\.\,\!]+"),         
+    re.compile(r"^great[\.\,\!]+"),         
     re.compile(r"finally"), 
     re.compile(r"honestly"),
     re.compile(r"actually"),

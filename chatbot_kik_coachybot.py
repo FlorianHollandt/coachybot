@@ -10,6 +10,7 @@ from ngrams import corrections
 from nltk import sent_tokenize
 
 from datetime import datetime
+from pytz import timezone
 from collections import defaultdict
 from random import choice
 
@@ -121,6 +122,9 @@ def incoming():
                     "dialogue_count" : 1
                     })
 
+                if not user["kik_timezone"]:
+                    user["kik_timezone"] = "Europe/Berlin"
+
 
             #####################################################################
             ###     Statement normalization
@@ -138,6 +142,7 @@ def incoming():
 
             answer = []
             answer_facts = []
+
 
             for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
 
@@ -362,6 +367,60 @@ def incoming():
             if not answer:
 
                 answer.append("Hmmm....")
+
+
+###############################################################################################################################
+###############################################################################################################################
+###############################################################################################################################
+
+
+            #####################################################################
+            ###     Greeting
+            #####################################################################
+
+            time_since_last_message = message.timestamp - user["message_last"]
+            
+            if user["greeting_last"]:
+                time_since_last_greeting = message.timestamp - user["greeting_last"]
+            else:
+                time_since_last_greeting = 1000*60*60*24*365
+
+            current_time = datetime.now(tz=timezone(user["kik_timezone"])).time()
+            current_hour = int(str(current_time)[:2])
+
+            print "Current time in timezone " + user["kik_timezone"] + ": " + str(current_hour)
+
+            if current_hour >= 24 or current_hour < 11:
+                current_daytime = "morning"
+            elif current_hour >= 18 and current_hour < 24:   
+                current_daytime = "evening"
+            elif current_hour >= 14 and current_hour < 18:   
+                current_daytime = "afternoon"
+            else:
+                current_daytime = "day" 
+
+            if (
+                "has_greeting" in answer_facts
+                ):
+
+                print "Message contains greeting..."   
+
+                answer.append(choice([
+                    "Good " + current_daytime + "to you, " + user["kik_firstname"] + "!",
+                    "Hey" + user["kik_firstname"] + "!\n Are you having a good " + current_daytime + "?"
+                ])) 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             #####################################################################
