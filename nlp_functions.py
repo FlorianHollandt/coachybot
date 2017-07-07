@@ -1,6 +1,36 @@
 import re
 
 
+def current_daytime(current_hour):
+    if current_hour < 11:
+        return "morning"
+    elif current_hour >= 18:   
+        return "evening"
+    elif current_hour >= 14 and current_hour < 18:   
+        return "afternoon"
+    else:
+        return "day" 
+
+def previous_daytime(current_hour):
+    if current_hour < 10:
+        return "night"
+    elif current_hour >= 10 and current_hour < 18:   
+        return "day so far"
+    else:
+        return "day" 
+
+def next_daytime(current_hour):
+    if current_hour < 5:
+        return "night"
+    elif current_hour >= 5 or current_hour < 10:
+        return "start into the day"
+    elif current_hour >= 15 and current_hour < 20:   
+        return "evening"
+    elif current_hour >= 20:   
+        return "night"
+    else:
+        return "day"         
+
 greetings = [
     re.compile(r'^good morning'),
     re.compile(r'^good afternoon'),

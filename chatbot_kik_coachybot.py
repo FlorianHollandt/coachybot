@@ -390,27 +390,38 @@ def incoming():
 
             print "Current time in timezone " + user["kik_timezone"] + ": " + str(current_hour)
 
-            if current_hour >= 24 or current_hour < 11:
-                current_daytime = "morning"
-            elif current_hour >= 18 and current_hour < 24:   
-                current_daytime = "evening"
-            elif current_hour >= 14 and current_hour < 18:   
-                current_daytime = "afternoon"
-            else:
-                current_daytime = "day" 
-
             if (
-                "has_greeting" in answer_facts
+                "has_greeting" in message_facts
                 ):
+                    print "Message contains greeting..."   
 
-                print "Message contains greeting..."   
+                    if(
+                        not user["greeting_last"]
+                        or time_since_last_greeting > (3*60*60*1000)
+                        ):
+                        print "...and no greeting was registered recently. Going for full greeting!"   
 
-                answer.append(choice([
-                    "Good " + current_daytime + "to you, " + user["kik_firstname"] + "!",
-                    "Hey" + user["kik_firstname"] + "!\n Are you having a good " + current_daytime + "?"
-                ])) 
+                        if random.choice([True,False]):
+                            answer.append(choice([
+                                "Good " + current_daytime + " to you, " + user["kik_firstname"] + "! :)",
+                                "Hey" + user["kik_firstname"] + ", good to see you! :)",
+                                "Oh, hello " + user["kik_firstname"] + "! :)"
 
-
+                            ])) 
+                            answer_facts.append("contains_username","contains_greeting")
+                        else:
+                            answer.append(choice([
+                                "Hey, good " + current_daytime + "! So nice to see you! :)",
+                                "Oh, it's you! Hi! :)"
+                            ])) 
+                            answer_facts.append("contains_greeting")
+                    elif (
+                        time_since_last_greeting <= (3*60*60*1000) and time_since_last_greeting > (5*60*1000)
+                        ):
+                            answer.append(choice([
+                                "Hello again! :)"
+                            ])) 
+                            answer_facts.append("contains_greeting")
 
 
 
