@@ -291,7 +291,7 @@ def incoming():
                             answer.append(choice([
                                 "Good " + current_daytime + " to you, " + user["kik_firstname"] + "! :)",
                                 "Hey" + user["kik_firstname"] + ", good to see you! :)",
-                                "Oh, hello " + user["kik_firstname"] + "! :)"
+                                "Oh, hello " + user["kik_firstname"] + "! :)",
                                 current_greeting(current_hour) + " " + user["kik_firstname"] + "! :)"
                             ])) 
                             answer_facts.append("has_username","has_greeting")
