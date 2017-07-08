@@ -226,32 +226,32 @@ def incoming():
                 #--   Greet again after long inactivity
                 #-------------------------------------------------------------------
 
-                if(
-                    message.timestamp - user["message_last"] > (2*60*60*1000)
-                    ):
+                # if(
+                #     message.timestamp - user["message_last"] > (2*60*60*1000)
+                #     ):
 
 
-                    current_time = int(str(datetime.now().time())[:2])
+                #     current_time = int(str(datetime.now().time())[:2])
 
-                    print "Current time for greeting: " + str(current_time)
+                #     print "Current time for greeting: " + str(current_time)
 
-                    if current_time >= 22 or current_time < 9:
-                        greeting = "Good morning"
-                    elif current_time >= 16 and current_time < 22:   
-                        greeting = "Good evening"
-                    elif current_time >= 12 and current_time < 16:   
-                        greeting = "Good afternoon"
-                    else:
-                        greeting = "Hello"  
+                #     if current_time >= 22 or current_time < 9:
+                #         greeting = "Good morning"
+                #     elif current_time >= 16 and current_time < 22:   
+                #         greeting = "Good evening"
+                #     elif current_time >= 12 and current_time < 16:   
+                #         greeting = "Good afternoon"
+                #     else:
+                #         greeting = "Hello"  
 
-                    answer.append(choice([
-                        greeting + " " + message.from_user + "!\nI've just been thinking of you! :)",
-                        greeting + "!\nGood to see you again, " + message.from_user + ". :)",
-                        "Ah, " + message.from_user + "!\nSo nice to see you again!",
-                        "Hey " + message.from_user + "!\n" + greeting,
-                        ]))
-                    answer_facts.append("has_greeting")  
-                    user["greeting_last"] = message.timestamp
+                #     answer.append(choice([
+                #         greeting + " " + message.from_user + "!\nI've just been thinking of you! :)",
+                #         greeting + "!\nGood to see you again, " + message.from_user + ". :)",
+                #         "Ah, " + message.from_user + "!\nSo nice to see you again!",
+                #         "Hey " + message.from_user + "!\n" + greeting,
+                #         ]))
+                #     answer_facts.append("has_greeting")  
+                #     user["greeting_last"] = message.timestamp
 
 
                 #####################################################################
@@ -391,6 +391,26 @@ def incoming():
             print "Current time in timezone " + user["kik_timezone"] + ": " + str(current_hour)
 
             if (
+                time_since_last_greeting > (8*60*60*1000)
+                ):
+                    print "Last message was quite some time ago... Let's do some greeting!"   
+
+                    if random.choice([True,False]):
+                        answer.append(choice([
+                            current_salutation(current_hour) + " " + message.from_user + "!\nI've just been thinking of you! :)",
+                            "Oh, " + current_salutation(current_hour).lower() + "!\nGood to see you again, " + user["kik_firstname"] + ". :)",
+                            "Ah, " + user["kik_firstname"] + "!\nSo nice to see you again!",
+                            "Hey " + message.from_user + "!\n" + current_salutation(current_hour) + "! :)"
+                            ]))
+                        answer_facts.append("contains_username","contains_greeting")
+                    else:
+                        answer.append(choice([
+                            "Ah, it's you! What a pleasant surprise! :)"
+                            ]))
+                        answer_facts.append("contains_greeting")
+
+
+            elif (
                 "has_greeting" in message_facts
                 ):
                     print "Message contains greeting..."   
@@ -406,7 +426,7 @@ def incoming():
                                 "Good " + current_daytime + " to you, " + user["kik_firstname"] + "! :)",
                                 "Hey" + user["kik_firstname"] + ", good to see you! :)",
                                 "Oh, hello " + user["kik_firstname"] + "! :)"
-
+                                current_salutation(current_hour) + " " + user["kik_firstname"] + "! :)"
                             ])) 
                             answer_facts.append("contains_username","contains_greeting")
                         else:
@@ -418,10 +438,15 @@ def incoming():
                     elif (
                         time_since_last_greeting <= (3*60*60*1000) and time_since_last_greeting > (5*60*1000)
                         ):
+                        print "...but there was another greeting recently. Doing only a short greeting!"   
+
                             answer.append(choice([
                                 "Hello again! :)"
                             ])) 
                             answer_facts.append("contains_greeting")
+
+                    else:
+                        print "...but it is a repetition. No greeting!"   
 
 
 

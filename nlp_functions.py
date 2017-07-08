@@ -1,5 +1,14 @@
 import re
 
+def current_salutation(current_hour):
+    if current_hour < 11:
+        return "Good morning"
+    elif current_hour >= 18:   
+        return "Good evening"
+    elif current_hour >= 14 and current_hour < 18:   
+        return "Good afternoon"
+    else:
+        return "Hello" 
 
 def current_daytime(current_hour):
     if current_hour < 11:
