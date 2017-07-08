@@ -1,6 +1,6 @@
 import re
 
-def current_salutation(current_hour):
+def current_greeting(current_hour):
     if current_hour < 11:
         return "Good morning"
     elif current_hour >= 18:   

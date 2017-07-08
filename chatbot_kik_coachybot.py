@@ -160,143 +160,7 @@ def incoming():
                 if is_how_are_you(sentence):
                     message_facts.append("has_question_how_are_you")
 
-                # #####################################################################
-                # ###     Greeting
-                # #####################################################################
-
-                # if (
-                #     is_greeting(sentence) 
-                #     and "has_greeting" not in answer_facts
-                #     ):    
-
-                #     print "Has greeting, and answer does not include other greeting yet."
-
-                #     message_facts.append("has_greeting")   
-
-                #     if(
-                #         not user["greeting_last"]
-                #         or message.timestamp - user["greeting_last"] > (3*60*60*1000)
-                #         ):
-
-
-                #         current_time = int(str(datetime.now().time())[:2])
-
-                #         print "Current time for greeting: " + str(current_time)
-
-                #         if current_time >= 22 or current_time < 9:
-                #             greeting = "Good morning"
-                #         elif current_time >= 16 and current_time < 22:   
-                #             greeting = "Good evening"
-                #         elif current_time >= 12 and current_time < 16:   
-                #             greeting = "Good afternoon"
-                #         else:
-                #             greeting = "Hello"  
-
-                #         answer.append(choice([
-                #             greeting + " " + message.from_user + "!",
-                #             greeting + "!\nGood to see you, " + message.from_user + ". :)" 
-                #             ]))
-                #         answer_facts.append("has_greeting")  
-                #         user["greeting_last"] = message.timestamp
-
-                #     elif (
-                #         message.timestamp - user["greeting_last"] < (10*60*1000)
-                #         and message.timestamp - user["greeting_last"] >= (2*60*1000)
-                #         ):
-                #         answer.append(choice([
-                #             "Hello again... We've done this recently.",
-                #             "This is getting ridiculous. Are you obsessed with greetings? :D",
-                #             "Is this some kind of 'Hello' game that you want to play? ;)"
-                #             ]))                        
-                #         answer_facts.append("has_greeting")  
-                #         user["greeting_last"] = message.timestamp                       
-
-                #     elif message.timestamp - user["greeting_last"] < (2*60*1000):
-                #         user["greeting_last"] = message.timestamp     
-
-                #     else:
-                #         answer.append(choice([
-                #             "Hello again, " + message.from_user + "!",
-                #             "Well... Hello again! :D"
-                #             ]))
-                #         answer_facts.append("has_greeting")  
-                #         user["greeting_last"] = message.timestamp
-
-                #--------------------------------------------------------------------
-                #--   Greet again after long inactivity
-                #-------------------------------------------------------------------
-
-                # if(
-                #     message.timestamp - user["message_last"] > (2*60*60*1000)
-                #     ):
-
-
-                #     current_time = int(str(datetime.now().time())[:2])
-
-                #     print "Current time for greeting: " + str(current_time)
-
-                #     if current_time >= 22 or current_time < 9:
-                #         greeting = "Good morning"
-                #     elif current_time >= 16 and current_time < 22:   
-                #         greeting = "Good evening"
-                #     elif current_time >= 12 and current_time < 16:   
-                #         greeting = "Good afternoon"
-                #     else:
-                #         greeting = "Hello"  
-
-                #     answer.append(choice([
-                #         greeting + " " + message.from_user + "!\nI've just been thinking of you! :)",
-                #         greeting + "!\nGood to see you again, " + message.from_user + ". :)",
-                #         "Ah, " + message.from_user + "!\nSo nice to see you again!",
-                #         "Hey " + message.from_user + "!\n" + greeting,
-                #         ]))
-                #     answer_facts.append("has_greeting")  
-                #     user["greeting_last"] = message.timestamp
-
-
-                #####################################################################
-                ###     "How are you" from user
-                #####################################################################
-
-                if (
-                    is_how_are_you(sentence)
-                    ): 
-
-                    print "Contains question like 'How are you?'."
-
-                    if(
-                        not user["how_are_you_last"]
-                        or message.timestamp - user["how_are_you_last"] > (3*60*60*1000)
-                        ):
-
-                        answer.append(choice([
-                            "I'm doing fine, thanks! :)",
-                            "I'm doing well, thank you!",
-                            "Quite fine actually, thanks for asking!",
-                            "Yeah, I'm pretty good."
-                            ]))    
-
-                        message_facts.append("has_question_how_are_you")       
-                        answer_facts.append("has_answer_how_are_you")  
-                        user["how_are_you_last"] = message.timestamp
-
-                    elif message.timestamp - user["how_are_you_last"] < (5*60*1000):
-                        message_facts.append("has_question_how_are_you")       
-                        answer_facts.append("suppress_answer_how_are_you")     # To prevent repetition
-                        answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
-                        user["how_are_you_last"] = message.timestamp   
-                        continue  
-
-                    else:
-                        answer.append(choice([
-                            "Jup... Still doing fine.",
-                            "Pretty much the same as some minutes ago. :D"
-                            ]))
-                        message_facts.append("has_question_how_are_you")       
-                        answer_facts.append("has_answer_how_are_you")  
-                        answer_facts.append("suppress_question_how_are_you")     # To prevent repetition
-                        user["how_are_you_last"] = message.timestamp   
-                        continue                     
+            
 
 
                 #####################################################################
@@ -394,26 +258,28 @@ def incoming():
                 time_since_last_greeting > (8*60*60*1000)
                 ):
                     print "Last message was quite some time ago... Let's do some greeting!"   
+                    user["greeting_last"] = message.timestamp
 
                     if random.choice([True,False]):
                         answer.append(choice([
-                            current_salutation(current_hour) + " " + message.from_user + "!\nI've just been thinking of you! :)",
-                            "Oh, " + current_salutation(current_hour).lower() + "!\nGood to see you again, " + user["kik_firstname"] + ". :)",
+                            current_greeting(current_hour) + " " + message.from_user + "!\nI've just been thinking of you! :)",
+                            "Oh, " + current_greeting(current_hour).lower() + "!\nGood to see you again, " + user["kik_firstname"] + ". :)",
                             "Ah, " + user["kik_firstname"] + "!\nSo nice to see you again!",
-                            "Hey " + message.from_user + "!\n" + current_salutation(current_hour) + "! :)"
+                            "Hey " + message.from_user + "!\n" + current_greeting(current_hour) + "! :)"
                             ]))
-                        answer_facts.append("contains_username","contains_greeting")
+                        answer_facts.append("has_username","has_greeting")
                     else:
                         answer.append(choice([
                             "Ah, it's you! What a pleasant surprise! :)"
                             ]))
-                        answer_facts.append("contains_greeting")
+                        answer_facts.append("has_greeting")
 
 
             elif (
                 "has_greeting" in message_facts
                 ):
-                    print "Message contains greeting..."   
+                    print "Message contains greeting..."
+                    user["greeting_last"] = message.timestamp   
 
                     if(
                         not user["greeting_last"]
@@ -426,30 +292,82 @@ def incoming():
                                 "Good " + current_daytime + " to you, " + user["kik_firstname"] + "! :)",
                                 "Hey" + user["kik_firstname"] + ", good to see you! :)",
                                 "Oh, hello " + user["kik_firstname"] + "! :)"
-                                current_salutation(current_hour) + " " + user["kik_firstname"] + "! :)"
+                                current_greeting(current_hour) + " " + user["kik_firstname"] + "! :)"
                             ])) 
-                            answer_facts.append("contains_username","contains_greeting")
+                            answer_facts.append("has_username","has_greeting")
                         else:
                             answer.append(choice([
                                 "Hey, good " + current_daytime + "! So nice to see you! :)",
                                 "Oh, it's you! Hi! :)"
                             ])) 
-                            answer_facts.append("contains_greeting")
+                            answer_facts.append("has_greeting")
                     elif (
-                        time_since_last_greeting <= (3*60*60*1000) and time_since_last_greeting > (5*60*1000)
+                        time_since_last_greeting <= (3*60*60*1000) 
+                        and time_since_last_greeting > (5*60*1000)
                         ):
                         print "...but there was another greeting recently. Doing only a short greeting!"   
 
                             answer.append(choice([
                                 "Hello again! :)"
                             ])) 
-                            answer_facts.append("contains_greeting")
+                            answer_facts.append("has_greeting")
 
                     else:
                         print "...but it is a repetition. No greeting!"   
 
 
+            #####################################################################
+            ###     "How are you" from user
+            #####################################################################
 
+            if user["how_are_you_last"]:
+                time_since_last_how_are_you = message.timestamp - user["how_are_you_last"]
+            else:
+                time_since_last_how_are_you = 1000*60*60*24*365
+
+            if (
+                "has_question_how_are_you" in message_facts
+                ): 
+
+                print "Contains question like 'How are you?'..."
+                message_facts.append("has_question_how_are_you")  
+
+                if(
+                    not user["how_are_you_last"]
+                    or time_since_last_how_are_you> (3*60*60*1000)
+                    ):
+
+                    print "...and there was no such question in the last 3 hours. Answering...!"   
+                    user["how_are_you_last"] = message.timestamp
+                    answer_facts.append("has_answer_how_are_you")
+
+                    answer.append(choice([
+                        "I'm doing fine, thanks! :)",
+                        "I'm doing well, thank you!",
+                        "Quite fine actually, thanks for asking!",
+                        "Yeah, I'm pretty good."
+                        ]))    
+
+                if(
+                    time_since_last_how_are_you <= (3*60*60*1000)
+                    and time_since_last_how_are_you > (5*60*1000)
+                    ):
+
+                    print "...but there was such a question in the last 3 hours. Giving a brief answer..."   
+                    user["how_are_you_last"] = message.timestamp
+                    answer_facts.append("has_answer_how_are_you")
+                    answer_facts.append("suppress_question_how_are_you")
+
+                    answer.append(choice([
+                        "Yup, still doing fine."
+                        ]))   
+
+                else:
+                    
+                    print "...but it is a repetition. No answer!"  
+                    answer_facts.append("has_answer_how_are_you")  
+                    answer_facts.append("suppress_question_how_are_you")
+      
 
 
 
