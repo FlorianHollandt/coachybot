@@ -98,7 +98,7 @@ def incoming():
 
                 # ! I might need to initiate user as a defaultdict here...
                 user.update(dict(zip(user_attributes, user_values)))
-                user["message_count"] =+ 1
+                user["message_count"] += 1
 
             else:
 
@@ -262,10 +262,10 @@ def incoming():
 
                     if random.choice([True,False]):
                         answer.append(choice([
-                            current_greeting(current_hour) + " " + message.from_user + "!\nI've just been thinking of you! :)",
+                            current_greeting(current_hour) + " " +  user["kik_firstname"] + "!\nI've just been thinking of you! :)",
                             "Oh, " + current_greeting(current_hour).lower() + "!\nGood to see you again, " + user["kik_firstname"] + ". :)",
                             "Ah, " + user["kik_firstname"] + "!\nSo nice to see you again!",
-                            "Hey " + message.from_user + "!\n" + current_greeting(current_hour) + "! :)"
+                            "Hey " +  user["kik_firstname"] + "!\n" + current_greeting(current_hour) + "! :)"
                             ]))
                         answer_facts.append("has_username","has_greeting")
                     else:
