@@ -162,53 +162,49 @@ def incoming():
 
             
 
+            #     #####################################################################
+            #     ###     Yes-No-Question from user
+            #     #####################################################################
 
-        
+            #     if (
+            #         "has_question_how_are_you" not in message_facts 
+            #         #and sentence_type == "SQ"
+            #         and False
+            #         ):
 
+            #         print "Y/N-question!"
 
-                #####################################################################
-                ###     Yes-No-Question from user
-                #####################################################################
-
-                if (
-                    "has_question_how_are_you" not in message_facts 
-                    #and sentence_type == "SQ"
-                    and False
-                    ):
-
-                    print "Y/N-question!"
-
-                    answer.append(choice([
-                        "Well... It depends, right?",
-                        "What does your heart tell you?",
-                        "It's all about definitions, right?\nCan you be more specific?"
-                    ]))   
-                    message_facts.append("has_yn_question")                        
-                    answer_facts.append("has_answer_to_yn_question")   
+            #         answer.append(choice([
+            #             "Well... It depends, right?",
+            #             "What does your heart tell you?",
+            #             "It's all about definitions, right?\nCan you be more specific?"
+            #         ]))   
+            #         message_facts.append("has_yn_question")                        
+            #         answer_facts.append("has_answer_to_yn_question")   
 
 
-                #####################################################################
-                ###     Open Question from user
-                #####################################################################
+            #     #####################################################################
+            #     ###     Open Question from user
+            #     #####################################################################
 
-                if (
-                    "has_question_how_are_you" not in message_facts 
-                    #and sentence_type == "SBARQ"
-                    and False
-                    ):
+            #     if (
+            #         "has_question_how_are_you" not in message_facts 
+            #         #and sentence_type == "SBARQ"
+            #         and False
+            #         ):
 
-                    print "Open question!"
+            #         print "Open question!"
 
-                    answer.append(choice([
-                        "Haha, sorry... Currently, I don't do open questions. ;)",
-                        "Enough questions for now. Let's get out and play!"
-                    ]))   
-                    message_facts.append("has_open_question")                        
-                    answer_facts.append("has_answer_to_open_question")  
+            #         answer.append(choice([
+            #             "Haha, sorry... Currently, I don't do open questions. ;)",
+            #             "Enough questions for now. Let's get out and play!"
+            #         ]))   
+            #         message_facts.append("has_open_question")                        
+            #         answer_facts.append("has_answer_to_open_question")  
 
-            if not answer:
+            # if not answer:
 
-                answer.append("Hmmm....")
+            #     answer.append("Hmmm....")
 
 
 ###############################################################################################################################
