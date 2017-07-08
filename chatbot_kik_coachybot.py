@@ -78,6 +78,7 @@ def incoming():
                 "dialogue_count", 
                 "dialogue_start", 
                 "message_last",
+                "message_count",
                 "greeting_last",
                 "how_are_you_last",
                 "topic_current",
@@ -96,7 +97,6 @@ def incoming():
                 print "Found user data: " + str(user_values)
                 message_facts.append("known_user") 
 
-                # ! I might need to initiate user as a defaultdict here...
                 user.update(dict(zip(user_attributes, user_values)))
                 user["message_count"] += 1
 
@@ -163,29 +163,7 @@ def incoming():
             
 
 
-                #####################################################################
-                ###     "How are you" to user
-                #####################################################################
-
-                if (
-                    "has_question_how_are_you" in message_facts 
-                    and "has_question_how_are_you" not in answer_facts
-                    and "suppress_question_how_are_you" not in answer_facts
-                    ): 
-
-                    print "Contains question like 'How are you?', and no such question in return yet."
-
-                    answer.append(choice([
-                        "How has your day been so far?",
-                        "How are you today?",
-                        "What's on your mind?"
-                    ])) 
-                    answer_facts.append("has_question_how_are_you")   
-                    user.update({
-                        "question_open_topic" : "how_are_you",
-                        "question_open_start" : message.timestamp
-                        })      
-                    continue            
+        
 
 
                 #####################################################################
@@ -311,6 +289,7 @@ def incoming():
                             "Hello again! :)"
                         ])) 
                         answer_facts.append("has_greeting")
+                        answer_facts.append("suppress_question_how_are_you")
 
                     else:
                         print "...but it is a repetition. No greeting!"   
@@ -369,12 +348,39 @@ def incoming():
                     answer_facts.append("suppress_question_how_are_you")
       
 
+            #####################################################################
+            ###     "How are you" to user
+            #####################################################################
 
+            if (
+                ("has_question_how_are_you" in message_facts
+                    or "has_greeting" in answer_facts
+                    )
+                and "suppress_question_how_are_you" not in answer_facts
+                ): 
 
+                print "It's a good time to aks the user how he is doing."
+                answer_facts.append("has_question_how_are_you")   
+                user.update({
+                    "question_open_topic" : "how_are_you",
+                    "question_open_start" : message.timestamp
+                    }) 
 
-
-
-
+                if (
+                    "has_username" in answer_facts
+                    or random.choice([True,False])
+                    ):
+                    answer.append(choice([
+                        "How is you " + current_daytime(current_hour) + "?",
+                        "How was you " + previous_daytime(current_hour) + "?",
+                        "How are you today?",
+                        "What's on your mind?"
+                    ])) 
+                else:
+                    answer.append(choice([
+                        "How are you today, " + user["kik_username"] + "?",
+                    ])) 
+                    answer_facts.append("has_username")
 
 
             #####################################################################
