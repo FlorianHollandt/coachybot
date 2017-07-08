@@ -307,10 +307,10 @@ def incoming():
                         ):
                         print "...but there was another greeting recently. Doing only a short greeting!"   
 
-                            answer.append(choice([
-                                "Hello again! :)"
-                            ])) 
-                            answer_facts.append("has_greeting")
+                        answer.append(choice([
+                            "Hello again! :)"
+                        ])) 
+                        answer_facts.append("has_greeting")
 
                     else:
                         print "...but it is a repetition. No greeting!"   
