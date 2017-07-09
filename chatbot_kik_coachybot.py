@@ -142,6 +142,7 @@ def incoming():
 
             answer = []
             answer_facts = []
+            answer_cache = []
 
 
             for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
@@ -160,6 +161,9 @@ def incoming():
                 if is_how_are_you(sentence):
                     message_facts.append("has_question_how_are_you")
 
+                if is_statement_about_self(sentence):
+                    message_facts.append("has_statement_about_self")
+                    answer_cache.append("Why " + perform_open_reflection(sentence) + "?")
             
 
             #     #####################################################################
@@ -360,6 +364,8 @@ def incoming():
                 user.update({
                     "question_open_topic" : "how_are_you",
                     "question_open_start" : message.timestamp
+                    "topic_current" : "how_are_you",
+                    "topic_start" : message.timestamp
                     }) 
 
                 if (
@@ -377,6 +383,24 @@ def incoming():
                         "How are you today, " + user["kik_username"] + "?",
                     ])) 
                     answer_facts.append("has_username")
+
+
+            #####################################################################
+            ###     Listening for response to "How are you?"
+            #####################################################################
+
+            if (
+                "has_statement_about_self" in message_facts
+                and user["question_open_topic"] ==  "how_are_you"
+                and answer_cache
+                ): 
+
+                print "Message contains a statement about the user as a response to a 'How are you'-quesion?"
+
+                answer.append(
+                    random.choice(answer_cache)
+                    )
+                answer_facts.append("has_reflection")
 
 
             #####################################################################

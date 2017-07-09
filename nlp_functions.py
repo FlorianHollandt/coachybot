@@ -1,4 +1,86 @@
 import re
+from regex import sub as sub2
+
+
+temporal = "|".join([
+    r"(today",
+    r"right now",
+    r"currently",
+    r"now",
+    r"recently",
+    r"previously",
+    r"lately",
+    r"these days",
+    r"this \w+",
+    r"sometimes",
+    r"every now and then)"
+    ])
+
+statements_about_self = [
+    re.compile(r"^" + temporal + r"?\W*i am "),
+    re.compile(r"^" + temporal + r"?\W*i was "),
+    re.compile(r"^" + temporal + r"?\W*i will "),
+    re.compile(r"^" + temporal + r"?\W*i have "),
+    re.compile(r"^" + temporal + r"?\W*i had "),
+    re.compile(r"^" + temporal + r"?\W*i got "),
+    re.compile(r"^" + temporal + r"?\W*i do "),
+    re.compile(r"^" + temporal + r"?\W*i did "),
+    re.compile(r"^" + temporal + r"?\W*i can "),
+    re.compile(r"^" + temporal + r"?\W*i could "),
+    re.compile(r"^" + temporal + r"?\W*i feel "),
+    re.compile(r"^" + temporal + r"?\W*i felt "),
+    re.compile(r"^" + temporal + r"?\W*i hope "),
+    re.compile(r"^" + temporal + r"?\W*i hoped "),
+    re.compile(r"^" + temporal + r"?\W*i wish "),
+    re.compile(r"^" + temporal + r"?\W*i wished ")     
+]
+
+def is_statement_about_self(sentence, statements_about_self=statements_about_self):
+    if any(statement.search(sentence) for statement in statements_about_self):
+        return True
+    else:
+        return False
+
+pronoun_reflections = [
+    (r"(^|\W)i(\W|$)", r"\1YOU\2"),
+    (r"(^|\W)me(\W|$)", r"\1YOU\2"),
+    (r"(^|\W)mine(\W|$)", r"\1YOURS\2"),
+    (r"(^|\W)my(\W|$)", r"\1YOUR\2"),
+    (r"(^|\W)myself(\W|$)", r"\1MYSELF\2"),    
+    (r"(^|\W)you(\W|$)", r"\1I\2"),
+    (r"(^|\W)your(\W|$)", r"\1MY\2"),
+    (r"(^|\W)yours(\W|$)", r"\1MINE\2")
+    ]
+
+def perform_open_reflection(statement):
+    reflections_open = [
+        (r"^" + temporal + r"?(\W?)i am\W([^\.\,\!]+)(?:.*)", r'are you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i was\W([^\.\,\!]+)(?:.*)", r'were you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i will\W([^\.\,\!]+)(?:.*)", r'will you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i have got\W([^\.\,\!]+)(?:.*)", r'do you have |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i have had\W([^\.\,\!]+)(?:.*)", r'did you have |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r'have you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i had\W([^\.\,\!]+)(?:.*)", r'did you have |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i got\W([^\.\,\!]+)(?:.*)", r'did you get |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i do\W([^\.\,\!]+)(?:.*)", r'do you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i did\W([^\.\,\!]+)(?:.*)", r'did you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i can\W([^\.\,\!]+)(?:.*)", r'can you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i could\W([^\.\,\!]+)(?:.*)", r'could you |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i feel\W([^\.\,\!]+)(?:.*)", r'do you feel |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i felt\W([^\.\,\!]+)(?:.*)", r'did you feel |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i hope\W([^\.\,\!]+)(?:.*)", r'do you hope |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i hoped\W([^\.\,\!]+)(?:.*)", r'did you hope |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i wish\W([^\.\,\!]+)(?:.*)", r'do you wish |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i wished\W([^\.\,\!]+)(?:.*)", r'did you wish |||\3\2\1')
+    ]
+    for (before, after) in reflections_open:
+        if re.search(before,statement):
+            reflection = sub2(before,after,statement)
+            break
+    introduction,content = reflection.split("|||")
+    for (before, after) in pronoun_reflections:
+        content = re.sub(before, after, content) 
+    return introduction + content.lower()
 
 def current_greeting(current_hour):
     if current_hour < 11:
@@ -105,7 +187,6 @@ fluffs = [
 
 def contains_fluff(text, fluffs=fluffs):
     "Remove words that don't contribute to the meaning of a statement." 
-
     # Create a regular expression  from the fluff list
     if any(fluff.search(text) for fluff in fluffs):
         return True
@@ -114,11 +195,9 @@ def contains_fluff(text, fluffs=fluffs):
 
 def remove_fluff(text, fluffs=fluffs):
     "Remove words that don't contribute to the meaning of a statement." 
-
     while any(fluff.search(text) for fluff in fluffs):
         for fluff in fluffs:
             text = fluff.sub('', text)
-        
     return text   
 
 def expand_contractions(text):
@@ -295,7 +374,6 @@ def expand_contractions(text):
     # Create a regular expression  from the dictionary keys
     for (before, after) in contractions:
         text = re.sub(r"(^|\W)"+before+r"($|\W)", r"\1"+after+r"\2", text)
-
     return text
 
 
