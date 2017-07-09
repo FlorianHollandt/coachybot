@@ -12,7 +12,7 @@ from nltk import sent_tokenize
 from datetime import datetime
 from pytz import timezone
 from collections import defaultdict
-from random import choice
+import random
 
 import psycopg2
 import urlparse
