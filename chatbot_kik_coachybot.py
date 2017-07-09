@@ -239,7 +239,7 @@ def incoming():
                     user["greeting_last"] = message.timestamp
 
                     if random.choice([True,False]):
-                        answer.append(choice([
+                        answer.append(random.choice([
                             current_greeting(current_hour) + " " +  user["kik_firstname"] + "!\nI've just been thinking of you! :)",
                             "Oh, " + current_greeting(current_hour).lower() + "!\nGood to see you again, " + user["kik_firstname"] + ". :)",
                             "Ah, " + user["kik_firstname"] + "!\nSo nice to see you again!",
@@ -247,7 +247,7 @@ def incoming():
                             ]))
                         answer_facts.append("has_username","has_greeting")
                     else:
-                        answer.append(choice([
+                        answer.append(random.choice([
                             "Ah, it's you! What a pleasant surprise! :)"
                             ]))
                         answer_facts.append("has_greeting")
@@ -266,7 +266,7 @@ def incoming():
                         print "...and no greeting was registered recently. Going for full greeting!"   
 
                         if random.choice([True,False]):
-                            answer.append(choice([
+                            answer.append(random.choice([
                                 "Good " + current_daytime + " to you, " + user["kik_firstname"] + "! :)",
                                 "Hey" + user["kik_firstname"] + ", good to see you! :)",
                                 "Oh, hello " + user["kik_firstname"] + "! :)",
@@ -274,7 +274,7 @@ def incoming():
                             ])) 
                             answer_facts.append("has_username","has_greeting")
                         else:
-                            answer.append(choice([
+                            answer.append(random.choice([
                                 "Hey, good " + current_daytime + "! So nice to see you! :)",
                                 "Oh, it's you! Hi! :)"
                             ])) 
@@ -285,7 +285,7 @@ def incoming():
                         ):
                         print "...but there was another greeting recently. Doing only a short greeting!"   
 
-                        answer.append(choice([
+                        answer.append(random.choice([
                             "Hello again! :)"
                         ])) 
                         answer_facts.append("has_greeting")
@@ -320,7 +320,7 @@ def incoming():
                     user["how_are_you_last"] = message.timestamp
                     answer_facts.append("has_answer_how_are_you")
 
-                    answer.append(choice([
+                    answer.append(random.choice([
                         "I'm doing fine, thanks! :)",
                         "I'm doing well, thank you!",
                         "Quite fine actually, thanks for asking!",
@@ -337,7 +337,7 @@ def incoming():
                     answer_facts.append("has_answer_how_are_you")
                     answer_facts.append("suppress_question_how_are_you")
 
-                    answer.append(choice([
+                    answer.append(random.choice([
                         "Yup, still doing fine."
                         ]))   
 
@@ -372,14 +372,14 @@ def incoming():
                     "has_username" in answer_facts
                     or random.choice([True,False])
                     ):
-                    answer.append(choice([
+                    answer.append(random.choice([
                         "How is you " + current_daytime(current_hour) + "?",
                         "How was you " + previous_daytime(current_hour) + "?",
                         "How are you today?",
                         "What's on your mind?"
                     ])) 
                 else:
-                    answer.append(choice([
+                    answer.append(random.choice([
                         "How are you today, " + user["kik_username"] + "?",
                     ])) 
                     answer_facts.append("has_username")
