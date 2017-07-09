@@ -373,8 +373,8 @@ def incoming():
                     or random.choice([True,False])
                     ):
                     answer.append(random.choice([
-                        "How is you " + current_daytime(current_hour) + "?",
-                        "How was you " + previous_daytime(current_hour) + "?",
+                        "How is your " + current_daytime(current_hour) + "?",
+                        "How was your " + previous_daytime(current_hour) + "?",
                         "How are you today?",
                         "What's on your mind?"
                     ])) 
