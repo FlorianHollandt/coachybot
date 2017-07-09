@@ -363,7 +363,7 @@ def incoming():
                 answer_facts.append("has_question_how_are_you")   
                 user.update({
                     "question_open_topic" : "how_are_you",
-                    "question_open_start" : message.timestamp
+                    "question_open_start" : message.timestamp,
                     "topic_current" : "how_are_you",
                     "topic_start" : message.timestamp
                     }) 
