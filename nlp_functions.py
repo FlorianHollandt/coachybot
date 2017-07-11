@@ -164,8 +164,6 @@ def stemmer(word,pos):
 fluffs = [
     #re.compile(r"^[\s\.\,\;\-\!\?]"), 
     re.compile(r"(?:^|\W)(?::|;|=|B|8)(?:-|\^)?(?:\)|\(|D|P|\||\[|\]|>|\$|3)+(?:$|\W)"), 
-    re.compile(r"^\W"), 
-    re.compile(r"\s$"), 
     re.compile(r"^well\W"), 
     re.compile(r"^so\W"), 
     re.compile(r"^alright\W"), 
@@ -181,6 +179,7 @@ fluffs = [
     re.compile(r"quite"),    
     re.compile(r"really"),    
     re.compile(r"literally"),    
+    re.compile(r"certainly"),    
     re.compile(r"in fact"),
     re.compile(r"just")
 ]
@@ -200,23 +199,24 @@ def remove_fluff(text, fluffs=fluffs):
             text = fluff.sub('', text)
     return text   
 
+def cleanup_sentence(text):
+    corrections = [
+        (r"^\W", r""), 
+        (r"\s$", r""),          
+        (r"\;" , ","),
+        (r"\s{2,}" , " "),
+        (r"\.{2,}" , " "),
+        (r"[\!\?]+\?[\!\?]*" , "?"),
+        (r"[\!\?]*\?[\!\?]+" , "?")        
+    ]
+    while any(re.search(before,text) for (before,after) in corrections):
+        for (before, after) in corrections:
+            text = re.sub(before, after, text)
+    return text
+
 def expand_contractions(text):
     "Replace contractions of pronoun and auxiliary verb with their expanded versions." 
     contractions = [
-        (r"\.\.\." , "."),
-        (r"\.\." , "."),
-        (r"\!\!\!" , "."),
-        (r"\!\!" , "."),
-        (r"\?\?\?" , "?"),        
-        (r"\?\?" , "?"),        
-        (r"\?\!" , "?"),        
-        (r"\!\?" , "?"),
-        (r"\!" , "."),        
-        (r"\;" , "."),
-        (r"    " , " "),
-        (r"   " , " "),
-        (r"  " , " "),
-        (r"^ " , ""),
         (r"ain't", "is not"),
         (r"aren't", "are not"),
         (r"can't", "can not"),

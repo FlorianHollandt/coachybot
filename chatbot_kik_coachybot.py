@@ -7,7 +7,7 @@ import os
 
 from nlp_functions import *
 from ngrams import corrections
-from nltk import sent_tokenize
+import nltk
 
 from datetime import datetime
 from pytz import timezone
@@ -35,6 +35,8 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
 global history
 history = dict()
+
+tokenize_sentences = nltk.data.load('tokenizers/punkt/english.pickle')
 
 # ===========================================================================================
 
@@ -133,24 +135,22 @@ def incoming():
             print message.from_user + ": " + message.body
 
             statement = message.body
-            statement = statement.lower()
-            statement = expand_contractions(statement) 
-
-            print "Step 1: " + statement 
-
-            sentences = sent_tokenize(statement)
+            sentences = tokenize_sentences(statement)
 
             answer = []
             answer_facts = []
             answer_cache = []
 
-
             for (sentence,sentence_counter) in zip(sentences, range(len(sentences)+1)[1:]):
 
-                print "Step 2." + str(sentence_counter) + ": " + sentence
+
+                print "Step 1." + str(sentence_counter) + ": " + sentence
+                sentence = sentence.lower()
                 sentence = corrections(sentence)
+                sentence = expand_contractions(sentence) 
                 sentence = remove_fluff(sentence)
-                print "Step 3." + str(sentence_counter) + ": " + sentence
+                sentence = cleanup_sentence(sentence)                
+                print "Step 2." + str(sentence_counter) + ": " + sentence
 
                 #sentence_tree = list(parser.raw_parse(sentence))[0][0]
                 #sentence_type = str(sentence_tree.label())
