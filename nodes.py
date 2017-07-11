@@ -71,7 +71,8 @@ def greeting(message, user):
                         "Ah, " + user["kik_firstname"] + "!\nSo nice to see you again!",
                         "Hey " +  user["kik_firstname"] + "!\n" + current_greeting(current_hour) + "! :)"
                         ]))
-                    answer_facts.append("has_username","has_greeting")
+                    answer_facts.append("has_username")
+                    answer_facts.append("has_greeting")
                 else:
                     answer.append(random.choice([
                         "Ah, it's you! What a pleasant surprise! :)"
