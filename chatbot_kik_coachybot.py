@@ -327,7 +327,7 @@ def incoming():
                         "Yeah, I'm pretty good."
                         ]))    
 
-                if(
+                elif(
                     time_since_last_how_are_you <= (3*60*60*1000)
                     and time_since_last_how_are_you > (5*60*1000)
                     ):
