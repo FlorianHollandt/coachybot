@@ -7,9 +7,19 @@ from pytz import timezone
 from ngrams import corrections
 import nltk
 
-sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-
 # ===========================================================================================
+
+
+ #     #                                                                          
+ ##    #  ####  #####  #    #   ##   #      # ######   ##   ##### #  ####  #    # 
+ # #   # #    # #    # ##  ##  #  #  #      #     #   #  #    #   # #    # ##   # 
+ #  #  # #    # #    # # ## # #    # #      #    #   #    #   #   # #    # # #  # 
+ #   # # #    # #####  #    # ###### #      #   #    ######   #   # #    # #  # # 
+ #    ## #    # #   #  #    # #    # #      #  #     #    #   #   # #    # #   ## 
+ #     #  ####  #    # #    # #    # ###### # ###### #    #   #   #  ####  #    # 
+                                                                                  
+
+sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 def preprocess_message(statement):
     sentences = sentence_tokenizer.tokenize(statement)
@@ -24,6 +34,24 @@ def preprocess_message(statement):
         in sentences
         ]
 
+def stemmer(word,pos):
+    if pos=="NOUN" and  word[-1]=="s":
+        return word[:-1]
+    elif pos=="VERB" and  word[-1]=="s":
+        return word[:-1]
+    elif pos=="VERB" and  word[-2:]=="ed" and word[-3]!="e":
+        return word[:-2]+"ing"
+    else:
+        return word
+
+ ######                                                           
+ #     # ###### ###### #      ######  ####  ##### #  ####  #    # 
+ #     # #      #      #      #      #    #   #   # #    # ##   # 
+ ######  #####  #####  #      #####  #        #   # #    # # #  # 
+ #   #   #      #      #      #      #        #   # #    # #  # # 
+ #    #  #      #      #      #      #    #   #   # #    # #   ## 
+ #     # ###### #      ###### ######  ####    #   #  ####  #    # 
+                                                                  
 
 temporal = "|".join([
     r"(today",
@@ -105,6 +133,15 @@ def perform_open_reflection(statement):
         content = re.sub(before, after, content) 
     return introduction + content.lower()
 
+  #####                                             
+ #     # #####  ###### ###### ##### # #    #  ####  
+ #       #    # #      #        #   # ##   # #    # 
+ #  #### #    # #####  #####    #   # # #  # #      
+ #     # #####  #      #        #   # #  # # #  ### 
+ #     # #   #  #      #        #   # #   ## #    # 
+  #####  #    # ###### ######   #   # #    #  ####  
+                                                    
+
 def current_greeting(current_hour):
     if current_hour < 11:
         return "Good morning"
@@ -174,15 +211,14 @@ def is_how_are_you(sentence, how_are_yous=how_are_yous):
     else:
         return False
 
-def stemmer(word,pos):
-    if pos=="NOUN" and  word[-1]=="s":
-        return word[:-1]
-    elif pos=="VERB" and  word[-1]=="s":
-        return word[:-1]
-    elif pos=="VERB" and  word[-2:]=="ed" and word[-3]!="e":
-        return word[:-2]+"ing"
-    else:
-        return word
+
+ #######                             
+ #       #      #    # ###### ###### 
+ #       #      #    # #      #      
+ #####   #      #    # #####  #####  
+ #       #      #    # #      #      
+ #       #      #    # #      #      
+ #       ######  ####  #      #      
 
 fluffs = [
     #re.compile(r"^[\s\.\,\;\-\!\?]"), 
@@ -236,6 +272,15 @@ def cleanup_sentence(text):
         for (before, after) in corrections:
             text = re.sub(before, after, text)
     return text
+
+  #####                                                                        
+ #     #  ####  #    # ##### #####    ##    ####  ##### #  ####  #    #  ####  
+ #       #    # ##   #   #   #    #  #  #  #    #   #   # #    # ##   # #      
+ #       #    # # #  #   #   #    # #    # #        #   # #    # # #  #  ####  
+ #       #    # #  # #   #   #####  ###### #        #   # #    # #  # #      # 
+ #     # #    # #   ##   #   #   #  #    # #    #   #   # #    # #   ## #    # 
+  #####   ####  #    #   #   #    # #    #  ####    #   #  ####  #    #  ####  
+                                                                               
 
 def expand_contractions(text):
     "Replace contractions of pronoun and auxiliary verb with their expanded versions." 
