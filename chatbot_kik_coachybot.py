@@ -158,14 +158,14 @@ def incoming():
              #        #  #  #    # #      # #    # #    #   #   # #   ## #    #    #    ## #    # #    # #      
              #######   ##   #    # ###### #  ####  #    #   #   # #    #  ####     #     #  ####  #####  ###### 
                                                                                                                   
-             print "Message: " + message.body
-             print "User: " + user
+            print "Message: " + message.body
+            print "User: " + user
 
-             answer, next_node, user = eval(user["node_current"])(message, user)
+            answer, next_node, user = eval(user["node_current"])(message, user)
 
-             print "Answer: " + answer
-             print "Next node: " + next_node
-             print "User: " + user
+            print "Answer: " + answer
+            print "Next node: " + next_node
+            print "User: " + user
 
 #             #####################################################################
 #             ###     Statement normalization
