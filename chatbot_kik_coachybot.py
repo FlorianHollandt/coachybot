@@ -159,13 +159,15 @@ def incoming():
              #######   ##   #    # ###### #  ####  #    #   #   # #    #  ####     #     #  ####  #####  ###### 
                                                                                                                   
             print "Message: " + message.body
-            print "User: " + user
+            for key in user.keys():
+                print("{:12}: {}".format(key,str(user[key])))
 
             answer, next_node, user = eval(user["node_current"])(message, user)
 
             print "Answer: " + answer
             print "Next node: " + next_node
-            print "User: " + user
+            for key in user.keys():
+                print("{:12}: {}".format(key,str(user[key])))
 
 #             #####################################################################
 #             ###     Statement normalization

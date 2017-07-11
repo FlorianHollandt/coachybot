@@ -33,6 +33,7 @@ def greeting(user,message):
 
     message_facts = []
     answer_facts = []
+    
     sentences = preprocess_messages(message.body)
 
     for sentence in sentences:
