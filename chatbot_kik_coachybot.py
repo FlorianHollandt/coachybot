@@ -135,7 +135,8 @@ def incoming():
             print message.from_user + ": " + message.body
 
             statement = message.body
-            sentences = sentence_tokenizer.tokenize(statement)
+            #sentences = sentence_tokenizer.tokenize(statement)
+            sentences = preprocess_message(statement)
 
             answer = []
             answer_facts = []
@@ -145,11 +146,11 @@ def incoming():
 
 
                 print "Step 1." + str(sentence_counter) + ": " + sentence
-                sentence = sentence.lower()
-                sentence = corrections(sentence)
-                sentence = expand_contractions(sentence) 
-                sentence = remove_fluff(sentence)
-                sentence = cleanup_sentence(sentence)                
+                #sentence = sentence.lower()
+                #sentence = corrections(sentence)
+                #sentence = expand_contractions(sentence) 
+                #sentence = remove_fluff(sentence)
+                #sentence = cleanup_sentence(sentence)                
                 print "Step 2." + str(sentence_counter) + ": " + sentence
 
                 #sentence_tree = list(parser.raw_parse(sentence))[0][0]

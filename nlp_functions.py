@@ -1,6 +1,29 @@
 import re
 from regex import sub as sub2
 
+from datetime import datetime
+from pytz import timezone
+
+from ngrams import corrections
+import nltk
+
+sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+
+# ===========================================================================================
+
+def preprocess_message(statement):
+    sentences = sentence_tokenizer.tokenize(statement)
+    return [
+        cleanup_sentence(
+            remove_fluff(
+                    corrections(
+                            expand_contractions(
+                                    sentence.lower()
+                                    ))))
+        for sentence 
+        in sentences
+        ]
+
 
 temporal = "|".join([
     r"(today",
