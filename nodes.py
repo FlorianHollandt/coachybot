@@ -1,6 +1,8 @@
 from datetime import datetime
 from pytz import timezone
 
+from nlp_functions import *
+
 # ===========================================================================================
 
  #     #                                           
@@ -33,7 +35,7 @@ def greeting(user,message):
 	sentences = preprocess_messages(message.body)
 	for sentence in sentences:
         if is_greeting(sentence):
-            message_facts.append("has_greeting")  
+        	message_facts.append("has_greeting")  
         if is_how_are_you(sentence):
             message_facts.append("has_question_how_are_you")
 
