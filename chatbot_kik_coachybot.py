@@ -164,7 +164,7 @@ def incoming():
 
             answer, next_node, user = eval(user["node_current"])(message, user)
 
-            print "Answer: " + answer
+            print "Answer: " + " | ".join(answer)
             print "Next node: " + next_node
             for key in user.keys():
                 print("{:12}: {}".format(key,str(user[key])))
