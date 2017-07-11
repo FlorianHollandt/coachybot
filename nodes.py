@@ -35,6 +35,7 @@ def greeting(message, user):
 
     message_facts = []
     answer_facts = []
+    answer = []
 
     sentences = preprocess_message(message.body)
 
