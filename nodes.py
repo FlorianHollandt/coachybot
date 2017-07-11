@@ -15,7 +15,7 @@ from nlp_functions import *
                                                    
 
 #def welcome(user,statement):
-#	"Welcome message to first time users"
+#    "Welcome message to first time users"
 
   #####                                             
  #     # #####  ###### ###### ##### # #    #  ####  
@@ -27,15 +27,18 @@ from nlp_functions import *
                                                     
 
 def greeting(user,message):
-	"Regular greeting or first message after some time"
+    "Regular greeting or first message after some time"
 
-	print "Evaluating node 'greeting'"
+    print "Evaluating node 'greeting'"
 
-	message_facts = []
-	sentences = preprocess_messages(message.body)
-	for sentence in sentences:
+    message_facts = []
+    answer_facts = []
+    sentences = preprocess_messages(message.body)
+
+    for sentence in sentences:
+
         if is_greeting(sentence):
-        	message_facts.append("has_greeting")  
+            message_facts.append("has_greeting")  
         if is_how_are_you(sentence):
             message_facts.append("has_question_how_are_you")
 
@@ -203,6 +206,6 @@ def greeting(user,message):
                 ])) 
                 answer_facts.append("has_username")    
 
-	next_node = "test"     
+    next_node = "test"     
 
-	return answer, next_node, user        
+    return answer, next_node, user        
