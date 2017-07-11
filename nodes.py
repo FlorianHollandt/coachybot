@@ -26,14 +26,14 @@ from nlp_functions import *
   #####  #    # ###### ######   #   # #    #  ####  
                                                     
 
-def greeting(user,message):
+def greeting(message, user):
     "Regular greeting or first message after some time"
 
     print "Evaluating node 'greeting'"
 
     message_facts = []
     answer_facts = []
-    
+
     sentences = preprocess_message(message.body)
 
     for sentence in sentences:
