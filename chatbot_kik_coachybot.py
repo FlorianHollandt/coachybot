@@ -36,7 +36,7 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 global history
 history = dict()
 
-tokenize_sentences = nltk.data.load('tokenizers/punkt/english.pickle')
+sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 # ===========================================================================================
 
@@ -135,7 +135,7 @@ def incoming():
             print message.from_user + ": " + message.body
 
             statement = message.body
-            sentences = tokenize_sentences(statement)
+            sentences = sentence_tokenizer.tokenize(statement)
 
             answer = []
             answer_facts = []
