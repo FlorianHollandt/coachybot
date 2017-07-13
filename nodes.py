@@ -189,6 +189,10 @@ def greeting(message, user):
             answer_facts.append("has_answer_how_are_you")  
             answer_facts.append("suppress_question_how_are_you")
 
+            answer.append(random.choice([
+                "You obviously like greetings, right? ;)."
+                ]))   
+
             next_node = "dummy"
 
 
@@ -277,7 +281,7 @@ def dummy(message, user):
 
     answer = "Hmmm... Tell me more!"
 
-    next_node = "dummy"
+    next_node = "greeting"
 
     return answer, next_node, user
 
