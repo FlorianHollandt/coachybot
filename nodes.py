@@ -279,7 +279,7 @@ def dummy(message, user):
 
     print "Evaluating node 'how_are_you'"
 
-    answer = "Hmmm... Tell me more!"
+    answer = ["Hmmm... Tell me more!"]
 
     next_node = "greeting"
 
