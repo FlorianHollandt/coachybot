@@ -44,6 +44,179 @@ def stemmer(word,pos):
     else:
         return word
 
+
+ #     #                        #    #     #        
+  #   #  ######  ####          #     ##    #  ####  
+   # #   #      #             #      # #   # #    # 
+    #    #####   ####        #       #  #  # #    # 
+    #    #           #      #        #   # # #    # 
+    #    #      #    #     #         #    ## #    # 
+    #    ######  ####     #          #     #  ####  
+                                                    
+# Maybe intensifiers can be viewed as a subset of affirmations?
+affirmations = "|".join([
+    r"(yes",
+    r"yeah",
+    r"aye",
+    r"absolutely",
+    r"total?ly",
+    r"certainly",
+    r"probably",
+    r"definitely",
+    r"maybe",
+    r"right",
+    r"correct",
+    r"true",
+    r"possible",
+    r"possibly",
+    r"sure",
+    r"almost",
+    r"entirely",
+    r"fully",
+    r"highly",
+    r"ok"
+    r"okay"
+    r"alright)"
+    ])   
+
+negations_short = "|".join([
+    r"(no",
+    r"not",
+    r"nay",
+    r"nope)"
+    ])   
+
+negations_pronoun = "|".join([
+    r"(never",
+    r"no?one",
+    r"nobody",
+    r"nowhere",
+    r"nothing)"
+    ])   
+
+negations_adjective = "|".join([
+    r"(impossible",
+    r"wrong",
+    r"false",
+    r"bullshit",
+    r"incorrect)"
+    ])   
+
+negations = r"("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
+
+def has_negation(sentence):
+    if re.search(negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
+        return False
+    elif re.search(negations,sentence):
+        return True
+    else:
+        return False
+
+def has_affirmation(sentence):
+    if re.search(affirmations,sentence):
+        return True
+    else:
+        return False
+
+  #####                                #    ######                
+ #     #  ####   ####  #####          #     #     #   ##   #####  
+ #       #    # #    # #    #        #      #     #  #  #  #    # 
+ #  #### #    # #    # #    #       #       ######  #    # #    # 
+ #     # #    # #    # #    #      #        #     # ###### #    # 
+ #     # #    # #    # #    #     #         #     # #    # #    # 
+  #####   ####   ####  #####     #          ######  #    # #####  
+                                                                  
+
+intensifiers = "|".join([
+    r"(pretty( much)?",
+    r"quite",
+    r"very",
+    r"absolutely",
+    r"total?ly",
+    r"real?ly",
+    r"somewhat",
+    r"kind of",
+    r"perfectly",
+    r"positively",
+    r"definitely",
+    r"completely",
+    r"propably",
+    r"just",
+    r"rather",
+    r"almost",
+    r"entirely",
+    r"fully",
+    r"highly",
+    r"a bit)"
+    ])   
+
+goods = "|".join([
+    r"(good",
+    r"fine",
+    r"nice",
+    r"lovely",
+    r"great",
+    r"amazing",
+    r"super",
+    r"smashing",
+    r"fantastic",
+    r"stunning",
+    r"groovy",
+    r"wunderful?l",
+    r"superb",
+    r"marvel?lous",
+    r"neat",
+    r"terrific",
+    r"swell",
+    r"dandy",
+    r"tremendous",
+    r"excellent",
+    r"dope",
+    r"well",
+    r"elated",
+    r"enthusiastic",
+    r"looking forward to",
+    r"engaged",
+    r"thrilled",
+    r"excited",
+    r"happy",
+    r"joyful",
+    r"joyous",
+    r"delighted",
+    r"curious",
+    r"eager",
+    r"ok",
+    r"alright)"
+    ])                                                                 
+
+bads = "|".join([
+    r"(bad",
+    r"terrible",
+    r"awful",
+    r"mad",
+    r"horrible",
+    r"horrid",
+    r"sad",
+    r"blue",
+    r"down",
+    r"unhappy",
+    r"unwell",
+    r"miserable",
+    r"dissatisfied",
+    r"unsatisfied",
+    r"sick",
+    r"ill",
+    r"tired",
+    r"jealous",
+    r"envious",
+    r"afraid",
+    r"scared",
+    r"converned",
+    r"worried",
+    r"uneasy",
+    r"troubled)"
+    ])      
+
  ######                                                           
  #     # ###### ###### #      ######  ####  ##### #  ####  #    # 
  #     # #      #      #      #      #    #   #   # #    # ##   # 
@@ -225,22 +398,23 @@ fluffs = [
     re.compile(r"(?:^|\W)(?::|;|=|B|8)(?:-|\^)?(?:\)|\(|D|P|\||\[|\]|>|\$|3)+(?:$|\W)"), 
     re.compile(r"^well\W"), 
     re.compile(r"^so\W"), 
-    re.compile(r"^alright\W"), 
+    #re.compile(r"^alright\W"), 
     re.compile(r"^anyways?\W"), 
     re.compile(r"^lol\w?\W"), 
     re.compile(r"^wo+w\W"), 
     re.compile(r"^cool[\.\,\!]+"),         
     re.compile(r"^sorry[\.\,\!]+"),         
-    re.compile(r"^great[\.\,\!]+"),         
-    re.compile(r"finally"), 
+    #re.compile(r"^great[\.\,\!]+"),         
+    re.compile(r"final?ly"), 
     re.compile(r"honestly"),
     re.compile(r"actually"),
     re.compile(r"quite"),    
     re.compile(r"really"),    
-    re.compile(r"literally"),    
+    re.compile(r"literal?ly"),    
     re.compile(r"certainly"),    
     re.compile(r"in fact"),
-    re.compile(r"just")
+    re.compile(r"basical?ly")
+    #re.compile(r"just")
 ]
 
 def contains_fluff(text, fluffs=fluffs):
