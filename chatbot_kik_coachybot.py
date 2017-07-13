@@ -166,6 +166,8 @@ def incoming():
 
             print "Answer: " + " | ".join(answer)
             print "Next node: " + next_node
+            user["node_previous"] = user["node_current"]
+            user["node_current"]  = next_node
             for key in user.keys():
                 print("{:12}: {}".format(key,str(user[key])))
 
