@@ -228,7 +228,11 @@ def greeting(message, user):
             ])) 
             answer_facts.append("has_username")    
 
-    	next_node = "how_are_you"     
+    	next_node = "how_are_you"  
+
+    else:
+
+    	next_node = "dummy"   
 
     return answer, next_node, user        
 
