@@ -123,11 +123,15 @@ def greeting(message, user):
                 answer_facts.append("has_greeting")
                 answer_facts.append("suppress_question_how_are_you")
 
+                next_node = "dummy"
+
             else:
                 print "...but it is a repetition. No greeting!"   
                 answer.append(random.choice([
                     "Hey! :)\nLet's talk about something interesting!"
                 ])) 
+
+                next_node = "dummy"
 
     #####################################################################
     ###     "How are you" from user
@@ -160,6 +164,8 @@ def greeting(message, user):
                 "Quite fine actually, thanks for asking!",
                 "Yeah, I'm pretty good."
                 ]))    
+
+            next_node = "how_are_you"
 
         elif(
             time_since_last_how_are_you <= (3*60*60*1000)
