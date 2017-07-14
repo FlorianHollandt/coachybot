@@ -160,7 +160,8 @@ def incoming():
                                                                                                                   
             print "Message: " + message.body
             for key in user.keys():
-                print("{:12}: {}".format(key,str(user[key])))
+                if user[key]:
+                    print("{:12}: {}".format(key,str(user[key])))
 
             answer, next_node, user = eval(user["node_current"])(message, user)
 
@@ -169,7 +170,8 @@ def incoming():
             user["node_previous"] = user["node_current"]
             user["node_current"]  = next_node
             for key in user.keys():
-                print("{:12}: {}".format(key,str(user[key])))
+                if user[key]:
+                    print("{:12}: {}".format(key,str(user[key])))
 
 
               #####                                          #     #                                           
@@ -220,6 +222,11 @@ def incoming():
         for key in user.keys():
             if user[key]:
                 db.execute("UPDATE users SET " + key + " = %s WHERE kik_id = %s;", (user[key], message.from_user))
+
+        if(
+            user["node_current"]  = "dummy"
+            ):
+            db.execute( "DELETE FROM users WHERE kik_id = %s;", (message.from_user,))
 
 
     #####################################################################

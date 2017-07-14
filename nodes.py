@@ -369,7 +369,7 @@ def dummy(message, user):
 
     print "Evaluating node 'dummy'"
 
-    answer = ["Hmmm... Tell me more!"]
+    answer = ["It was nice talking to you! :)"]
 
     next_node = "greeting"
 
@@ -430,16 +430,19 @@ def template(message, user):
 			"Hi " + user["kik_firstname"] + "!\nWe were just talking about something interesting..."
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
 	elif(		# Major interruption
-		time_since_last_message < 11*60*60*1000
+		time_since_last_message >= 11*60*60*1000
 		):
 
 		print "There was a major interruption in the conversation. Return to full greeting..."
 
-		answer, next_node, user = greeting(message, user)
-		return answer, next_node, user
+		answer = ["Hello again!"]
+		next_node = "dummy"
+
+		#answer, next_node, user = greeting(message, user)
+		#return answer, next_node, user
 
 	elif(		# Why-Question
 		"has_question_why" in answer_facts
@@ -451,7 +454,7 @@ def template(message, user):
 			"Well... It's just an intersting topic, right?"
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
 	elif(		# Protest to question
 		"has_protest_to_question" in answer_facts
@@ -463,7 +466,7 @@ def template(message, user):
 			"Oh, sorry! So this is a touchy subject for you, right?"
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
 	elif(		# Actual relevant decision
 		True
@@ -473,7 +476,7 @@ def template(message, user):
 			"OK..."
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
 	else:		# Backup plan, if no pattern matches
 
@@ -481,7 +484,7 @@ def template(message, user):
 			"OK..."
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
     return answer, next_node, user
 
