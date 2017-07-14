@@ -277,7 +277,7 @@ def how_are_you(message, user):
             message_facts.append("is_bad")            
         
 	if has_elaboration(sentences):
-    	message_facts.append("has_elaboration")
+		message_facts.append("has_elaboration")
 
 
 	time_since_last_message = message.timestamp - user["message_last"]
