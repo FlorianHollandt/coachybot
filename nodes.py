@@ -327,7 +327,7 @@ def how_are_you(message, user):
 			"Great! What was today's highlight?"
 			]))
 
-		next_node = "template" # highlight
+		next_node = "dummy" # highlight
 
 	elif(		# Negative answer with no further elaboration
 		"is_bad" in message_facts
@@ -349,7 +349,7 @@ def how_are_you(message, user):
 			"OK..."
 			]))
 
-		next_node = "template"
+		next_node = "dummy"
 
     return answer, next_node, user
 
@@ -367,7 +367,7 @@ def how_are_you(message, user):
 def dummy(message, user):
     "Dummy node, to test node transition."
 
-    print "Evaluating node 'how_are_you'"
+    print "Evaluating node 'dummy'"
 
     answer = ["Hmmm... Tell me more!"]
 
