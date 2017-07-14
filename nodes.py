@@ -344,8 +344,10 @@ def how_are_you(message, user):
 		):
 
 		answer.append(random.choice([
-			"Wow, " + answer.append(random.choice(reflections_closed)) + "? That's great!",
-			"Really  -  " + answer.append(random.choice(reflections_closed)) + "? That's amazing!",
+			#"Wow, " + answer.append(random.choice(reflections_closed)) + "? That's great!",
+			"Wow, " + reflections_closed[0] + "? That's great!",
+			#"Really  -  " + answer.append(random.choice(reflections_closed)) + "? That's amazing!"
+			"Really  -  " + reflections_closed[0] + "? That's amazing!"
 			]))
 
 		next_node = "dummy" # highlight		
