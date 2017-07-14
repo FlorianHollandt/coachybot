@@ -394,6 +394,38 @@ def perform_open_reflection(statement):
         content = re.sub(before, after, content) 
     return introduction + content.lower()
 
+
+def perform_closed_reflection(statement):
+    reflections_open = [
+        (r"^" + temporal + r"?(\W?)i am\W([^\.\,\!]+)(?:.*)", r'you are |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i was\W([^\.\,\!]+)(?:.*)", r'you were |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i will\W([^\.\,\!]+)(?:.*)", r'you will |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i have got\W([^\.\,\!]+)(?:.*)", r"you've got |||\3\2\1"),
+        (r"^" + temporal + r"?(\W?)i have had\W([^\.\,\!]+)(?:.*)", r"you've had |||\3\2\1"),
+        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r'you have |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i had\W([^\.\,\!]+)(?:.*)", r'you had |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i got\W([^\.\,\!]+)(?:.*)", r'you got |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i do\W([^\.\,\!]+)(?:.*)", r'you do |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i did\W([^\.\,\!]+)(?:.*)", r'you did |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i can\W([^\.\,\!]+)(?:.*)", r'you can |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i could\W([^\.\,\!]+)(?:.*)", r'you could |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i feel\W([^\.\,\!]+)(?:.*)", r'you feel |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i felt\W([^\.\,\!]+)(?:.*)", r'you felt |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i hope\W([^\.\,\!]+)(?:.*)", r'you hope |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i hoped\W([^\.\,\!]+)(?:.*)", r'you hoped |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i wish\W([^\.\,\!]+)(?:.*)", r'you wish |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i wished\W([^\.\,\!]+)(?:.*)", r'you wished |||\3\2\1')
+    ]
+    for (before, after) in reflections_open:
+        if re.search(before,statement):
+            reflection = sub2(before,after,statement)
+            break
+    introduction,content = reflection.split("|||")
+    for (before, after) in pronoun_reflections:
+        content = re.sub(before, after, content) 
+    return introduction + content.lower()
+
+
   #####                                             
  #     # #####  ###### ###### ##### # #    #  ####  
  #       #    # #      #        #   # ##   # #    # 

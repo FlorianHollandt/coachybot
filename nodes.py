@@ -258,6 +258,8 @@ def how_are_you(message, user):
     message_facts = []
     answer_facts = []
     answer = []
+    reflections_open = []
+    reflections_closed = []
 
     sentences = preprocess_message(message.body)
 
@@ -274,7 +276,12 @@ def how_are_you(message, user):
         if is_good(sentence):
             message_facts.append("is_good")
         if is_bad(sentence):
-            message_facts.append("is_bad")            
+            message_facts.append("is_bad")
+        if is_statement_about_self(sentence):
+            message_facts.append("has_statement_about_self")
+            reflections_closed.append(perform_closed_reflection(sentence))
+            reflections_open.append(perform_open_reflection(sentence))
+
         
 	if has_elaboration(sentences):
 		message_facts.append("has_elaboration")
@@ -328,6 +335,18 @@ def how_are_you(message, user):
 			]))
 
 		next_node = "dummy" # highlight
+
+	elif(		# Positive answer with statement about self
+		"is_good" in message_facts
+		and reflections_open
+		):
+
+		answer.append(random.choice([
+			"Wow, " + answer.append(random.choice(reflections_closed)) + "? That's great!",
+			"Really  -  " + answer.append(random.choice(reflections_closed)) + "? That's amazing!",
+			]))
+
+		next_node = "dummy" # highlight		
 
 	elif(		# Negative answer with no further elaboration
 		"is_bad" in message_facts
