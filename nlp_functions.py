@@ -56,10 +56,10 @@ def stemmer(word,pos):
 
 def has_protest_to_question(sentence):
     if(
-        re.search(r"no[^\.\,\;(is)]+you[^\.\,\;]+(busines|concern)")
-        or re.search(r"mind[^\.\,\;(is)]+own[^\.\,\;]+busines")
-        or re.search(r"(never|no)[^\.\,\;(is)]+mind")
-        or re.search(r"no[^\.\,\;]+((talk[^\.\,\;]+about)|discuss)")        
+        re.search(r"no[^\.\,\;(is)]+you[^\.\,\;]+(busines|concern)",sentence)
+        or re.search(r"mind[^\.\,\;(is)]+own[^\.\,\;]+busines",sentence)
+        or re.search(r"(never|no)[^\.\,\;(is)]+mind",sentence)
+        or re.search(r"no[^\.\,\;]+((talk[^\.\,\;]+about)|discuss)",sentence)        
         ):
         return True
     else:
