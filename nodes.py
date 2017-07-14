@@ -261,7 +261,97 @@ def how_are_you(message, user):
 
     sentences = preprocess_message(message.body)
 
-    #for sentence in sentences:	
+    for sentence in sentences:
+
+        if has_question_why(sentence):
+            message_facts.append("has_question_why")  
+        if has_protest_to_question(sentence):
+            message_facts.append("has_protest_to_question")
+        if is_greeting(sentence):
+            message_facts.append("has_greeting")
+        if is_how_are_you(sentence):
+            message_facts.append("has_question_how_are_you")
+        if is_good(sentence):
+            message_facts.append("is_good")
+        if is_bad(sentence):
+            message_facts.append("is_bad")            
+        
+	if has_elaboration(sentences):
+    	message_facts.append("has_elaboration")
+
+
+	time_since_last_message = message.timestamp - user["message_last"]
+
+	if(			# Interruption
+		time_since_last_message >= 3*60*60*1000
+		):
+
+		print "There was an interruption in the conversation. Return to full greeting..."
+
+		answer, next_node, user = greeting(message, user)
+		return answer, next_node, user
+
+	elif(		# Why-Question
+		"has_question_why" in answer_facts
+		):
+
+		print "User wants to know the reason for this question..."
+
+		answer.append(random.choice([
+			"Oh, that's a nice way to start a conversation. You should gibe it a try sometimes! ;)"
+			"\nBut really, how are you today?"
+			]))
+
+		next_node = "how_are_you"
+
+	elif(		# Protest to question
+		"has_protest_to_question" in message_facts
+		):
+
+		print "User does not want to answer the question..."
+
+		answer.append(random.choice([
+			"Come on, I just wanted to get the conversation started."
+			"\nThere is something annoying you, right?"
+			]))
+
+		next_node = "dummy" # "aggression"
+
+	elif(		# Positive answer, but no further elaboration
+		"is_good" in message_facts
+		and "has_elaboration" not in message_facts
+		):
+
+		answer.append(random.choice([
+			"That's good to hear. So... Was there any particular highlight?",
+			"Great! What was today's highlight?"
+			]))
+
+		next_node = "template" # highlight
+
+	elif(		# Negative answer with no further elaboration
+		"is_bad" in message_facts
+		and "has_elaboration" not in message_facts
+		):
+
+		answer.append(random.choice([
+			"Okay... Do you want to talk about it?",
+			"What happened?",
+			"Can you tell me some more?",
+			"Really???"
+			]))
+
+		next_node = "dummy" # how_are_you_bad
+
+	else:		# Backup plan, if no pattern matches
+
+		answer.append(random.choice([
+			"OK..."
+			]))
+
+		next_node = "template"
+
+    return answer, next_node, user
 
 
 
@@ -320,7 +410,7 @@ def template(message, user):
 
 	time_since_last_message = message.timestamp - user["message_last"]
 
-	if(
+	if(			# Medium interruption
 		(
 			time_since_last_message >= 2*60*60*1000
 			and time_since_last_message < 5*60*60*1000
@@ -334,16 +424,64 @@ def template(message, user):
 			)
 		):
 
+		print "There was a medium interruption in the conversation. Resuming..."
+
 		answer.append(random.choice([
 			"Hi " + user["kik_firstname"] + "!\nWe were just talking about something interesting..."
 			]))
 
 		next_node = "template"
 
+	elif(		# Major interruption
+		time_since_last_message < 11*60*60*1000
+		):
 
-    answer = ["Hmmm... Tell me more!"]
+		print "There was a major interruption in the conversation. Return to full greeting..."
 
-    next_node = "greeting"
+		answer, next_node, user = greeting(message, user)
+		return answer, next_node, user
+
+	elif(		# Why-Question
+		"has_question_why" in answer_facts
+		):
+
+		print "User wants to know the reason for this question..."
+
+		answer.append(random.choice([
+			"Well... It's just an intersting topic, right?"
+			]))
+
+		next_node = "template"
+
+	elif(		# Protest to question
+		"has_protest_to_question" in answer_facts
+		):
+
+		print "User does not want to answer the question..."
+
+		answer.append(random.choice([
+			"Oh, sorry! So this is a touchy subject for you, right?"
+			]))
+
+		next_node = "template"
+
+	elif(		# Actual relevant decision
+		True
+		):
+
+		answer.append(random.choice([
+			"OK..."
+			]))
+
+		next_node = "template"
+
+	else:		# Backup plan, if no pattern matches
+
+		answer.append(random.choice([
+			"OK..."
+			]))
+
+		next_node = "template"
 
     return answer, next_node, user
 

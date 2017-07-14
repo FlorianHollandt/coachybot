@@ -150,7 +150,7 @@ negations_adjective = "|".join([
     r"incorrect)"
     ])   
 
-negations = r"("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
+negations = r"(("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
 
 def has_negation(sentence):
     if re.search(negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
@@ -210,7 +210,7 @@ goods = "|".join([
     r"fantastic",
     r"stunning",
     r"groovy",
-    r"wunderful?l",
+    r"wonderful?l",
     r"superb",
     r"marvel?lous",
     r"neat",
@@ -221,16 +221,16 @@ goods = "|".join([
     r"excellent",
     r"dope",
     r"well",
-    r"elated",
+    r"elat(ed|ing)",
     r"enthusiastic",
     r"looking forward to",
-    r"engaged",
-    r"thrilled",
-    r"excited",
+    r"engag(ed|ing)",
+    r"thrill(ed|ing)",
+    r"excit(ed|ing)",
     r"happy",
     r"joyful",
     r"joyous",
-    r"delighted",
+    r"delight(ed|ing)",
     r"curious",
     r"eager",
     r"ok",
@@ -264,6 +264,46 @@ bads = "|".join([
     r"uneasy",
     r"troubled)"
     ])      
+
+def is_good(sentence):
+    if(
+        (
+            re.search(goods,sentence)
+            and not has_negation(sentence)
+            )or(
+            re.search(bads,sentence)
+            and has_negation(sentence)            
+            )
+        ):
+        return True
+    else:
+        return False
+
+def is_bad(sentence):
+    if(
+        (
+            re.search(bads,sentence)
+            and not has_negation(sentence)
+            )or(
+            re.search(goods,sentence)
+            and has_negation(sentence)            
+            )
+        ):
+        return True
+    else:
+        return False
+
+def has_elaboration(sentences):
+    text = "".join(sentences)
+    for pattern in [goods,bads,intensifiers,affirmations,negations]:
+        text=re.sub(pattern,"",text)
+    print text
+
+    if len(text) > 20:
+        return True
+    else:
+        return False
+
 
  ######                                                           
  #     # ###### ###### #      ######  ####  ##### #  ####  #    # 
