@@ -142,6 +142,7 @@ def incoming():
                     "message_last" : message.timestamp,
                     "dialogue_start" : message.timestamp,
                     "dialogue_count" : 1
+                    "node_current" : "greeting"
                     })
 
             if user["kik_timezone"]=="None":
