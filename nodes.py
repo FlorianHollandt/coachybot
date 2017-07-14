@@ -292,7 +292,7 @@ def how_are_you(message, user):
 		return answer, next_node, user
 
 	elif(		# Why-Question
-		"has_question_why" in answer_facts
+		"has_question_why" in message_facts
 		):
 
 		print "User wants to know the reason for this question..."
@@ -415,8 +415,8 @@ def template(message, user):
 			time_since_last_message >= 2*60*60*1000
 			and time_since_last_message < 5*60*60*1000
 			and (
-				"has_greeting" in answer_facts
-				or "has_question_how_are_you" in answer_facts
+				"has_greeting" in message_facts
+				or "has_question_how_are_you" in message_facts
 				)
 			) or (
 			time_since_last_message >= 5*60*60*1000
@@ -445,7 +445,7 @@ def template(message, user):
 		#return answer, next_node, user
 
 	elif(		# Why-Question
-		"has_question_why" in answer_facts
+		"has_question_why" in message_facts
 		):
 
 		print "User wants to know the reason for this question..."
@@ -457,7 +457,7 @@ def template(message, user):
 		next_node = "dummy"
 
 	elif(		# Protest to question
-		"has_protest_to_question" in answer_facts
+		"has_protest_to_question" in message_facts
 		):
 
 		print "User does not want to answer the question..."
