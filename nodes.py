@@ -280,7 +280,9 @@ def how_are_you(message, user):
         if is_statement_about_self(sentence):
             message_facts.append("has_statement_about_self")
             reflections_closed.append(perform_closed_reflection(sentence))
+            print reflections_closed
             reflections_open.append(perform_open_reflection(sentence))
+            print reflections_open
 
         
 	if has_elaboration(sentences):
