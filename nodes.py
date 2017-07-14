@@ -228,7 +228,7 @@ def greeting(message, user):
             ])) 
         else:
             answer.append(random.choice([
-                "How are you today, " + user["kik_username"] + "?",
+                "How are you today, " + user["kik_firstname"] + "?"
             ])) 
             answer_facts.append("has_username")    
 
@@ -286,6 +286,66 @@ def dummy(message, user):
     return answer, next_node, user
 
 
+
+ #######                                                 
+    #    ###### #    # #####  #        ##   ##### ###### 
+    #    #      ##  ## #    # #       #  #    #   #      
+    #    #####  # ## # #    # #      #    #   #   #####  
+    #    #      #    # #####  #      ######   #   #      
+    #    #      #    # #      #      #    #   #   #      
+    #    ###### #    # #      ###### #    #   #   ###### 
+                                                         
+
+def template(message, user):
+    "Node template"
+
+    print "Evaluating node 'Template'"
+
+    message_facts = []
+    answer_facts = []
+    answer = []
+
+    sentences = preprocess_message(message.body)
+
+    for sentence in sentences:
+
+        if has_question_why(sentence):
+            message_facts.append("has_question_why")  
+        if has_protest_to_question(sentence):
+            message_facts.append("has_protest_to_question")
+        if is_greeting(sentence):
+            message_facts.append("has_greeting")
+        if is_how_are_you(sentence):
+            message_facts.append("has_question_how_are_you")
+
+	time_since_last_message = message.timestamp - user["message_last"]
+
+	if(
+		(
+			time_since_last_message >= 2*60*60*1000
+			and time_since_last_message < 5*60*60*1000
+			and (
+				"has_greeting" in answer_facts
+				or "has_question_how_are_you" in answer_facts
+				)
+			) or (
+			time_since_last_message >= 5*60*60*1000
+			and time_since_last_message < 11*60*60*1000
+			)
+		):
+
+		answer.append(random.choice([
+			"Hi " + user["kik_firstname"] + "!\nWe were just talking about something interesting..."
+			]))
+
+		next_node = "template"
+
+
+    answer = ["Hmmm... Tell me more!"]
+
+    next_node = "greeting"
+
+    return answer, next_node, user
 
 
 

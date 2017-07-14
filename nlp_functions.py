@@ -45,6 +45,54 @@ def stemmer(word,pos):
         return word
 
 
+ ######                                          
+ #     # #####   ####  ##### ######  ####  ##### 
+ #     # #    # #    #   #   #      #        #   
+ ######  #    # #    #   #   #####   ####    #   
+ #       #####  #    #   #   #           #   #   
+ #       #   #  #    #   #   #      #    #   #   
+ #       #    #  ####    #   ######  ####    #   
+                                                 
+
+def has_protest_to_question(sentence):
+    if(
+        re.search(r"no[^\.\,\;(is)]+you[^\.\,\;]+(busines|concern)")
+        or re.search(r"mind[^\.\,\;(is)]+own[^\.\,\;]+busines")
+        or re.search(r"(never|no)[^\.\,\;(is)]+mind")
+        or re.search(r"no[^\.\,\;]+((talk[^\.\,\;]+about)|discuss)")        
+        ):
+        return True
+    else:
+        return False                                                 
+
+
+  #####                                                    
+ #     # #    # ######  ####  ##### #  ####  #    #  ####  
+ #     # #    # #      #        #   # #    # ##   # #      
+ #     # #    # #####   ####    #   # #    # # #  #  ####  
+ #   # # #    # #           #   #   # #    # #  # #      # 
+ #    #  #    # #      #    #   #   # #    # #   ## #    # 
+  #### #  ####  ######  ####    #   #  ####  #    #  ####  
+                                                           
+
+def has_question_why(sentence):
+    if(
+        (
+            re.search(r"(why|(what.*(for|reason)))", sentence)
+            and
+            re.search(r"(ask|know|question|curious|nosy|inquisitive)",sentence)
+            )
+        or(
+            re.search(r"(why|(how.*(is|be)))", sentence)
+            and
+            re.search(r"(important|relevant|interesting|fascinating)", sentence)
+            )
+        ):
+        return True
+    else:
+        return False
+
+
  #     #                        #    #     #        
   #   #  ######  ####          #     ##    #  ####  
    # #   #      #             #      # #   # #    # 
