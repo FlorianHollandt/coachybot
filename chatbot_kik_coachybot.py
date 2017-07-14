@@ -141,7 +141,7 @@ def incoming():
                     "message_first" : message.timestamp,
                     "message_last" : message.timestamp,
                     "dialogue_start" : message.timestamp,
-                    "dialogue_count" : 1
+                    "dialogue_count" : 1,
                     "node_current" : "greeting"
                     })
 
