@@ -48,7 +48,7 @@ def greeting(sentences, user):
         if is_how_are_you(sentence):
             message_facts.append("has_question_how_are_you")
 
-    time_since_last_message = user["message_current"] - user["message_last"]
+    time_since_last_message = user["message_current"] - user["message_previous"]
     
     if user["greeting_last"]:
         time_since_last_greeting = user["message_current"]- user["greeting_last"]
@@ -284,7 +284,7 @@ def how_are_you(sentences, user):
 		message_facts.append("has_elaboration")
 
 
-	time_since_last_message = user["message_current"]- user["message_last"]
+	time_since_last_message = user["message_current"]- user["message_previous"]
 
 	if(			# Medium interruption
 		user["repeat_question"]
@@ -435,7 +435,7 @@ def template(sentences, user):
         if is_how_are_you(sentence):
             message_facts.append("has_question_how_are_you")
 
-	time_since_last_message = user["message_current"] - user["message_last"]
+	time_since_last_message = user["message_current"] - user["message_previous"]
 
 	if(			# Medium interruption
 		user["repeat_question"]

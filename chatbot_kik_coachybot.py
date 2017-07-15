@@ -97,7 +97,7 @@ def incoming():
                 "gender", 
                 "dialogue_count", 
                 "dialogue_start", 
-                "message_last",
+                "message_previous",
                 "message_count",
                 "greeting_last",
                 "how_are_you_last",
@@ -140,7 +140,7 @@ def incoming():
                     "kik_timezone" : str(kik_user.timezone),
                     "message_count" : 1,
                     "message_first" : message.timestamp,
-                    "message_last" : message.timestamp,
+                    "message_previous" : message.timestamp,
                     "message_current" : message.timestamp,
                     "dialogue_start" : message.timestamp,
                     "dialogue_count" : 1,
@@ -169,7 +169,7 @@ def incoming():
                 if is_greeting(sentence):
                     disruptions.append("has_greeting")
 
-            time_since_last_message = message.timestamp - user["message_last"]
+            time_since_last_message = message.timestamp - user["message_previous"]
 
             if(
                 time_since_last_message >= 11*60*60*1000
@@ -263,7 +263,7 @@ def incoming():
           #####  #      #####  #    #   #   # #    #  ####     ######  #    #   #   #    # #####  #    #  ####  ###### 
                                                                                                                        
 
-        user["message_last"] = message.timestamp
+        user["message_previous"] = message.timestamp
 
         print user
 
