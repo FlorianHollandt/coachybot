@@ -44,6 +44,10 @@ def stemmer(word,pos):
     else:
         return word
 
+def capitalize_sentence(sentence):
+    sentence = sentence[:1].upper() + sentence[1:]
+    sentence = re.sub(r"(^|\W)i($|\W)",r"\1I\2",sentence)
+    return sentence
 
  ######                                          
  #     # #####   ####  ##### ######  ####  ##### 
@@ -359,7 +363,7 @@ pronoun_reflections = [
     (r"(^|\W)mine(\W|$)", r"\1YOURS\2"),
     (r"(^|\W)my(\W|$)", r"\1YOUR\2"),
     (r"(^|\W)myself(\W|$)", r"\1MYSELF\2"),    
-    (r"(^|\W)you(\W|$)", r"\1I\2"),
+    (r"(^|\W)you(\W|$)", r"\1ME\2"),
     (r"(^|\W)your(\W|$)", r"\1MY\2"),
     (r"(^|\W)yours(\W|$)", r"\1MINE\2")
     ]
@@ -396,13 +400,13 @@ def perform_open_reflection(statement):
 
 
 def perform_closed_reflection(statement):
-    reflections_open = [
+    reflections_closed = [
         (r"^" + temporal + r"?(\W?)i am\W([^\.\,\!]+)(?:.*)", r'you are |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i was\W([^\.\,\!]+)(?:.*)", r'you were |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i will\W([^\.\,\!]+)(?:.*)", r'you will |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i have got\W([^\.\,\!]+)(?:.*)", r"you've got |||\3\2\1"),
         (r"^" + temporal + r"?(\W?)i have had\W([^\.\,\!]+)(?:.*)", r"you've had |||\3\2\1"),
-        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r'you have |||\3\2\1'),
+        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r"you've |||\3\2\1"),
         (r"^" + temporal + r"?(\W?)i had\W([^\.\,\!]+)(?:.*)", r'you had |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i got\W([^\.\,\!]+)(?:.*)", r'you got |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i do\W([^\.\,\!]+)(?:.*)", r'you do |||\3\2\1'),
@@ -416,7 +420,7 @@ def perform_closed_reflection(statement):
         (r"^" + temporal + r"?(\W?)i wish\W([^\.\,\!]+)(?:.*)", r'you wish |||\3\2\1'),
         (r"^" + temporal + r"?(\W?)i wished\W([^\.\,\!]+)(?:.*)", r'you wished |||\3\2\1')
     ]
-    for (before, after) in reflections_open:
+    for (before, after) in reflections_closed:
         if re.search(before,statement):
             reflection = sub2(before,after,statement)
             break
@@ -739,3 +743,29 @@ def expand_contractions(text):
     return text
 
 
+
+ #######                                                         
+ #       #    # ##### #####    ##    ####  ##### #  ####  #    # 
+ #        #  #    #   #    #  #  #  #    #   #   # #    # ##   # 
+ #####     ##     #   #    # #    # #        #   # #    # # #  # 
+ #         ##     #   #####  ###### #        #   # #    # #  # # 
+ #        #  #    #   #   #  #    # #    #   #   # #    # #   ## 
+ ####### #    #   #   #    # #    #  ####    #   #  ####  #    # 
+                                                                 
+
+
+def extract_persons(text):
+    target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
+    tokens = nltk.tokenize.word_tokenize(text)
+    pos = nltk.pos_tag(tokens)
+    sentt = nltk.ne_chunk(pos, binary = False)
+    persons = []
+    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
+        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
+        for i in range(len((persons))):
+            if re.search(persons[i],name):
+                persons[i] = re.sub(persons[i],name,persons[i])
+        if not any(re.search(name,person) for person in persons):
+            persons.append(name)            
+
+    return (persons)

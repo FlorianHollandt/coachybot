@@ -121,6 +121,7 @@ def incoming():
 
                 user.update(dict(zip(user_attributes, user_values)))
                 user["message_count"] += 1
+                user["message_current"] = message.timestamp
 
             else:
 
@@ -140,6 +141,7 @@ def incoming():
                     "message_count" : 1,
                     "message_first" : message.timestamp,
                     "message_last" : message.timestamp,
+                    "message_current" : message.timestamp,
                     "dialogue_start" : message.timestamp,
                     "dialogue_count" : 1,
                     "node_current" : "greeting"
@@ -148,7 +150,59 @@ def incoming():
             if user["kik_timezone"]=="None":
                 user["kik_timezone"] = "Europe/Berlin"
 
-            #user["node_current"] = "greeting"
+
+             ######                                                             
+             #     # #  ####  #####  #    # #####  ##### #  ####  #    #  ####  
+             #     # # #      #    # #    # #    #   #   # #    # ##   # #      
+             #     # #  ####  #    # #    # #    #   #   # #    # # #  #  ####  
+             #     # #      # #####  #    # #####    #   # #    # #  # #      # 
+             #     # # #    # #   #  #    # #        #   # #    # #   ## #    # 
+             ######  #  ####  #    #  ####  #        #   #  ####  #    #  ####  
+                                                                    
+            disruptions = []
+
+            sentences = preprocess_message(message.body)
+
+            for sentence in sentences:
+                if has_question_why(sentence):
+                    disruptions.append("has_question_why")  
+                if is_greeting(sentence):
+                    disruptions.append("has_greeting")
+
+            time_since_last_message = message.timestamp - user["message_last"]
+
+            if(
+                time_since_last_message >= 11*60*60*1000
+                ):
+
+                user.update({
+                    "node_previous" : user["node_current"],
+                    "node_current" : "greeting"
+                    })
+
+            elif(
+                    (
+                        time_since_last_message >= 2*60*60*1000
+                        and time_since_last_message < 5*60*60*1000
+                        and (
+                            "has_greeting" in message_facts
+                            or "has_question_how_are_you" in message_facts
+                            )
+                        ) or (
+                        time_since_last_message >= 5*60*60*1000
+                        and time_since_last_message < 11*60*60*1000
+                        )
+                ):
+
+                kik.send_messages([
+                    TextMessage(
+                        to = message.from_user,
+                        chat_id = message.chat_id,
+                        body = "Hi " + user["kik_firstname"] + "!\nWe were just talking about something interesting..."
+                    )
+                ])        
+
+                user["repeat_question"] = True
 
 
              #######                                                               #     #                      
@@ -158,10 +212,11 @@ def incoming():
              #       #    # ###### #      # #    # ######   #   # #  # # #  ###    #   # # #    # #    # #      
              #        #  #  #    # #      # #    # #    #   #   # #   ## #    #    #    ## #    # #    # #      
              #######   ##   #    # ###### #  ####  #    #   #   # #    #  ####     #     #  ####  #####  ###### 
-                                                                                                                  
+                                                  
+
             print "Message: " + message.body
             for key in user.keys():
-                if user[key]:
+                if re.match(r"node",user[key]):
                     print("{:12}: {}".format(key,str(user[key])))
 
             answer, next_node, user = eval(user["node_current"])(message, user)
@@ -171,7 +226,7 @@ def incoming():
             user["node_previous"] = user["node_current"]
             user["node_current"]  = next_node
             for key in user.keys():
-                if user[key]:
+                if re.match(r"node",user[key]):
                     print("{:12}: {}".format(key,str(user[key])))
 
 
