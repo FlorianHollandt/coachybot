@@ -427,8 +427,7 @@ def template(sentences, user):
     answer_facts = []
     answer = []
 
-        for sentence in sentences:
-
+    for sentence in sentences:
         if has_question_why(sentence):
             message_facts.append("has_question_why")  
         if has_protest_to_question(sentence):
