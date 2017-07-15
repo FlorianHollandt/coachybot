@@ -219,7 +219,7 @@ def incoming():
                 if re.match(r"node",key):
                     print("{:12}: {}".format(key,str(user[key])))
 
-            answer, next_node, user = eval(user["node_current"])(message, user)
+            answer, next_node, user = eval(user["node_current"])(sentences, user)
 
             print "Answer: " + " | ".join(answer)
             print "Next node: " + next_node
