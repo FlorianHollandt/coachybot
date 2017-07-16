@@ -357,11 +357,13 @@ def how_are_you(sentences, user):
 		):
 
 		answer.append(random.choice([
-			"Wow, " + random.choice(reflections_closed) + "? That's great!",
-			"Really  -  " + random.choice(reflections_closed) + "? That's amazing!"
+			#"Oh no! " + capitalize_sentence("But why " + random.choice(reflections_open) + "?"),
+			capitalize_sentence("Hmm... So " + 
+				random.choice(reflections_closed) + 
+				"?")
 			]))
 
-		next_node = "dummy" # reflection_positive		
+		next_node = "dummy" # reflection_negative		
 
 	elif(		# Negative answer with no further elaboration
 		"is_bad" in message_facts
