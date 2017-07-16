@@ -348,7 +348,6 @@ def has_elaboration(sentences):
     text = "".join(sentences)
     for pattern in [goods,bads,intensifiers,affirmations,negations]:
         text=re.sub(pattern,"",text)
-    print text
 
     if len(text) > 20:
         return True

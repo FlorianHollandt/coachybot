@@ -229,11 +229,11 @@ def greeting(sentences, user):
             ])) 
             answer_facts.append("has_username")    
 
-    	next_node = "how_are_you"  
+        next_node = "how_are_you"  
 
     else:
 
-    	next_node = "dummy"   
+        next_node = "dummy"   
 
     return answer, next_node, user        
 
@@ -280,113 +280,113 @@ def how_are_you(sentences, user):
             #print reflections_open
 
         
-	if has_elaboration(sentences):
-		message_facts.append("has_elaboration")
+    if has_elaboration(sentences):
+        message_facts.append("has_elaboration")
 
-	print reflections_open
+    print reflections_open
 
-	time_since_last_message = user["message_current"]- user["message_previous"]
+    time_since_last_message = user["message_current"]- user["message_previous"]
 
-	if(			# Medium interruption
-		user["repeat_question"]
-		):
+    if(            # Medium interruption
+        user["repeat_question"]
+        ):
 
-		print "Re-formulate the node's question, because of an interruption"
+        print "Re-formulate the node's question, because of an interruption"
 
-		answer.append(random.choice([
-			"So... How are you, acutally?"
-			]))
-		
-		next_node = "how_are_you" # The same node again...
+        answer.append(random.choice([
+            "So... How are you, acutally?"
+            ]))
+        
+        next_node = "how_are_you" # The same node again...
 
-	elif(		# Why-Question
-		"has_question_why" in message_facts
-		):
+    elif(        # Why-Question
+        "has_question_why" in message_facts
+        ):
 
-		print "User wants to know the reason for this question..."
+        print "User wants to know the reason for this question..."
 
-		answer.append(random.choice([
-			"Oh, that's a nice way to start a conversation, right?"
-			"\nBut really, how are you today?"
-			]))
+        answer.append(random.choice([
+            "Oh, that's a nice way to start a conversation, right?"
+            "\nBut really, how are you today?"
+            ]))
 
-		next_node = "how_are_you"
+        next_node = "how_are_you"
 
-	elif(		# Protest to question
-		"has_protest_to_question" in message_facts
-		):
+    elif(        # Protest to question
+        "has_protest_to_question" in message_facts
+        ):
 
-		print "User does not want to answer the question..."
+        print "User does not want to answer the question..."
 
-		answer.append(random.choice([
-			"Come on, I just wanted to get the conversation started."
-			"\nThere is something annoying you, right?"
-			]))
+        answer.append(random.choice([
+            "Come on, I just wanted to get the conversation started."
+            "\nThere is something annoying you, right?"
+            ]))
 
-		next_node = "dummy" # "aggression"
+        next_node = "dummy" # "aggression"
 
-	elif(		# Positive answer with statement about self
-		"is_good" in message_facts
-		and reflections_open
-		):
+    elif(        # Positive answer with statement about self
+        "is_good" in message_facts
+        and reflections_open
+        ):
 
-		answer.append(random.choice([
-			capitalize_sentence("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
-			capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
-			"Oh, nice! " +  
-			capitalize_sentence("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
-			]))
+        answer.append(random.choice([
+            capitalize_sentence("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
+            capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
+            "Oh, nice! " +  
+            capitalize_sentence("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
+            ]))
 
-		next_node = "dummy" # reflection_positive	
+        next_node = "dummy" # reflection_positive    
 
 
-	elif(		# Positive answer, but no further elaboration
-		"is_good" in message_facts
-		and "has_elaboration" not in message_facts
-		):
+    elif(        # Positive answer, but no further elaboration
+        "is_good" in message_facts
+        and "has_elaboration" not in message_facts
+        ):
 
-		answer.append(random.choice([
-			"That's good to hear. So... Was there any particular highlight?",
-			"Great! What was today's highlight?"
-			]))
+        answer.append(random.choice([
+            "That's good to hear. So... Was there any particular highlight?",
+            "Great! What was today's highlight?"
+            ]))
 
-		next_node = "dummy" # highlight
+        next_node = "dummy" # highlight
 
-	elif(		# Negative answer with statement about self
-		"is_bad" in message_facts
-		and reflections_open
-		):
+    elif(        # Negative answer with statement about self
+        "is_bad" in message_facts
+        and reflections_open
+        ):
 
-		answer.append(random.choice([
-			#"Oh no! " + capitalize_sentence("But why " + random.choice(reflections_open) + "?"),
-			capitalize_sentence("Hmm... So " + 
-				random.choice(reflections_closed) + 
-				"?")
-			]))
+        answer.append(random.choice([
+            #"Oh no! " + capitalize_sentence("But why " + random.choice(reflections_open) + "?"),
+            capitalize_sentence("Hmm... So " + 
+                random.choice(reflections_closed) + 
+                "?")
+            ]))
 
-		next_node = "dummy" # reflection_negative		
+        next_node = "dummy" # reflection_negative        
 
-	elif(		# Negative answer with no further elaboration
-		"is_bad" in message_facts
-		and "has_elaboration" not in message_facts
-		):
+    elif(        # Negative answer with no further elaboration
+        "is_bad" in message_facts
+        and "has_elaboration" not in message_facts
+        ):
 
-		answer.append(random.choice([
-			"Okay... Do you want to talk about it?",
-			"What happened?",
-			"Can you tell me some more?",
-			"Really???"
-			]))
+        answer.append(random.choice([
+            "Okay... Do you want to talk about it?",
+            "What happened?",
+            "Can you tell me some more?",
+            "Really???"
+            ]))
 
-		next_node = "dummy" # how_are_you_bad
+        next_node = "dummy" # how_are_you_bad
 
-	else:		# Backup plan, if no pattern matches
+    else:        # Backup plan, if no pattern matches
 
-		answer.append(random.choice([
-			"Hm, I see..."
-			]))
+        answer.append(random.choice([
+            "Hm, I see..."
+            ]))
 
-		next_node = "dummy"
+        next_node = "dummy"
 
     return answer, next_node, user
 
@@ -440,61 +440,61 @@ def template(sentences, user):
         if is_how_are_you(sentence):
             message_facts.append("has_question_how_are_you")
 
-	time_since_last_message = user["message_current"] - user["message_previous"]
+    time_since_last_message = user["message_current"] - user["message_previous"]
 
-	if(			# Medium interruption
-		user["repeat_question"]
-		):
+    if(            # Medium interruption
+        user["repeat_question"]
+        ):
 
-		print "Re-formulate the node's question, because of an interruption"
+        print "Re-formulate the node's question, because of an interruption"
 
-		answer.append(random.choice([
-			"So... What do you feel about X?"
-			]))
-		
-		next_node = "dummy" # The same node again...
+        answer.append(random.choice([
+            "So... What do you feel about X?"
+            ]))
+        
+        next_node = "dummy" # The same node again...
 
-	elif(		# Why-Question
-		"has_question_why" in message_facts
-		):
+    elif(        # Why-Question
+        "has_question_why" in message_facts
+        ):
 
-		print "User wants to know the reason for this question..."
+        print "User wants to know the reason for this question..."
 
-		answer.append(random.choice([
-			"Well... It's just an intersting topic, right?"
-			]))
+        answer.append(random.choice([
+            "Well... It's just an intersting topic, right?"
+            ]))
 
-		next_node = "dummy" # The same node again...
+        next_node = "dummy" # The same node again...
 
-	elif(		# Protest to question
-		"has_protest_to_question" in message_facts
-		):
+    elif(        # Protest to question
+        "has_protest_to_question" in message_facts
+        ):
 
-		print "User does not want to answer the question..."
+        print "User does not want to answer the question..."
 
-		answer.append(random.choice([
-			"Oh, sorry! So this is a touchy subject for you, right?"
-			]))
+        answer.append(random.choice([
+            "Oh, sorry! So this is a touchy subject for you, right?"
+            ]))
 
-		next_node = "dummy" # Some appropriate node
+        next_node = "dummy" # Some appropriate node
 
-	elif(		# Actual relevant decision
-		True
-		):
+    elif(        # Actual relevant decision
+        True
+        ):
 
-		answer.append(random.choice([
-			"OK..."
-			]))
+        answer.append(random.choice([
+            "OK..."
+            ]))
 
-		next_node = "dummy"
+        next_node = "dummy"
 
-	else:		# Backup plan, if no pattern matches
+    else:        # Backup plan, if no pattern matches
 
-		answer.append(random.choice([
-			"OK..."
-			]))
+        answer.append(random.choice([
+            "OK..."
+            ]))
 
-		next_node = "dummy"
+        next_node = "dummy"
 
     return answer, next_node, user
 

@@ -239,8 +239,8 @@ def incoming():
               #####  ###### #    # #####  # #    #  ####     #     # ######  ####   ####  #    #  ####  ###### 
                                                                                                    
 
-            for key in user.keys():
-                print("{:12}: {}".format(key,str(user[key])))
+            #for key in user.keys():
+            #    print("{:12}: {}".format(key,str(user[key])))
             # print "Message: " + ", ".join(message_facts)
             # print "Answer: " + ", ".join(answer_facts)
             print " | ".join(answer)
