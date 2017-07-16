@@ -54,6 +54,14 @@ def capitalize_sentence(sentence):
     
     return sentence
 
+def capitalize_fragment(sentence):
+    sentence = re.sub(r"(^|\W)i($|\W)",r"\1I\2",sentence)
+
+    names = extract_named_entities(sentence.title())
+    for name in names:
+        sentence = re.sub(name.lower(),name,sentence)
+    
+    return sentence
 
  #######                                                         
  #       #    # ##### #####    ##    ####  ##### #  ####  #    # 
@@ -83,7 +91,7 @@ def extract_persons(text):
 
 
 def extract_named_entities(text):
-    target = re.compile(r"(PERSON|ORGANIZATION|FACILITY)|GPE|LOCATION")
+    target = re.compile(r"(PERSON|ORGANIZATION|GPE|LOCATION)")
     tokens = nltk.tokenize.word_tokenize(text)
     pos = nltk.pos_tag(tokens)
     sentt = nltk.ne_chunk(pos, binary = False)

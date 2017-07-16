@@ -274,9 +274,9 @@ def how_are_you(sentences, user):
             message_facts.append("is_bad")
         if is_statement_about_self(sentence):
             message_facts.append("has_statement_about_self")
-            reflections_closed.append(perform_closed_reflection(sentence))
+            reflections_closed.append(capitalize_fragment(perform_closed_reflection(sentence)))
             #print reflections_closed
-            reflections_open.append(perform_open_reflection(sentence))
+            reflections_open.append(capitalize_fragment(perform_open_reflection(sentence)))
             #print reflections_open
 
         
@@ -329,10 +329,9 @@ def how_are_you(sentences, user):
         ):
 
         answer.append(random.choice([
-            capitalize_sentence("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
-            capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!",
-            "Oh, nice! " +  
-            capitalize_sentence("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
+            "Wow, " + random.choice(reflections_closed) + "? That's great!",
+            "Really  -  " + random.choice(reflections_closed) + "? That's amazing!",
+            "Oh, nice! Can you tell me some more about how and why " + random.choice(reflections_closed) + "?"
             ]))
 
         next_node = "dummy" # reflection_positive    
