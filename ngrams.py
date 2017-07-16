@@ -11,7 +11,7 @@ http://www.opensource.org/licenses/mit-license.php
 
 import re, string, random, glob, operator, heapq
 from collections import defaultdict
-from math import log10
+from math import log10, pow
 
 def memo(f):
     "Memoize function f."
@@ -219,7 +219,7 @@ def correct(w):
         if not candidates:
             return w
         else:
-            c, edit = max(candidates, key=lambda (c,e): Pedit(e) * Pw(c) * Pw(c)) 
+            c, edit = max(candidates, key=lambda (c,e): Pedit(e) * pow(Pw(c),1.6)) 
             return c 
 
 def Pedit(edit): 
