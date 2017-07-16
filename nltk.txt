@@ -1,2 +1,3 @@
 punkt
 stopwords
+taggers
