@@ -54,7 +54,7 @@ def capitalize_sentence(sentence):
     for name in names:
         sentence = re.sub(name.lower(),name,sentence)
 
-    for token in nltk.tokenize.word_tokenize(sentence)[0:]:
+    for token in nltk.tokenize.word_tokenize(sentence)[1:]:
             if re.match(r"[A-Z]\w*",token):
                 if Pw(token.lower())>1e-06 and token not in firstnames.words():
                     sentence = re.sub(token,token.lower(),sentence)
@@ -182,6 +182,9 @@ def has_question_why(sentence):
             and
             re.search(r"(important|relevant|interesting|fascinating)", sentence)
             )
+        or(
+            re.search(r"why\?", sentence)
+            )        
         ):
         return True
     else:

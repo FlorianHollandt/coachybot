@@ -365,9 +365,8 @@ def how_are_you(sentences, user):
 
         next_node = "dummy" # highlight
 
-    elif(        # Negative answer with rationale
-        "is_bad" in message_facts
-        and rationale
+    elif(        # Negative or neutral answer with rationale
+        rationale
         ):
 
         answer.append(random.choice([
@@ -401,6 +400,16 @@ def how_are_you(sentences, user):
             ]))
 
         next_node = "how_are_you_bad" # how_are_you_bad
+
+    elif(        # Neutral answer with statement about self
+        reflections_open
+        ):
+
+        answer.append(random.choice([
+            "Hmm... So " + reflections_closed[-1] + "?"
+            ]))
+
+        next_node = "dummy" # reflection_negative 
 
     else:        # Backup plan, if no pattern matches
 
