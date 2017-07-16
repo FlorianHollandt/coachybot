@@ -47,7 +47,54 @@ def stemmer(word,pos):
 def capitalize_sentence(sentence):
     sentence = sentence[:1].upper() + sentence[1:]
     sentence = re.sub(r"(^|\W)i($|\W)",r"\1I\2",sentence)
+
+    names = extract_named_entities(sentence.title())
+    for name in names:
+        sentence = re.sub(name.lower(),name,sentence)
+    
     return sentence
+
+
+ #######                                                         
+ #       #    # ##### #####    ##    ####  ##### #  ####  #    # 
+ #        #  #    #   #    #  #  #  #    #   #   # #    # ##   # 
+ #####     ##     #   #    # #    # #        #   # #    # # #  # 
+ #         ##     #   #####  ###### #        #   # #    # #  # # 
+ #        #  #    #   #   #  #    # #    #   #   # #    # #   ## 
+ ####### #    #   #   #    # #    #  ####    #   #  ####  #    # 
+                                                                 
+
+
+def extract_persons(text):
+    target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
+    tokens = nltk.tokenize.word_tokenize(text)
+    pos = nltk.pos_tag(tokens)
+    sentt = nltk.ne_chunk(pos, binary = False)
+    persons = []
+    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
+        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
+        for i in range(len((persons))):
+            if re.search(persons[i],name):
+                persons[i] = re.sub(persons[i],name,persons[i])
+        if not any(re.search(name,person) for person in persons):
+            persons.append(name)            
+
+    return (persons)
+
+
+def extract_named_entities(text):
+    target = re.compile(r"(PERSON|ORGANIZATION|FACILITY)|GPE|LOCATION")
+    tokens = nltk.tokenize.word_tokenize(text)
+    pos = nltk.pos_tag(tokens)
+    sentt = nltk.ne_chunk(pos, binary = False)
+    entities = []
+    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
+        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
+        if name not in entities:
+            entities.append(name)            
+
+    return (entities)
+
 
  ######                                          
  #     # #####   ####  ##### ######  ####  ##### 
@@ -744,28 +791,4 @@ def expand_contractions(text):
 
 
 
- #######                                                         
- #       #    # ##### #####    ##    ####  ##### #  ####  #    # 
- #        #  #    #   #    #  #  #  #    #   #   # #    # ##   # 
- #####     ##     #   #    # #    # #        #   # #    # # #  # 
- #         ##     #   #####  ###### #        #   # #    # #  # # 
- #        #  #    #   #   #  #    # #    #   #   # #    # #   ## 
- ####### #    #   #   #    # #    #  ####    #   #  ####  #    # 
-                                                                 
 
-
-def extract_persons(text):
-    target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
-    tokens = nltk.tokenize.word_tokenize(text)
-    pos = nltk.pos_tag(tokens)
-    sentt = nltk.ne_chunk(pos, binary = False)
-    persons = []
-    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
-        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
-        for i in range(len((persons))):
-            if re.search(persons[i],name):
-                persons[i] = re.sub(persons[i],name,persons[i])
-        if not any(re.search(name,person) for person in persons):
-            persons.append(name)            
-
-    return (persons)

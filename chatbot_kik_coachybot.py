@@ -217,7 +217,7 @@ def incoming():
             print "Message: " + message.body
             for key in user.keys():
                 if re.match(r"node",key):
-                    print("{:12}: {}".format(key,str(user[key])))
+                    print("{:15}: {}".format(key,str(user[key])))
 
             answer, next_node, user = eval(user["node_current"])(sentences, user)
 
@@ -227,7 +227,7 @@ def incoming():
             user["node_current"]  = next_node
             for key in user.keys():
                 if re.match(r"node",key):
-                    print("{:12}: {}".format(key,str(user[key])))
+                    print("{:15}: {}".format(key,str(user[key])))
 
 
               #####                                          #     #                                           

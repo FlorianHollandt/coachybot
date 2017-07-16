@@ -305,7 +305,7 @@ def how_are_you(sentences, user):
 		print "User wants to know the reason for this question..."
 
 		answer.append(random.choice([
-			"Oh, that's a nice way to start a conversation. You should gibe it a try sometimes! ;)"
+			"Oh, that's a nice way to start a conversation, right?"
 			"\nBut really, how are you today?"
 			]))
 
@@ -330,8 +330,10 @@ def how_are_you(sentences, user):
 		):
 
 		answer.append(random.choice([
-			"Wow, " + random.choice(reflections_closed) + "? That's great!",
-			"Really  -  " + random.choice(reflections_closed) + "? That's amazing!"
+			sentence_capitalization("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
+			sentence_capitalization("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
+			"Oh, nice! " +  
+			sentence_capitalization("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
 			]))
 
 		next_node = "dummy" # reflection_positive	
