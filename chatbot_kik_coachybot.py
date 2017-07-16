@@ -215,9 +215,6 @@ def incoming():
                                                   
 
             print "Message: " + message.body
-            #for key in user.keys():
-            #    if re.match(r"node",key):
-            #        print("{:15}: {}".format(key,str(user[key])))
 
             answer, next_node, user = eval(user["node_current"])(sentences, user)
 
@@ -225,9 +222,7 @@ def incoming():
             print "Next node: " + next_node
             user["node_previous"] = user["node_current"]
             user["node_current"]  = next_node
-            #for key in user.keys():
-            #    if re.match(r"node",key):
-            #        print("{:15}: {}".format(key,str(user[key])))
+
 
 
               #####                                          #     #                                           
@@ -239,10 +234,6 @@ def incoming():
               #####  ###### #    # #####  # #    #  ####     #     # ######  ####   ####  #    #  ####  ###### 
                                                                                                    
 
-            #for key in user.keys():
-            #    print("{:12}: {}".format(key,str(user[key])))
-            # print "Message: " + ", ".join(message_facts)
-            # print "Answer: " + ", ".join(answer_facts)
             print " | ".join(answer)
 
             kik.send_messages([

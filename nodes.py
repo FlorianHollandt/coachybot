@@ -283,8 +283,6 @@ def how_are_you(sentences, user):
     if has_elaboration(sentences):
         message_facts.append("has_elaboration")
 
-    print reflections_open
-
     time_since_last_message = user["message_current"]- user["message_previous"]
 
     if(            # Medium interruption
@@ -332,7 +330,7 @@ def how_are_you(sentences, user):
 
         answer.append(random.choice([
             capitalize_sentence("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
-            capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
+            capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!",
             "Oh, nice! " +  
             capitalize_sentence("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
             ]))
