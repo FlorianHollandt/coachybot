@@ -275,14 +275,15 @@ def how_are_you(sentences, user):
         if is_statement_about_self(sentence):
             message_facts.append("has_statement_about_self")
             reflections_closed.append(perform_closed_reflection(sentence))
-            print reflections_closed
+            #print reflections_closed
             reflections_open.append(perform_open_reflection(sentence))
-            print reflections_open
+            #print reflections_open
 
         
 	if has_elaboration(sentences):
 		message_facts.append("has_elaboration")
 
+	print reflections_open
 
 	time_since_last_message = user["message_current"]- user["message_previous"]
 
@@ -382,7 +383,7 @@ def how_are_you(sentences, user):
 	else:		# Backup plan, if no pattern matches
 
 		answer.append(random.choice([
-			"OK..."
+			"Hm, I see..."
 			]))
 
 		next_node = "dummy"
