@@ -330,10 +330,10 @@ def how_are_you(sentences, user):
 		):
 
 		answer.append(random.choice([
-			sentence_capitalization("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
-			sentence_capitalization("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
+			capitalize_sentence("Wow, " + random.choice(reflections_closed) + "?") + " That's great!",
+			capitalize_sentence("Really  -  " + random.choice(reflections_closed) + "?") + " That's amazing!"
 			"Oh, nice! " +  
-			sentence_capitalization("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
+			capitalize_sentence("Can you tell me some more about how and why " + random.choice(reflections_closed) + "?")
 			]))
 
 		next_node = "dummy" # reflection_positive	
