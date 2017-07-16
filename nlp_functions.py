@@ -4,8 +4,10 @@ from regex import sub as sub2
 from datetime import datetime
 from pytz import timezone
 
-from ngrams import corrections
+from ngrams import corrections, Pw
 import nltk
+
+firstnames = nltk.corpus.names
 
 # ===========================================================================================
 
@@ -51,7 +53,12 @@ def capitalize_sentence(sentence):
     names = extract_named_entities(sentence.title())
     for name in names:
         sentence = re.sub(name.lower(),name,sentence)
-    
+
+    for token in nltk.tokenize.word_tokenize(sentence)[0:]:
+            if re.match(r"[A-Z]\w*",token):
+                if Pw(token.lower())>1e-06 and token not in firstnames.words():
+                    sentence = re.sub(token,token.lower(),sentence)
+
     return sentence
 
 def capitalize_fragment(sentence):
@@ -60,19 +67,48 @@ def capitalize_fragment(sentence):
     names = extract_named_entities(sentence.title())
     for name in names:
         sentence = re.sub(name.lower(),name,sentence)
-    
+
+    for token in nltk.tokenize.word_tokenize(sentence):
+        if re.match(r"[A-Z]\w*",token):
+            if Pw(token.lower())>1e-06 and token not in firstnames.words():
+                sentence = re.sub(token,token.lower(),sentence)
+
     return sentence
 
- #######                                                         
- #       #    # ##### #####    ##    ####  ##### #  ####  #    # 
- #        #  #    #   #    #  #  #  #    #   #   # #    # ##   # 
- #####     ##     #   #    # #    # #        #   # #    # # #  # 
- #         ##     #   #####  ###### #        #   # #    # #  # # 
- #        #  #    #   #   #  #    # #    #   #   # #    # #   ## 
- ####### #    #   #   #    # #    #  ####    #   #  ####  #    # 
-                                                                 
+
+ ######                                                    
+ #     #   ##   ##### #  ####  #    #   ##   #      ###### 
+ #     #  #  #    #   # #    # ##   #  #  #  #      #      
+ ######  #    #   #   # #    # # #  # #    # #      #####  
+ #   #   ######   #   # #    # #  # # ###### #      #      
+ #    #  #    #   #   # #    # #   ## #    # #      #      
+ #     # #    #   #   #  ####  #    # #    # ###### ###### 
+    
+rationale_pattern = re.compile(r"(?:.*)because\W([^\.\,\;\!\?]+)")
+
+def has_rationale(sentence):
+    if rationale_pattern.search(sentence):
+        return True
+    else:
+        return False
 
 
+def reflect_rationale(sentence):
+    reason = rationale_pattern.search(sentence).group(1)
+    return capitalize_fragment(
+        perform_pronoun_reflection(
+            reason))
+
+
+ #     #                                #######                                      
+ ##    #   ##   #    # ###### #####     #       #    # ##### # ##### # ######  ####  
+ # #   #  #  #  ##  ## #      #    #    #       ##   #   #   #   #   # #      #      
+ #  #  # #    # # ## # #####  #    #    #####   # #  #   #   #   #   # #####   ####  
+ #   # # ###### #    # #      #    #    #       #  # #   #   #   #   # #           # 
+ #    ## #    # #    # #      #    #    #       #   ##   #   #   #   # #      #    # 
+ #     # #    # #    # ###### #####     ####### #    #   #   #   #   # ######  ####  
+                                                                                     
+                                                                
 def extract_persons(text):
     target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
     tokens = nltk.tokenize.word_tokenize(text)
@@ -417,7 +453,7 @@ pronoun_reflections = [
     (r"(^|\W)me(\W|$)", r"\1YOU\2"),
     (r"(^|\W)mine(\W|$)", r"\1YOURS\2"),
     (r"(^|\W)my(\W|$)", r"\1YOUR\2"),
-    (r"(^|\W)myself(\W|$)", r"\1MYSELF\2"),    
+    (r"(^|\W)myself(\W|$)", r"\1YOURSELF\2"),    
     (r"(^|\W)you were not(\W|$)", r"\1I WASN'T\2"),
     (r"(^|\W)you were(\W|$)", r"\1I WAS\2"),
     (r"(^|\W)you are not(\W|$)", r"\1'M NOT\2"),
@@ -442,8 +478,14 @@ pronoun_reflections = [
     (r"(^|\W)you would(\W|$)", r"\1I WOULD\2"),
     (r"(^|\W)you(\W|$)", r"\1ME\2"),
     (r"(^|\W)your(\W|$)", r"\1MY\2"),
-    (r"(^|\W)yours(\W|$)", r"\1MINE\2")
+    (r"(^|\W)yours(\W|$)", r"\1MINE\2"),
+    (r"(^|\W)yourself(\W|$)", r"\1MYSELF\2"),
     ]
+
+def perform_pronoun_reflection(stetement):
+    for (before, after) in pronoun_reflections:
+        stetement = re.sub(before, after, stetement) 
+    return capitalize_fragment(stetement.lower())    
 
 def perform_open_reflection(statement):
     reflections_open = [
@@ -473,7 +515,7 @@ def perform_open_reflection(statement):
     introduction,content = reflection.split("|||")
     for (before, after) in pronoun_reflections:
         content = re.sub(before, after, content) 
-    return introduction + content.lower()
+    return capitalize_fragment(introduction + content.lower())
 
 
 def perform_closed_reflection(statement):
@@ -504,7 +546,7 @@ def perform_closed_reflection(statement):
     introduction,content = reflection.split("|||")
     for (before, after) in pronoun_reflections:
         content = re.sub(before, after, content) 
-    return introduction + content.lower()
+    return capitalize_fragment(introduction + content.lower())
 
 
   #####                                             

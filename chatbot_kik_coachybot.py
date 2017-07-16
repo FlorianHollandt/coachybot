@@ -164,8 +164,8 @@ def incoming():
             sentences = preprocess_message(message.body)
 
             for sentence in sentences:
-                if has_question_why(sentence):
-                    disruptions.append("has_question_why")  
+                if is_how_are_you(sentence):
+                    disruptions.append("has_question_how_are_you")  
                 if is_greeting(sentence):
                     disruptions.append("has_greeting")
 
