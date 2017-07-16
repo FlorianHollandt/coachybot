@@ -9,6 +9,7 @@ Jinja2==2.9.6
 kik==1.5.0
 MarkupSafe==1.0
 nltk==3.2.4
+numpy==1.13.1
 psycopg2==2.7.1
 pytz==2017.2
 regex==2017.6.23
