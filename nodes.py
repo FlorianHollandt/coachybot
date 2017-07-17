@@ -443,6 +443,7 @@ def how_are_you_bad(sentences, user):
     message_facts = []
     answer_facts = []
     answer = []
+    rationale = []
 
     for sentence in sentences:
         if has_question_why(sentence):
@@ -453,6 +454,12 @@ def how_are_you_bad(sentences, user):
             message_facts.append("has_negation")
         if has_affirmation(sentence):
             message_facts.append("has_affirmation")
+        if has_rationale(sentence):
+            rationale.append(capitalize_fragment(reflect_rationale(sentence)))
+
+    if has_elaboration(sentences):
+        message_facts.append("has_elaboration")
+
 
     if(            # Medium interruption
         user["repeat_question"]
@@ -479,36 +486,63 @@ def how_are_you_bad(sentences, user):
 
         next_node = "how_are_you_bad" # The same node again...
 
-    elif(        # Protest to question
+    elif(        # User does not want to talk about it
         "has_protest_to_question" in message_facts
+        or (
+            "has_negation" in message_facts
+            #and "has_elaboration"
+            )
         ):
 
         print "User does not want to answer the question..."
 
         answer.append(random.choice([
-            "Oh, sorry! So this is a touchy subject for you, right?"
+            "Oh, sorry! So this is a touchy subject for you, right?",
+            "I totally respect that. Let's talk about somethin else instead..."
             ]))
 
         next_node = "dummy" # Some appropriate node
 
-    elif(        # User does not want to talk about it
-        "has_protest_to_question" in message_facts
-        or (
-            "has_negation" in message_facts
-            and "has_elaboration"
-            )
+    elif(        # User responds positively, but does not talk
+        "has_affirmation" in message_facts
+        and "has_elaboration" not in message_facts
         ):
 
         answer.append(random.choice([
-            "OK..."
+            "OK, so... What is bothering you?"
             ]))
 
-        next_node = "dummy"
+        next_node = "dummy" #how_are_you_reason
+
+    elif(        # User offers the reason for his negative experience 
+        rationale
+        ):
+
+        # Dummy answer, actually the node "how_are_you_reason" needs to be evaluated directly
+        answer.append(random.choice([
+            "OK, so... " + rationale[-1] + "?"
+            ]))
+
+        # answer, next_node, user = how_are_you_reason(sentences,user)
+
+        next_node = "dummy" #how_are_you_reason
+
+    elif(        # User dumps some text...
+        "has_elaboration" in message_facts
+        ):
+
+        answer.append(random.choice([
+            "Interesting! Can you tell me some more about it?",
+            "Hm... Tell me a bit more about it.",
+            "OK, I see... What else?"
+            ]))
+
+        next_node = "dummy" #how_are_you_reason
 
     else:        # Backup plan, if no pattern matches
 
         answer.append(random.choice([
-            "OK..."
+            "Alright, that's enough. It was nice talking to you, " + user["kik_firstname"]
             ]))
 
         next_node = "dummy"
