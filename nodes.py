@@ -472,6 +472,8 @@ def how_are_you_bad(sentences, user):
             "Can you tell me something about it?"
             ]))
         
+        user["repeat_question"] = False
+
         next_node = "how_are_you_bad" # The same node again...
 
     elif(        # Why-Question
