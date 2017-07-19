@@ -514,7 +514,7 @@ def how_are_you_bad(sentences, user):
             "OK, so... What is bothering you?"
             ]))
 
-        next_node = "dummy" #how_are_you_reason
+        next_node = "how_are_you_reason"
 
     elif(        # User offers the reason for his negative experience 
         rationale
@@ -527,7 +527,7 @@ def how_are_you_bad(sentences, user):
 
         # answer, next_node, user = how_are_you_reason(sentences,user)
 
-        next_node = "dummy" #how_are_you_reason
+        next_node = "dummy" #next_node
 
     elif(        # User dumps some text...
         "has_elaboration" in message_facts

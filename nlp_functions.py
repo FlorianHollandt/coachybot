@@ -434,6 +434,9 @@ bads = "|".join([
     r"converned",
     r"worried",
     r"uneasy",
+    r"so-so",
+    r"medium",
+    r"negative",
     r"troubled)"
     ])      
 
