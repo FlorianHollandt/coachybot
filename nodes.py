@@ -280,7 +280,7 @@ def how_are_you(sentences, user):
             reflections_open.append(capitalize_fragment(perform_open_reflection(sentence)))
             #print reflections_open
         if has_rationale(sentence):
-            rationale.append(capitalize_fragment(reflect_rationale(sentence)))
+            rationale.append(capitalize_sentence(reflect_rationale(sentence)))
 
         
     if has_elaboration(sentences):
@@ -337,7 +337,7 @@ def how_are_you(sentences, user):
             rationale[-1] + "? Sounds good... Can you tell me more about it?",
             ]))
 
-        next_node = "dummy" # how_are_you_reason   
+        next_node = "how_are_you_reason" # how_are_you_reason   
 
     elif(        # Positive answer with statement about self
         "is_good" in message_facts
@@ -373,7 +373,7 @@ def how_are_you(sentences, user):
             rationale[-1] + "? Okay... Can you tell me some more about it?",
             ]))
 
-        next_node = "dummy" # how_are_you_reason   
+        next_node = "how_are_you_reason" # how_are_you_reason   
 
     elif(        # Negative answer with statement about self
         "is_bad" in message_facts
@@ -527,7 +527,7 @@ def how_are_you_bad(sentences, user):
 
         # answer, next_node, user = how_are_you_reason(sentences,user)
 
-        next_node = "dummy" #next_node
+        next_node = "how_are_you_reason" #next_node
 
     elif(        # User dumps some text...
         "has_elaboration" in message_facts
