@@ -191,6 +191,80 @@ def has_question_why(sentence):
         return False
 
 
+
+  #####                                                   
+ #     # #    #   ##   #    # ##### # ##### # ##### #   # 
+ #     # #    #  #  #  ##   #   #   #   #   #   #    # #  
+ #     # #    # #    # # #  #   #   #   #   #   #     #   
+ #   # # #    # ###### #  # #   #   #   #   #   #     #   
+ #    #  #    # #    # #   ##   #   #   #   #   #     #   
+  #### #  ####  #    # #    #   #   #   #   #   #     #   
+                                                          
+
+quantifier_much = "|".join([
+    r"(a [^\.\;]*lot",
+    r"lots",
+    r"enough",
+    r"(?:^|\s)sufficient",
+    r"great [^\.\;]*deal of",
+    r"some",
+    r"extensively",
+    r"several",
+    r"a few",
+    r"a [^\.\;]*couple of",
+    r"a [^\.\;]*bit of",
+    r"several",
+    r"multiple",
+    r"various",
+    r"fold",
+    r"numerous",
+    r"plent[iy]",
+    r"copious",
+    r"abundant",
+    r"ample",
+    r"any",
+    r"many",
+    r"much)"
+    ])   
+
+quantifier_insufficient = "|".join([
+    r"(insufficient",
+    r"lack of",
+    r"lacked",
+    r"defici",
+    r"(?<!a\s)few",     # match only if not preceded by "a "
+    r"(?<!a\s)little",
+    r"scant",
+    r"miss)"
+    ])   
+
+def has_quantifier_much(sentence):
+    if re.search(r"not[^\.\;]+" + quantifier_much,sentence):
+        return False
+    if re.search(quantifier_much,sentence):
+        return True
+    elif re.search(r"no[^\.\;]+(complain|lack|miss|defici|insufficient)",sentence):
+        return True
+    else:
+        return False
+
+def has_quantifier_insufficient(sentence):
+    if re.search(r"no[^\.\;]+" + quantifier_insufficient,sentence):
+        return False
+    if re.search(quantifier_insufficient,sentence):
+        return True        
+    elif re.search(r"not[^\.\;]+"+quantifier_much,sentence):
+        return True
+    else:
+        return False
+
+def has_quantifier_excessive(sentence):
+    if re.search(r"(too much|overmuch)",sentence):
+        return True
+    else:
+        return False
+
+
  #     #                        #    #     #        
   #   #  ######  ####          #     ##    #  ####  
    # #   #      #             #      # #   # #    # 
@@ -259,7 +333,7 @@ def has_negation(sentence):
         return False
 
 def has_affirmation(sentence):
-    if re.search(affirmations,sentence):
+    if re.search(affirmations,sentence) and not has_negation(sentence):
         return True
     else:
         return False

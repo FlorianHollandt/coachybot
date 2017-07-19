@@ -468,7 +468,7 @@ def how_are_you_bad(sentences, user):
         print "Re-formulate the node's question, because of an interruption"
 
         answer.append(random.choice([
-            "So... You mentioned that something is bothering you, right?\n"
+            "You mentioned that something is bothering you, right?\n"
             "Can you tell me something about it?"
             ]))
         
@@ -539,12 +539,94 @@ def how_are_you_bad(sentences, user):
             "OK, I see... What else?"
             ]))
 
-        next_node = "dummy" #how_are_you_reason
+        next_node = "how_are_you_reason" #how_are_you_reason
 
     else:        # Backup plan, if no pattern matches
 
         answer.append(random.choice([
             "Alright, that's enough. It was nice talking to you, " + user["kik_firstname"]
+            ]))
+
+        next_node = "dummy"
+
+    return answer, next_node, user
+
+
+ #     #                                                                          ######                                     
+ #     #  ####  #    #      ##   #####  ######    #   #  ####  #    #             #     # ######   ##    ####   ####  #    # 
+ #     # #    # #    #     #  #  #    # #          # #  #    # #    #             #     # #       #  #  #      #    # ##   # 
+ ####### #    # #    #    #    # #    # #####       #   #    # #    #    #####    ######  #####  #    #  ####  #    # # #  # 
+ #     # #    # # ## #    ###### #####  #           #   #    # #    #             #   #   #      ######      # #    # #  # # 
+ #     # #    # ##  ##    #    # #   #  #           #   #    # #    #             #    #  #      #    # #    # #    # #   ## 
+ #     #  ####  #    #    #    # #    # ######      #    ####   ####              #     # ###### #    #  ####   ####  #    # 
+                                                                                                                             
+
+def how_are_you_reason(sentences, user):
+    "User is aked about the reason for his negative experience, to branch off into relevant topics"
+
+    print "Evaluating node 'how_are_you_reason'"
+
+    message_facts = []
+    answer_facts = []
+    answer = []
+
+    for sentence in sentences:
+        if has_question_why(sentence):
+            message_facts.append("has_question_why")  
+        if has_protest_to_question(sentence):
+            message_facts.append("has_protest_to_question")
+
+
+    if(            # Medium interruption
+        user["repeat_question"]
+        ):
+
+        print "Re-formulate the node's question, because of an interruption"
+
+        answer.append(random.choice([
+            "You said that something could have been better lately. What was that about?"
+            ]))
+        
+        next_node = "how_are_you_reason" # The same node again...
+
+    elif(        # Why-Question
+        "has_question_why" in message_facts
+        ):
+
+        print "User wants to know the reason for this question..."
+
+        answer.append(random.choice([
+            "You've had some negative experience recently, and I want to help you transform it into a learning experience."
+            ]))
+
+        next_node = "how_are_you_reason" # The same node again...
+
+    elif(        # Protest to question
+        "has_protest_to_question" in message_facts
+        ):
+
+        print "User does not want to answer the question..."
+
+        answer.append(random.choice([
+            "Alright, let's change topic. But please think about what this resistance of yours might be about!"
+            ]))
+
+        next_node = "dummy" # Evaluate topic generation node here
+
+    elif(        # Actual relevant decision
+        True
+        ):
+
+        answer.append(random.choice([
+            "OK..."
+            ]))
+
+        next_node = "dummy"
+
+    else:        # Backup plan, if no pattern matches
+
+        answer.append(random.choice([
+            "OK..."
             ]))
 
         next_node = "dummy"
