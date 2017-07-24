@@ -89,7 +89,7 @@ def capitalize_fragment(sentence):
   #####   ####  #####   ####  ###### #    # ###### #    #   #   
                                                                 
 judgement_grammar = """
-        S_and_V: {((<PRP\$>|<DT>)? [<R.*> <J.*>]*)? <NN>? (<NNS>|<NN>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
+        S_and_V: {((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
         Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
         Judgement : {<.*>* <S_and_V> <Object>}
     """
