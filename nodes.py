@@ -335,7 +335,7 @@ def how_are_you(sentences, user):
         "is_judgement_positive" in message_facts
         ):
 
-         answer.append(random.choice([
+        answer.append(random.choice([
             "Sounds great... Can you tell me more about it?",
             ]))
 
