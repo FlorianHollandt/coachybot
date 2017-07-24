@@ -575,6 +575,10 @@ def how_are_you_reason(sentences, user):
             message_facts.append("has_question_why")  
         if has_protest_to_question(sentence):
             message_facts.append("has_protest_to_question")
+        if is_judgement_positive(sentence):
+            message_facts.append("is_judgement_positive")
+        if is_judgement_negative(sentence):
+            message_facts.append("is_judgement_negative")
 
 
     if(            # Medium interruption
@@ -614,14 +618,15 @@ def how_are_you_reason(sentences, user):
         next_node = "dummy" # Evaluate topic generation node here
 
     elif(        # Actual relevant decision
-        True
+        "is_judgement_negative" in message_facts
+        or "is_judgement_positive" in message_facts
         ):
 
         answer.append(random.choice([
-            "OK..."
+            "Okay. How did you arrive at that assessment?"
             ]))
 
-        next_node = "dummy"
+        next_node = "how_are_you_reason"
 
     else:        # Backup plan, if no pattern matches
 
