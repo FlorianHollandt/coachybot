@@ -382,7 +382,7 @@ def how_are_you(sentences, user):
         "is_judgement_negative" in message_facts
         ):
 
-         answer.append(random.choice([
+        answer.append(random.choice([
             "Hmm... Can you rephrase this in a way that highlights your role in this situation?",
             ]))
 
