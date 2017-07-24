@@ -5,7 +5,10 @@ from datetime import datetime
 from pytz import timezone
 
 from ngrams import corrections, Pw
+
 import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+vader = SentimentIntensityAnalyzer()
 
 firstnames = nltk.corpus.names
 
@@ -75,6 +78,97 @@ def capitalize_fragment(sentence):
 
     return sentence
 
+
+
+       #                                                        
+       # #    # #####   ####  ###### #    # ###### #    # ##### 
+       # #    # #    # #    # #      ##  ## #      ##   #   #   
+       # #    # #    # #      #####  # ## # #####  # #  #   #   
+ #     # #    # #    # #  ### #      #    # #      #  # #   #   
+ #     # #    # #    # #    # #      #    # #      #   ##   #   
+  #####   ####  #####   ####  ###### #    # ###### #    #   #   
+                                                                
+judgement_grammar = """
+        S_and_V: {(<PRP\$>(( <RB>*) <JJ>*))? <NN>? (<NNS>|<NN>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
+        Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
+        Labeling : {<.*>* <S_and_V> <Object>}
+    """
+
+PChunker = nltk.RegexpParser(judgement_grammar)
+
+def is_judgement_positive(sentence):
+    return_value = False
+    sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
+    tree = PChunker.parse(sentence_pos)
+    if unicode("Labeling") in [subtree.label() for subtree in tree.subtrees()]:
+        for subtree in tree.subtrees():
+            if subtree.label() == unicode("Object"):
+                vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
+            if subtree.label() == unicode("S_and_V"):
+                if re.search(r"(is|are|was|were|has been|have been)",sentence):
+                    equivalence = True
+        if (
+            vader_score["pos"] >= max(vader_score["neg"],vader_score["neu"])
+            and equivalence
+        ):
+            return_value = True
+    return return_value
+
+def is_judgement_negative(sentence):
+    return_value = False
+    equivalence = False
+    sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
+    tree = PChunker.parse(sentence_pos)
+    if unicode("Labeling") in [subtree.label() for subtree in tree.subtrees()]:
+        for subtree in tree.subtrees():
+            if subtree.label() == unicode("Object"):
+                vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
+            if subtree.label() == unicode("S_and_V"):
+                if re.search(r"(is|are|was|were|has been|have been)",sentence):
+                    equivalence = True
+        if (
+            vader_score["neg"] >= max(vader_score["neu"],vader_score["pos"])
+            and equivalence
+        ):
+            return_value = True
+    if re.search(r"(suck|full of .*shit|nothing but .*shit)",sentence):
+        return_value = True
+    return return_value
+
+
+
+  #####                                             
+ #     #  ####  #    # ###### #      #  ####  ##### 
+ #       #    # ##   # #      #      # #    #   #   
+ #       #    # # #  # #####  #      # #        #   
+ #       #    # #  # # #      #      # #        #   
+ #     # #    # #   ## #      #      # #    #   #   
+  #####   ####  #    # #      ###### #  ####    #   
+                                                    
+
+conflicts = "|".join([
+    r"(trouble",
+    r"problem",
+    r"conflict",
+    r"fight",
+    r"disagreement",
+    r"struggle",
+    r"dispute",
+    r"argument",
+    r"battle",
+    r"quarrel",
+    r"dispute",
+    r"controvery",
+    r"clash",
+    r"collision",
+    r"(?:^|\s)issue)"
+])
+
+def has_conflict(sentence):
+    if re.search(conflicts,sentence) and not has_negation(sentence):
+        return True
+    else:
+        return False
 
  ######                                                    
  #     #   ##   ##### #  ####  #    #   ##   #      ###### 
@@ -182,6 +276,13 @@ def has_question_why(sentence):
             and
             re.search(r"(important|relevant|interesting|fascinating)", sentence)
             )
+        or(
+            re.search(r"(what|(not.*get))", sentence)
+            and
+            re.search(r"you", sentence)
+            and
+            re.search(r"(point|mean)", sentence)
+            )        
         or(
             re.search(r"why\?", sentence)
             )        
