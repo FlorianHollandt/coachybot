@@ -89,18 +89,20 @@ def capitalize_fragment(sentence):
   #####   ####  #####   ####  ###### #    # ###### #    #   #   
                                                                 
 judgement_grammar = """
-        S_and_V: {(<PRP\$>(( <RB>*) <JJ>*))? <NN>? (<NNS>|<NN>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
+        S_and_V: {((<PRP\$>|<DT>)? [<R.*> <J.*>]*)? <NN>? (<NNS>|<NN>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
         Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
-        Labeling : {<.*>* <S_and_V> <Object>}
+        Judgement : {<.*>* <S_and_V> <Object>}
     """
 
 PChunker = nltk.RegexpParser(judgement_grammar)
 
 def is_judgement_positive(sentence):
     return_value = False
+    equivalence = False    
+    sentence = re.sub(r"(\,)",r"",sentence)
     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
     tree = PChunker.parse(sentence_pos)
-    if unicode("Labeling") in [subtree.label() for subtree in tree.subtrees()]:
+    if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
         for subtree in tree.subtrees():
             if subtree.label() == unicode("Object"):
                 vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
@@ -117,9 +119,10 @@ def is_judgement_positive(sentence):
 def is_judgement_negative(sentence):
     return_value = False
     equivalence = False
+    sentence = re.sub(r"(\,)",r"",sentence)    
     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
     tree = PChunker.parse(sentence_pos)
-    if unicode("Labeling") in [subtree.label() for subtree in tree.subtrees()]:
+    if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
         for subtree in tree.subtrees():
             if subtree.label() == unicode("Object"):
                 vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))

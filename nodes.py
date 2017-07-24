@@ -281,7 +281,10 @@ def how_are_you(sentences, user):
             #print reflections_open
         if has_rationale(sentence):
             rationale.append(capitalize_sentence(reflect_rationale(sentence)))
-
+        if is_judgement_positive(sentence):
+            message_facts.append("is_judgement_positive")
+        if is_judgement_negative(sentence):
+            message_facts.append("is_judgement_negative")
         
     if has_elaboration(sentences):
         message_facts.append("has_elaboration")
@@ -328,6 +331,16 @@ def how_are_you(sentences, user):
 
         next_node = "dummy" # "aggression"
 
+    elif(        # Positive judgement
+        "is_judgement_positive" in message_facts
+        ):
+
+         answer.append(random.choice([
+            "Sounds great... Can you tell me more about it?",
+            ]))
+
+        next_node = "dummy" # highlight?    
+
     elif(        # Positive answer with rationale
         "is_good" in message_facts
         and rationale
@@ -364,6 +377,16 @@ def how_are_you(sentences, user):
             ]))
 
         next_node = "dummy" # highlight
+
+    elif(        # Positive judgement
+        "is_judgement_negative" in message_facts
+        ):
+
+         answer.append(random.choice([
+            "Hmm... Can you rephrase this in a way that highlights your role in this situation?",
+            ]))
+
+        next_node = "how_are_you_reason" # highlight?    
 
     elif(        # Negative or neutral answer with rationale
         rationale
