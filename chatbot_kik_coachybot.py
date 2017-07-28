@@ -39,6 +39,10 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 global history
 history = dict()
 
+epoch = datetime.datetime.utcfromtimestamp(0)
+def epoch_timestamp(dt):
+    return (dt - epoch).total_seconds() * 1000.0
+
 sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 # ===========================================================================================
@@ -86,6 +90,10 @@ def incoming():
              #####   ####  ###### #    #    #     # #  ####    #    ####  #    #   #   
                                                                             
 
+             epoch = 
+
+            print "System time: " + epoch_timestamp(datetime.now())
+            print "Kik time   : " + message.timestamp
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
             user_attributes = [
