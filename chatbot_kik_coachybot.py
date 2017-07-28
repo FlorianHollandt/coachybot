@@ -39,7 +39,7 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 global history
 history = dict()
 
-epoch = datetime.datetime.utcfromtimestamp(0)
+epoch = datetime.utcfromtimestamp(0)
 def epoch_timestamp(dt):
     return (dt - epoch).total_seconds() * 1000.0
 
