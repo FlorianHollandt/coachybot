@@ -93,7 +93,6 @@ judgement_grammar = """
         Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
         Judgement : {<.*>* <S_and_V> <Object>}
     """
-    bbbbbb
 PChunker = nltk.RegexpParser(judgement_grammar)
 
 def is_judgement_positive(sentence):
