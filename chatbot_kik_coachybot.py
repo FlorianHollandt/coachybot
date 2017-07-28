@@ -90,8 +90,6 @@ def incoming():
              #####   ####  ###### #    #    #     # #  ####    #    ####  #    #   #   
                                                                             
 
-             epoch = 
-
             print "System time: " + epoch_timestamp(datetime.now())
             print "Kik time   : " + message.timestamp
             print "Looking up Kik user '" + message.from_user + "' in database..."
