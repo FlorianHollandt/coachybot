@@ -146,7 +146,7 @@ def incoming():
                     "timezone" : str(kik_user.timezone),
                     #"message_count" : 1,
                     "message_first" : kik_time,
-                    "message_previous" : kik_time,
+                    #"message_previous" : kik_time,
                     "message_current" : kik_time,
                     "node_current" : "Welcome"
                     })
