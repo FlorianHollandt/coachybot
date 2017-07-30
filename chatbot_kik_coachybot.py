@@ -165,7 +165,7 @@ def incoming():
              #######   ##   #    # ###### #  ####  #    #   #   # #    #  ####     #     #  ####  #####  ###### 
                                                   
 
-            print "Message: " + message.body
+            #print "Message: " + message.body
 
             #answer, next_node, user = eval(user["node_current"])(sentences, user)
             node_main = eval(user["node_current"])(message.body, user)
@@ -174,8 +174,8 @@ def incoming():
             next_node = node_main.next_node
             user      = node_main.user
 
-            print "Answer: " + " | ".join(answer)
-            print "Next node: " + next_node
+            #print "Answer: " + " | ".join(answer)
+            #print "Next node: " + next_node
 
 
 

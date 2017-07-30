@@ -521,9 +521,14 @@ class How_are_you(Template):
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
+        for sentence in self.sentences:
+                    if has_desire( sentence):
+                        self.message_facts.append("has_desire")  
+
         if(
             "has_question_why" in self.message_facts
             ):
+
             self.answer.append(random.choice([
                 "Oh, that's a great way to start a conversation, right?"
                 "\nWhat would you rather talk about?"
@@ -531,6 +536,18 @@ class How_are_you(Template):
 
             self.answer_facts.append("has_explanation_for_question")
             self.next_node = "Terminator" #"How_are_you"
+
+        elif(
+            "has_desire" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Okay. So... is that something that would really make a difference in you life, "
+                "and that you can achieve when you set your mind to it?"
+                ]))
+
+            self.answer_facts.append("is_questioning_desire")
+            self.next_node = "Terminator" #"Goal"
 
         self.update_user()
 

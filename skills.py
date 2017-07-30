@@ -80,6 +80,165 @@ def capitalize_fragment(sentence):
 
 
 
+  #####                                #    ######                
+ #     #  ####   ####  #####          #     #     #   ##   #####  
+ #       #    # #    # #    #        #      #     #  #  #  #    # 
+ #  #### #    # #    # #    #       #       ######  #    # #    # 
+ #     # #    # #    # #    #      #        #     # ###### #    # 
+ #     # #    # #    # #    #     #         #     # #    # #    # 
+  #####   ####   ####  #####     #          ######  #    # #####  
+                                                                  
+
+intensifiers = "|".join([
+    r"(pretty( much)?",
+    r"quite",
+    r"very",
+    r"absolutely",
+    r"total?ly",
+    r"real?ly",
+    r"somewhat",
+    r"kind of",
+    r"perfectly",
+    r"positively",
+    r"definitely",
+    r"completely",
+    r"propably",
+    r"just",
+    r"rather",
+    r"almost",
+    r"entirely",
+    r"fully",
+    r"highly",
+    r"a bit)"
+    ])   
+
+goods = "|".join([
+    r"(good",
+    r"better",
+    r"best",
+    r"finer?",
+    r"nicer?",
+    r"lovel(y|ier)",
+    r"great(er)?",
+    r"amazing",
+    r"super",
+    r"smashing",
+    r"fantastic",
+    r"stunning",
+    r"groovy",
+    r"wonderful?l",
+    r"superb",
+    r"marvel?lous",
+    r"neat",
+    r"terrific",
+    r"swell",
+    r"dandy",
+    r"tremendous",
+    r"excellent",
+    r"dope",
+    r"well",
+    r"elat(ed|ing)",
+    r"enthusiastic",
+    r"looking forward to",
+    r"engag(ed|ing)",
+    r"thrill(ed|ing)",
+    r"excit(ed|ing)",
+    r"happ(y|ier)",
+    r"joyful",
+    r"joyous",
+    r"delight(ed|ing)",
+    r"curious",
+    r"eager",
+    r"ok",
+    r"alright)"
+    ])                                                                 
+
+bads = "|".join([
+    r"(bad",
+    r"terrible",
+    r"awful",
+    r"mad",
+    r"horrible",
+    r"horrid",
+    r"sad",
+    r"blue",
+    r"down",
+    r"unhappy",
+    r"unwell",
+    r"miserable",
+    r"dissatisfied",
+    r"unsatisfied",
+    r"sick",
+    r"ill",
+    r"tired",
+    r"jealous",
+    r"envious",
+    r"afraid",
+    r"scared",
+    r"converned",
+    r"worried",
+    r"uneasy",
+    r"so-so",
+    r"medium",
+    r"negative",
+    r"troubled)"
+    ])      
+
+def is_good(sentence):
+    if(
+        (
+            re.search(goods,sentence)
+            and not has_negation(sentence)
+            )or(
+            re.search(bads,sentence)
+            and has_negation(sentence)            
+            )
+        ):
+        return True
+    else:
+        return False
+
+def is_bad(sentence):
+    if(
+        (
+            re.search(bads,sentence)
+            and not has_negation(sentence)
+            )or(
+            re.search(goods,sentence)
+            and has_negation(sentence)            
+            )
+        ):
+        return True
+    else:
+        return False
+
+
+
+ ######                                
+ #     # ######  ####  # #####  ###### 
+ #     # #      #      # #    # #      
+ #     # #####   ####  # #    # #####  
+ #     # #           # # #####  #      
+ #     # #      #    # # #   #  #      
+ ######  ######  ####  # #    # ###### 
+                                       
+
+desire = "|".join([
+    r"(i (\w+ )?wish",
+    r"if only",
+    r"my (\w+ )?goal is (that|for|to|when|.w+ing)",
+    r"i (\w+ )?hope(?! for)",
+    r"it would (\w+ )?be (\w+ )?"+goods +r" (if|when))",
+    ])
+
+def has_desire(sentence):
+    desire_match = re.search( desire + r"(\s|\.|\,)(?!you)", sentence)
+    if desire_match:
+        if not has_negation( desire_match.group(0)):
+            return True
+    else:
+        return False
+
        #                                                        
        # #    # #####   ####  ###### #    # ###### #    # ##### 
        # #    # #    # #    # #      ##  ## #      ##   #   #   
@@ -441,135 +600,6 @@ def has_affirmation(sentence):
     else:
         return False
 
-  #####                                #    ######                
- #     #  ####   ####  #####          #     #     #   ##   #####  
- #       #    # #    # #    #        #      #     #  #  #  #    # 
- #  #### #    # #    # #    #       #       ######  #    # #    # 
- #     # #    # #    # #    #      #        #     # ###### #    # 
- #     # #    # #    # #    #     #         #     # #    # #    # 
-  #####   ####   ####  #####     #          ######  #    # #####  
-                                                                  
-
-intensifiers = "|".join([
-    r"(pretty( much)?",
-    r"quite",
-    r"very",
-    r"absolutely",
-    r"total?ly",
-    r"real?ly",
-    r"somewhat",
-    r"kind of",
-    r"perfectly",
-    r"positively",
-    r"definitely",
-    r"completely",
-    r"propably",
-    r"just",
-    r"rather",
-    r"almost",
-    r"entirely",
-    r"fully",
-    r"highly",
-    r"a bit)"
-    ])   
-
-goods = "|".join([
-    r"(good",
-    r"fine",
-    r"nice",
-    r"lovely",
-    r"great",
-    r"amazing",
-    r"super",
-    r"smashing",
-    r"fantastic",
-    r"stunning",
-    r"groovy",
-    r"wonderful?l",
-    r"superb",
-    r"marvel?lous",
-    r"neat",
-    r"terrific",
-    r"swell",
-    r"dandy",
-    r"tremendous",
-    r"excellent",
-    r"dope",
-    r"well",
-    r"elat(ed|ing)",
-    r"enthusiastic",
-    r"looking forward to",
-    r"engag(ed|ing)",
-    r"thrill(ed|ing)",
-    r"excit(ed|ing)",
-    r"happy",
-    r"joyful",
-    r"joyous",
-    r"delight(ed|ing)",
-    r"curious",
-    r"eager",
-    r"ok",
-    r"alright)"
-    ])                                                                 
-
-bads = "|".join([
-    r"(bad",
-    r"terrible",
-    r"awful",
-    r"mad",
-    r"horrible",
-    r"horrid",
-    r"sad",
-    r"blue",
-    r"down",
-    r"unhappy",
-    r"unwell",
-    r"miserable",
-    r"dissatisfied",
-    r"unsatisfied",
-    r"sick",
-    r"ill",
-    r"tired",
-    r"jealous",
-    r"envious",
-    r"afraid",
-    r"scared",
-    r"converned",
-    r"worried",
-    r"uneasy",
-    r"so-so",
-    r"medium",
-    r"negative",
-    r"troubled)"
-    ])      
-
-def is_good(sentence):
-    if(
-        (
-            re.search(goods,sentence)
-            and not has_negation(sentence)
-            )or(
-            re.search(bads,sentence)
-            and has_negation(sentence)            
-            )
-        ):
-        return True
-    else:
-        return False
-
-def is_bad(sentence):
-    if(
-        (
-            re.search(bads,sentence)
-            and not has_negation(sentence)
-            )or(
-            re.search(goods,sentence)
-            and has_negation(sentence)            
-            )
-        ):
-        return True
-    else:
-        return False
 
 def has_elaboration(sentences):
     text = "".join(sentences)
