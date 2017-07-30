@@ -213,6 +213,32 @@ def is_bad(sentence):
         return False
 
 
+ ######                                
+ #     # ######  ####  # #####  ###### 
+ #     # #      #      # #    # #      
+ #     # #####   ####  # #    # #####  
+ #     # #           # # #####  #      
+ #     # #      #    # # #   #  #      
+ ######  ######  ####  # #    # ###### 
+                                       
+
+desires = "|".join([
+    r"(i (\w+ )?wish",
+    r"if only",
+    r"my (\w+ )?goal is (that|for|to|when|.w+ing)",
+    r"i (\w+ )?hope(?! for)",
+    r"it would (\w+ )?be (\w+ )?"+goods +r" (if|when))",
+    ])
+
+def has_desire(sentence):
+    desire_match = re.search( desires + r"(\s|\.|\,)(?!you)", sentence)
+    if desire_match:
+        if not has_negation( desire_match.group(0)):
+            return True
+    else:
+        return False
+
+
 
  ######                                                         #####                       
  #     #   ##   #    #  ####  ###### #####     #####  ####     #     # ###### #      ###### 
@@ -248,6 +274,7 @@ intentions_self = "|".join([
 
 def has_danger_to_self(sentence):
     intention_match = re.search( intentions_self+r"(.*)", sentence)
+    desire_match =  re.search( desires+r"(.*)", sentence)
     if intention_match:
         if(
             not has_negation( intention_match.group(1))
@@ -255,35 +282,28 @@ def has_danger_to_self(sentence):
             and re.search(  r"\W(me|myself)\W", intention_match.group(len(intention_match.groups())))
             ):
             return True
-        return False
-    else:
-        return False
-
-
- ######                                
- #     # ######  ####  # #####  ###### 
- #     # #      #      # #    # #      
- #     # #####   ####  # #    # #####  
- #     # #           # # #####  #      
- #     # #      #    # # #   #  #      
- ######  ######  ####  # #    # ###### 
-                                       
-
-desire = "|".join([
-    r"(i (\w+ )?wish",
-    r"if only",
-    r"my (\w+ )?goal is (that|for|to|when|.w+ing)",
-    r"i (\w+ )?hope(?! for)",
-    r"it would (\w+ )?be (\w+ )?"+goods +r" (if|when))",
-    ])
-
-def has_desire(sentence):
-    desire_match = re.search( desire + r"(\s|\.|\,)(?!you)", sentence)
-    if desire_match:
-        if not has_negation( desire_match.group(0)):
+        else:
+            return False
+    elif desire_match:
+        if(
+            not has_negation( desire_match.group(1))
+            and (
+                (
+                    re.search(  r"\W(dead)\W", desire_match.group(len(desire_match.groups())))
+                    and re.search(  r"\W(i)\W", desire_match.group(len(desire_match.groups())))
+                    )
+                or(
+                    re.search( hurts, desire_match.group( len( desire_match.groups())))
+                    and re.search(  r"\W(me|myself)\W", desire_match.group( len( desire_match.groups())))
+                    )
+                )
+            ):
             return True
+        else:
+            return False
     else:
         return False
+
 
        #                                                        
        # #    # #####   ####  ###### #    # ###### #    # ##### 

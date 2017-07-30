@@ -1,7 +1,7 @@
 from flask import Flask, request, Response
 
 from kik import KikApi, Configuration
-from kik.messages import messages_from_json, TextMessage
+from kik.messages import messages_from_json, TextMessage, IsTypingMessage
 
 import os 
 
@@ -191,7 +191,13 @@ def incoming():
             print " | ".join(answer)
 
             for line in answer:
-                sleep(random.randint(1,5))
+                kik.send_messages([
+                    IsTypingMessage(
+                        to = message.from_user,
+                        chat_id = message.chat_id,
+                        isTyping = True)
+                ])                      
+                sleep(random.randint(1,5)) 
                 kik.send_messages([
                     TextMessage(
                         to = message.from_user,
