@@ -122,7 +122,7 @@ def incoming():
 
             if user_values:
 
-                print "Found user data: " + str(user_values)
+                #print "Found user data: " + str(user_values)
                 connection_facts.append("known_user") 
 
                 user.update(dict(zip(user_attributes, user_values)))

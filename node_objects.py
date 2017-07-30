@@ -404,6 +404,7 @@ class Terminator(Template):
         """
 
         verbose_argument = verbose
+        if verbose_argument: text_argument = text
         if verbose_argument: print "Terminator node - Restarting conversation"
 
         Template.__init__(self, text=".", user=user, verbose=False)
@@ -415,6 +416,7 @@ class Terminator(Template):
 
         self.update_user()
 
+        if verbose_argument: self.message = text
         if verbose_argument: self.summary()        
 
 
