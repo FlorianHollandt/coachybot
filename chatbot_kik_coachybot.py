@@ -45,7 +45,7 @@ def epoch_timestamp(dt):
     return (dt - epoch).total_seconds() * 1000.0
 
 def generate_timestring_from_timestamp(timestamp):
-    time = datetime.datetime.fromtimestamp(timestamp)
+    time = datetime.fromtimestamp(timestamp)
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
