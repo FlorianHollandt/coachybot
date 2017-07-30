@@ -18,7 +18,7 @@ import urlparse
 
 from nlp_functions import *
 #from nodes import *
-from nodes_object import *
+from node_objects import *
 
 # http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
 # ===========================================================================================
