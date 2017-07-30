@@ -238,11 +238,11 @@ hurts = "|".join([
 intentions_self = "|".join([
     r"(i am (\w+ )?going to",
     r"i (\w+ )?will",
-    r"i (\w\s)*plan(ing)? to",
-    r"i (\w\s)*intend(ing)? to",    
-    r"i (\w\s)*prepar(e|ing) to",
+    r"i (\w|\s)*plan(ing)? to",
+    r"i (\w|\s)*inten(d|t)(ing)? to",    
+    r"i (\w|\s)*prepar(e|ing) to",
     r"i (\w+ )?want to",
-    r"i (\w+ )?think(ing)? about",    
+    r"i (\w|\s)*think(ing)? about",    
     r"i am (\w+ )about to)",
     ])
 
