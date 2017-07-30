@@ -199,7 +199,7 @@ def incoming():
                         delay     = random.randint(0,500),
                         type_time = random.randint(500,4500))
                 ])        
-                sleep(randint(0.1, 2))              
+                sleep(random.randint(0.1, 2))              
 
 
          #     #                                               ######                                                  
