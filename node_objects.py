@@ -45,6 +45,7 @@ class Template(object):
         if not (isinstance( user, dict) or isinstance( user, defaultdict)):
             raise TypeError
             print "Argument 'user' must be a dictionary."
+            print "Instead, user argument of type '" + type(user).__name__ + "' was given."
         user_backup = deepcopy(user)            
         if isinstance( user, dict) and  not isinstance( user, defaultdict):
             if verbose: print "Converting 'user' from dict to defaultdict."
