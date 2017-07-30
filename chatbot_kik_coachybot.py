@@ -196,9 +196,10 @@ def incoming():
                         to        = message.from_user,
                         chat_id   = message.chat_id,
                         body      = line,
-                        delay     = random.randint(0,1000),
-                        type_time = random.randint(500,4000))
-                ])                      
+                        delay     = random.randint(0,500),
+                        type_time = random.randint(500,4500))
+                ])        
+                sleep(randint(0.1, 2))              
 
 
          #     #                                               ######                                                  
