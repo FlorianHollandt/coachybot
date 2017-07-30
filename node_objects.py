@@ -129,7 +129,8 @@ class Template(object):
                 self.message_facts.append("has_question_you_had_good_time")                       
             if is_greeting(sentence):
                 self.message_facts.append("has_greeting")   
-            # tdb: Suicide intention!
+            if has_danger_to_self(sentence):
+                self.message_facts.append("has_danger_to_self")   
 
 
         # Greeting logic (without "How are you?")
@@ -290,6 +291,24 @@ class Template(object):
                 self.answer_facts.append("use_user_firstname")  
 
             self.answer_facts.append("has_question_how_are_you") 
+
+
+        # Danger to self! --> Flush all accumulated answers!
+
+        if(
+            "has_danger_to_self" in self.message_facts
+            ):
+            self.answer=[
+                "In this case you should be talking to a professional and not a chatbot.",
+                "In Germany you can get help at TelefonSeelsorge."
+                "\nWebsite: www.telefonseelsorge.de"
+                "\nPhone: 0800 1110333",
+                "In the US, try National Suicide Prevention Lifeline:"
+                "\nWebsite: www.suicidepreventionlifeline.org"
+                "\nPhone: 18002738255",
+                "For other countries, please check https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines"
+            ]     
+            self.answer_facts = ["has_response_to_danger_to_self"]
 
         # Updating user dictionary
 
@@ -484,6 +503,10 @@ class Welcome(Template):
         # Determining next node, typically "How_are_you"
 
         if(
+            "has_danger_to_self" in self.message_facts
+            ):
+            self.next_node ="Terminator" # Danger_to_self
+        elif(
             "has_question_how_are_you" in self.answer_facts
             ):
             self.next_node ="How_are_you"
@@ -526,6 +549,10 @@ class How_are_you(Template):
                         self.message_facts.append("has_desire")  
 
         if(
+            "has_danger_to_self" in self.message_facts
+            ):
+            self.next_node ="Terminator" # Danger_to_self            ):
+        elif(
             "has_question_why" in self.message_facts
             ):
 

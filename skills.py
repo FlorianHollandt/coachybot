@@ -214,6 +214,52 @@ def is_bad(sentence):
 
 
 
+ ######                                                         #####                       
+ #     #   ##   #    #  ####  ###### #####     #####  ####     #     # ###### #      ###### 
+ #     #  #  #  ##   # #    # #      #    #      #   #    #    #       #      #      #      
+ #     # #    # # #  # #      #####  #    #      #   #    #     #####  #####  #      #####  
+ #     # ###### #  # # #  ### #      #####       #   #    #          # #      #      #      
+ #     # #    # #   ## #    # #      #   #       #   #    #    #     # #      #      #      
+ ######  #    # #    #  ####  ###### #    #      #    ####      #####  ###### ###### #      
+                                                                                            
+
+hurts = "|".join([
+    r"(kill",
+    r"hang",
+    r"cut",
+    r"harm",
+    r"electrocute",
+    r"burn",
+    r"to death", 
+    r"hurt",   
+    r"drown)",
+    ])
+
+intentions_self = "|".join([
+    r"(i am (\w+ )?going to",
+    r"i (\w+ )?will",
+    r"i (\w\s)*plan(ing)? to",
+    r"i (\w\s)*intend(ing)? to",    
+    r"i (\w\s)*prepar(e|ing) to",
+    r"i (\w+ )?want to",
+    r"i (\w+ )?think(ing)? about",    
+    r"i am (\w+ )about to)",
+    ])
+
+def has_danger_to_self(sentence):
+    intention_match = re.search( intentions_self+r"(.*)", sentence)
+    if intention_match:
+        if(
+            not has_negation( intention_match.group(1))
+            and re.search( hurts, intention_match.group(len(intention_match.groups())))
+            and re.search(  r"\W(me|myself)\W", intention_match.group(len(intention_match.groups())))
+            ):
+            return True
+        return False
+    else:
+        return False
+
+
  ######                                
  #     # ######  ####  # #####  ###### 
  #     # #      #      # #    # #      
