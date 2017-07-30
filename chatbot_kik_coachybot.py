@@ -45,7 +45,7 @@ def epoch_timestamp(dt):
     return (dt - epoch).total_seconds() * 1000.0
 
 def generate_timestring_from_timestamp(timestamp):
-    time = datetime.fromtimestamp(float(timestamp)/1000.)
+    time = datetime.fromtimestamp(float(timestamp))
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -95,8 +95,8 @@ def incoming():
              #####   ####  ###### #    #    #     # #  ####    #    ####  #    #   #   
                                                                             
 
-            system_time = epoch_timestamp(datetime.now())
-            kik_time = message.timestamp
+            system_time = epoch_timestamp(datetime.now())/1000
+            kik_time = message.timestamp/1000
             print "System time : " + '{:.0f}'.format(system_time) + "   (" + generate_timestring_from_timestamp(system_time) + ")"
             print "Kik    time : " + str(kik_time) + "   (" + generate_timestring_from_timestamp(kik_time) + ")"
             print "Looking up Kik user '" + message.from_user + "' in database..."
