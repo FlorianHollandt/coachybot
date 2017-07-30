@@ -97,8 +97,8 @@ def incoming():
 
             system_time = epoch_timestamp(datetime.now())
             kik_time = message.timestamp
-            print "System time: " + '{:f}'.format(system_time) + "(" + generate_timestring_from_timestamp(system_time) + ")"
-            print "Kik time   : " + str(kik_time) + "(" + generate_timestring_from_timestamp(kik_time) + ")"
+            print "System time: " + '{:.0f}'.format(system_time) + " (" + generate_timestring_from_timestamp(system_time) + ")"
+            print "Kik time   : " + str(kik_time) + "   (" + generate_timestring_from_timestamp(kik_time) + ")"
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
             user_attributes = [
@@ -108,7 +108,7 @@ def incoming():
                 "timezone",                 
                 "message_first",
                 "message_previous",
-                "message_count",
+                #"message_count",
                 "message_current",                
                 "how_are_you_last",
                 "node_previous",
