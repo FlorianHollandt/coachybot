@@ -314,7 +314,7 @@ class Template(object):
 
     def update_user(self):
 
-        #if self.verbose: self.print_user()
+        if self.verbose: self.print_user()
 
         if(
             not "node_current" in self.user.keys()
@@ -337,7 +337,7 @@ class Template(object):
             ):
             self.user["message_previous"] = self.user["message_current"]
 
-        #if self.verbose: self.print_user()
+        if self.verbose: self.print_user()
 
 
     def print_user(self):
