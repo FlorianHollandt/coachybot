@@ -17,7 +17,7 @@ import random
 import psycopg2
 import urlparse
 
-from nlp_functions import *
+#from nlp_functions import *
 #from nodes import *
 from node_objects import *
 
@@ -197,15 +197,7 @@ def incoming():
                         to = message.from_user,
                         chat_id = message.chat_id,
                         body = line)
-                ])                   
-
-            # kik.send_messages([
-            #     TextMessage(
-            #         to = message.from_user,
-            #         chat_id = message.chat_id,
-            #         body = line
-            #     ) for line in answer
-            # ])                 
+                ])                      
 
 
          #     #                                               ######                                                  
