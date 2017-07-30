@@ -127,7 +127,7 @@ def incoming():
 
                 user.update(dict(zip(user_attributes, user_values)))
                 #user["message_count"] += 1
-                user["message_current"] = message.timestamp
+                user["message_current"] = kik_time
 
             else:
 
@@ -145,9 +145,9 @@ def incoming():
                     "lastname" : str(kik_user.last_name),
                     "timezone" : str(kik_user.timezone),
                     #"message_count" : 1,
-                    "message_first" : message.timestamp,
-                    "message_previous" : message.timestamp,
-                    "message_current" : message.timestamp,
+                    "message_first" : kik_time,
+                    "message_previous" : kik_time,
+                    "message_current" : kik_time,
                     "node_current" : "Welcome"
                     })
 
