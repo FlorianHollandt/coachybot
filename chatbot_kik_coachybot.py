@@ -191,7 +191,6 @@ def incoming():
             print " | ".join(answer)
 
             for line in answer:
-                sleepp(random.randint(1,5)) 
                 kik.send_messages([
                     TextMessage(
                         to        = message.from_user,
