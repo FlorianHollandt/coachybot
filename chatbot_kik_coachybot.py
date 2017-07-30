@@ -191,18 +191,13 @@ def incoming():
             print " | ".join(answer)
 
             for line in answer:
-                kik.send_messages([
-                    IsTypingMessage(
-                        to = message.from_user,
-                        chat_id = message.chat_id,
-                        isTyping = True)
-                ])                      
-                sleep(random.randint(1,5)) 
+                sleepp(random.randint(1,5)) 
                 kik.send_messages([
                     TextMessage(
-                        to = message.from_user,
-                        chat_id = message.chat_id,
-                        body = line)
+                        to        = message.from_user,
+                        chat_id   = message.chat_id,
+                        body      = line,
+                        type_time = 1)
                 ])                      
 
 
