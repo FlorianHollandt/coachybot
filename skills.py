@@ -605,133 +605,6 @@ temporal = "|".join([
     r"every now and then)"
     ])
 
-statements_about_self = [
-    re.compile(r"^" + temporal + r"?\W*i am "),
-    re.compile(r"^" + temporal + r"?\W*i was "),
-    re.compile(r"^" + temporal + r"?\W*i will "),
-    re.compile(r"^" + temporal + r"?\W*i have "),
-    re.compile(r"^" + temporal + r"?\W*i had "),
-    re.compile(r"^" + temporal + r"?\W*i got "),
-    re.compile(r"^" + temporal + r"?\W*i do "),
-    re.compile(r"^" + temporal + r"?\W*i did "),
-    re.compile(r"^" + temporal + r"?\W*i can "),
-    re.compile(r"^" + temporal + r"?\W*i could "),
-    re.compile(r"^" + temporal + r"?\W*i feel "),
-    re.compile(r"^" + temporal + r"?\W*i felt "),
-    re.compile(r"^" + temporal + r"?\W*i hope "),
-    re.compile(r"^" + temporal + r"?\W*i hoped "),
-    re.compile(r"^" + temporal + r"?\W*i wish "),
-    re.compile(r"^" + temporal + r"?\W*i wished ")     
-]
-
-def is_statement_about_self(sentence, statements_about_self=statements_about_self):
-    if any(statement.search(sentence) for statement in statements_about_self):
-        return True
-    else:
-        return False
-
-pronoun_reflections = [
-    (r"(^|\W)i was(\W|$)", r"\1YOU WERE\2"),
-    (r"(^|\W)i(\W|$)", r"\1YOU\2"),
-    (r"(^|\W)me(\W|$)", r"\1YOU\2"),
-    (r"(^|\W)mine(\W|$)", r"\1YOURS\2"),
-    (r"(^|\W)my(\W|$)", r"\1YOUR\2"),
-    (r"(^|\W)myself(\W|$)", r"\1YOURSELF\2"),    
-    (r"(^|\W)you were not(\W|$)", r"\1I WASN'T\2"),
-    (r"(^|\W)you were(\W|$)", r"\1I WAS\2"),
-    (r"(^|\W)you are not(\W|$)", r"\1'M NOT\2"),
-    (r"(^|\W)you are(\W|$)", r"\1I'M\2"),
-    (r"(^|\W)you have not(\W|$)", r"\1I HAVEN'T\2"),
-    (r"(^|\W)you have(\W|$)", r"\1I'VE\2"),
-    (r"(^|\W)you had not(\W|$)", r"\1I HADN'T\2"),
-    (r"(^|\W)you had(\W|$)", r"\1I HAD\2"),
-    (r"(^|\W)you will not(\W|$)", r"\1I WON'T\2"),
-    (r"(^|\W)you will(\W|$)", r"\1I WILL\2"),
-    (r"(^|\W)you do not(\W|$)", r"\1I DON'T\2"),
-    (r"(^|\W)you do(\W|$)", r"\1I DO\2"),
-    (r"(^|\W)you did not(\W|$)", r"\1I DIDN'T\2"),
-    (r"(^|\W)you did(\W|$)", r"\1I DID\2"),
-    (r"(^|\W)you can not(\W|$)", r"\1I CAN'T\2"),
-    (r"(^|\W)you can(\W|$)", r"\1I CAN\2"),
-    (r"(^|\W)you could not(\W|$)", r"\1I COULDN'T\2"),
-    (r"(^|\W)you could(\W|$)", r"\1I COULD\2"),
-    (r"(^|\W)you should not(\W|$)", r"\1I SHOULDN'T\2"),
-    (r"(^|\W)you should(\W|$)", r"\1I SHOULD\2"),
-    (r"(^|\W)you would not(\W|$)", r"\1I WOULDN'T\2"),
-    (r"(^|\W)you would(\W|$)", r"\1I WOULD\2"),
-    (r"(^|\W)you(\W|$)", r"\1ME\2"),
-    (r"(^|\W)your(\W|$)", r"\1MY\2"),
-    (r"(^|\W)yours(\W|$)", r"\1MINE\2"),
-    (r"(^|\W)yourself(\W|$)", r"\1MYSELF\2"),
-    ]
-
-def perform_pronoun_reflection(stetement):
-    for (before, after) in pronoun_reflections:
-        stetement = re.sub(before, after, stetement) 
-    return capitalize_fragment(stetement.lower())    
-
-def perform_open_reflection(statement):
-    reflections_open = [
-        (r"^" + temporal + r"?(\W?)i am\W([^\.\,\!]+)(?:.*)", r'are you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i was\W([^\.\,\!]+)(?:.*)", r'were you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i will\W([^\.\,\!]+)(?:.*)", r'will you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i have got\W([^\.\,\!]+)(?:.*)", r'do you have |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i have had\W([^\.\,\!]+)(?:.*)", r'did you have |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r'have you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i had\W([^\.\,\!]+)(?:.*)", r'did you have |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i got\W([^\.\,\!]+)(?:.*)", r'did you get |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i do\W([^\.\,\!]+)(?:.*)", r'do you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i did\W([^\.\,\!]+)(?:.*)", r'did you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i can\W([^\.\,\!]+)(?:.*)", r'can you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i could\W([^\.\,\!]+)(?:.*)", r'could you |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i feel\W([^\.\,\!]+)(?:.*)", r'do you feel |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i felt\W([^\.\,\!]+)(?:.*)", r'did you feel |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i hope\W([^\.\,\!]+)(?:.*)", r'do you hope |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i hoped\W([^\.\,\!]+)(?:.*)", r'did you hope |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i wish\W([^\.\,\!]+)(?:.*)", r'do you wish |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i wished\W([^\.\,\!]+)(?:.*)", r'did you wish |||\3\2\1')
-    ]
-    for (before, after) in reflections_open:
-        if re.search(before,statement):
-            reflection = sub2(before,after,statement)
-            break
-    introduction,content = reflection.split("|||")
-    for (before, after) in pronoun_reflections:
-        content = re.sub(before, after, content) 
-    return capitalize_fragment(introduction + content.lower())
-
-
-def perform_closed_reflection(statement):
-    reflections_closed = [
-        (r"^" + temporal + r"?(\W?)i am\W([^\.\,\!]+)(?:.*)", r'you are |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i was\W([^\.\,\!]+)(?:.*)", r'you were |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i will\W([^\.\,\!]+)(?:.*)", r'you will |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i have got\W([^\.\,\!]+)(?:.*)", r"you've got |||\3\2\1"),
-        (r"^" + temporal + r"?(\W?)i have had\W([^\.\,\!]+)(?:.*)", r"you've had |||\3\2\1"),
-        (r"^" + temporal + r"?(\W?)i have\W([^\.\,\!]+)(?:.*)", r"you've |||\3\2\1"),
-        (r"^" + temporal + r"?(\W?)i had\W([^\.\,\!]+)(?:.*)", r'you had |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i got\W([^\.\,\!]+)(?:.*)", r'you got |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i do\W([^\.\,\!]+)(?:.*)", r'you do |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i did\W([^\.\,\!]+)(?:.*)", r'you did |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i can\W([^\.\,\!]+)(?:.*)", r'you can |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i could\W([^\.\,\!]+)(?:.*)", r'you could |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i feel\W([^\.\,\!]+)(?:.*)", r'you feel |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i felt\W([^\.\,\!]+)(?:.*)", r'you felt |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i hope\W([^\.\,\!]+)(?:.*)", r'you hope |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i hoped\W([^\.\,\!]+)(?:.*)", r'you hoped |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i wish\W([^\.\,\!]+)(?:.*)", r'you wish |||\3\2\1'),
-        (r"^" + temporal + r"?(\W?)i wished\W([^\.\,\!]+)(?:.*)", r'you wished |||\3\2\1')
-    ]
-    for (before, after) in reflections_closed:
-        if re.search(before,statement):
-            reflection = sub2(before,after,statement)
-            break
-    introduction,content = reflection.split("|||")
-    for (before, after) in pronoun_reflections:
-        content = re.sub(before, after, content) 
-    return capitalize_fragment(introduction + content.lower())
-
-
   #####                                             
  #     # #####  ###### ###### ##### # #    #  ####  
  #       #    # #      #        #   # ##   # #    # 
@@ -789,35 +662,113 @@ def next_daytime(current_hour):
     else:
         return "day"         
 
-greetings = [
-    re.compile(r'^good morning'),
-    re.compile(r'^good afternoon'),
-    re.compile(r'^good evening'),
-    re.compile(r'^hello'),
-    re.compile(r'^hi\W*'),
-    re.compile(r'^howdy'),
-    re.compile(r'^hey\W+((there)|((\s|\w)*coachy)|((\s|\w)*bot))'),
-    re.compile(r'^hey\s*[youm]*\s+\w+[\.\!]+')   
-]
 
-def is_greeting(sentence, greetings=greetings):
-    if any(greeting.search(sentence) for greeting in greetings):
+greeting = r"^(" + "|".join([r"^(oh\,? ",
+    r"hey [\w\s-]+\,?",
+    r"hey\,? ",
+    r"why\, ",
+    r"\w+ \w+\, ",
+    r"oh [\w\s-]+\,)"
+    ]) + "?" + "|".join([
+    r"(good morning",
+    r"good afternoon",
+    r"good evening",
+    r"h[ea]llo",
+    r"hi",
+    r"howdy",
+    r"salut",
+    r"servus",
+    r"ahoi)"
+    ]) + r"($|\,| |\.|\!|\;))|(hey there!)"
+
+
+def is_greeting(sentence):
+    if re.search( greeting, sentence):
         return True
     else:
         return False
 
-how_are_yous = [
-    re.compile('(?:^|,|;|-\s*)how are you[\s\,]?\w*'),
-    re.compile('[^,;]how is it going[\s\,]?\w*'),    
-    re.compile('[^,;]what is up[\s\,]?\w*')    
-]
+temporal_general = "|".join([
+    r"(today",
+    r"yesterday",
+    r"right now",
+    r"currently",
+    r"now",
+    r"recently",
+    r"previously",
+    r"lately",
+    r"sometimes",
+    r"every now and then)"
+    ])
 
-def is_how_are_you(sentence, how_are_yous=how_are_yous):
-    if any(how_are_you.match(sentence) for how_are_you in how_are_yous):
+temporal_units = "|".join([
+    r"(days?",
+    r"weeks?",
+    r"weekend",
+    r"morning",
+    r"evening",
+    r"night",
+    r"time",
+    r"\w+day",
+    r"hours?",
+    r"january",
+    r"february",
+    r"march",
+    r"april",
+    r"mai",
+    r"june",
+    r"july",
+    r"august",
+    r"september",
+    r"ocotber",
+    r"november",
+    r"december",
+    r"spring",
+    r"winter",
+    r"summer",
+    r"fall",
+    r"autumn",
+    r"years?)",
+])
+
+how_are_you = r"(^|([\,\;\.\!]\s))" + "|".join([
+    r"(how are you( doing| feeling)?",
+    r"how is it going",   
+    r"how do you (do|feel)",        
+    r"what is up)"    
+]) + r"(\s(this|these|those|lately|recently|today|now|again|right now)\s?)?" + temporal_units + r"?(\,[\s\w]+)?\?"
+
+how_was_your_time = r"(^|([\,\;\.\!]\s))" + "|".join([
+    r"(how (is|was|were) your",
+    r"how (has|have) your)",
+]) + r"\s(last|current|recent|previous)?\s?" + temporal_units + r"\s?(been)?\s?(so far|lately|recently)?(\,[\s\w]+)?\?"
+
+you_had_good_time = r"(?<!(why  |how  |who  |what |when ))" + "|".join([r"(did you have",
+    "have you had)"]) + r"\s" + "|".join([
+    r"(a",
+    r"some",
+    r"a few)" ]) + "\s" + intensifiers + r"?\s?" + goods + r"\s" + temporal_units + r"((\s|\,)[\,\s\w]+)?\?"
+
+def is_question_how_are_you(sentence):
+    if re.search( how_are_you, sentence):
         return True
     else:
         return False
 
+def is_question_how_was_your_time(sentence):
+    if re.search( how_was_your_time, sentence):
+        return True
+    else:
+        return False
+
+def is_question_you_had_good_time(sentence):
+    sentence = sentence.replace( "why did", "why  did")
+    sentence = sentence.replace( "how did", "how  did")
+    sentence = sentence.replace( "who did", "who  did")
+    if re.search( you_had_good_time, sentence):
+        return True
+    else:
+        return False
 
  #######                             
  #       #      #    # ###### ###### 
