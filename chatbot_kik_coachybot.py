@@ -9,6 +9,7 @@ from ngrams import corrections
 import nltk
 
 from datetime import datetime
+from time import sleep
 from pytz import timezone
 from collections import defaultdict
 import random
@@ -146,7 +147,6 @@ def incoming():
                     "timezone" : str(kik_user.timezone),
                     #"message_count" : 1,
                     "message_first" : kik_time,
-                    #"message_previous" : kik_time,
                     "message_current" : kik_time,
                     "node_current" : "Welcome"
                     })
@@ -190,13 +190,22 @@ def incoming():
 
             print " | ".join(answer)
 
-            kik.send_messages([
-                TextMessage(
-                    to = message.from_user,
-                    chat_id = message.chat_id,
-                    body = line
-                ) for line in answer
-            ])                 
+            for line in answer:
+                sleep(random.randint(1,5))
+                kik.send_messages([
+                    TextMessage(
+                        to = message.from_user,
+                        chat_id = message.chat_id,
+                        body = line)
+                ])                   
+
+            # kik.send_messages([
+            #     TextMessage(
+            #         to = message.from_user,
+            #         chat_id = message.chat_id,
+            #         body = line
+            #     ) for line in answer
+            # ])                 
 
 
          #     #                                               ######                                                  
