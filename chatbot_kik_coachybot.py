@@ -221,7 +221,7 @@ def incoming():
                 db.execute("UPDATE users SET " + key + " = %s WHERE username = %s;", (user[key], message.from_user))
 
         if(
-            user["node_current"]  == "dummy"
+            user["node_previous"]  == "Terminator"
             ):
             db.execute( "DELETE FROM users WHERE username = %s;", (message.from_user,))
 
