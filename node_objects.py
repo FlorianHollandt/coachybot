@@ -36,8 +36,10 @@ class Template(object):
         # Making sure that 'sentences' is a list of strings
 
         if not isinstance( text, str):
+            if verbose: print "Argument 'text' must be a string."
+            if verbose: print "Instead, text argument of type '" + type(text).__name__ + "' was given."
             raise TypeError
-            print "Argument 'text' must be a string."
+            
 
 
         # Making sure that 'user' is a dictionary
