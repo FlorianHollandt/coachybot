@@ -17,7 +17,8 @@ import psycopg2
 import urlparse
 
 from nlp_functions import *
-from nodes import *
+#from nodes import *
+from nodes_object import *
 
 # http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
 # ===========================================================================================
@@ -42,6 +43,10 @@ history = dict()
 epoch = datetime.utcfromtimestamp(0)
 def epoch_timestamp(dt):
     return (dt - epoch).total_seconds() * 1000.0
+
+def generate_timestring_from_timestamp(timestamp):
+    time = datetime.datetime.fromtimestamp(timestamp)
+    return time.strftime("%Y-%m-%d %H:%M:%S")
 
 sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
@@ -78,7 +83,7 @@ def incoming():
     for message in messages:
         if isinstance(message, TextMessage):
 
-            message_facts = []
+            connection_facts = []
 
 
             #     #                         #     #                                    
@@ -90,32 +95,27 @@ def incoming():
              #####   ####  ###### #    #    #     # #  ####    #    ####  #    #   #   
                                                                             
 
-            print "System time: " + str(epoch_timestamp(datetime.now()))
-            print "Kik time   : " + str(message.timestamp)
+            system_time = epoch_timestamp(datetime.now())
+            kik_time = message.timestamp
+            print "System time: " + str(system_time) + "(" + generate_timestring_from_timestamp(system_time) + ")"
+            print "Kik time   : " + str(kik_time) + "(" + generate_timestring_from_timestamp(kik_time) + ")"
             print "Looking up Kik user '" + message.from_user + "' in database..."
 
             user_attributes = [
-                "kik_id" ,
-                "kik_firstname", 
-                "kik_lastname", 
-                "kik_timezone",                 
-                "name", 
-                "gender", 
-                "dialogue_count", 
-                "dialogue_start", 
+                "username" ,
+                "firstname", 
+                "lastname", 
+                "timezone",                 
+                "message_first",
                 "message_previous",
                 "message_count",
-                "greeting_last",
+                "message_current",                
                 "how_are_you_last",
-                "topic_current",
-                "topic_start",
-                "question_open_start",
-                "question_open_topic",
-                "node_current",
-                "node_previous"
+                "node_previous",
+                "node_current"
             ]
 
-            db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE kik_id = %s;", (message.from_user,))
+            db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE username = %s;", (message.from_user,))
             user_values = db.fetchone()
 
             user = defaultdict(bool)
@@ -123,15 +123,15 @@ def incoming():
             if user_values:
 
                 print "Found user data: " + str(user_values)
-                message_facts.append("known_user") 
+                connection_facts.append("known_user") 
 
                 user.update(dict(zip(user_attributes, user_values)))
-                user["message_count"] += 1
+                #user["message_count"] += 1
                 user["message_current"] = message.timestamp
 
             else:
 
-                message_facts.append("unknown_user") 
+                connection_facts.append("unknown_user") 
                 print "No user data in database. Looking up " + message.from_user + " in Kik..."
 
                 kik_user = kik.get_user(message.from_user)
@@ -140,75 +140,20 @@ def incoming():
                 print "User timezone: " + str(kik_user.timezone)                
 
                 user.update({
-                    "kik_id" : message.from_user,
-                    "kik_firstname" : str(kik_user.first_name),
-                    "kik_lastname" : str(kik_user.last_name),
-                    "kik_timezone" : str(kik_user.timezone),
-                    "message_count" : 1,
+                    "username" : message.from_user,
+                    "firstname" : str(kik_user.first_name),
+                    "lastname" : str(kik_user.last_name),
+                    "timezone" : str(kik_user.timezone),
+                    #"message_count" : 1,
                     "message_first" : message.timestamp,
                     "message_previous" : message.timestamp,
                     "message_current" : message.timestamp,
-                    "dialogue_start" : message.timestamp,
-                    "dialogue_count" : 1,
-                    "node_current" : "greeting"
+                    "node_current" : "Welcome"
                     })
 
-            if user["kik_timezone"]=="None":
-                user["kik_timezone"] = "Europe/Berlin"
+            if user["timezone"]=="None":
+                user["timezone"] = "Europe/Berlin"
 
-
-             ######                                                             
-             #     # #  ####  #####  #    # #####  ##### #  ####  #    #  ####  
-             #     # # #      #    # #    # #    #   #   # #    # ##   # #      
-             #     # #  ####  #    # #    # #    #   #   # #    # # #  #  ####  
-             #     # #      # #####  #    # #####    #   # #    # #  # #      # 
-             #     # # #    # #   #  #    # #        #   # #    # #   ## #    # 
-             ######  #  ####  #    #  ####  #        #   #  ####  #    #  ####  
-                                                                    
-            disruptions = []
-
-            sentences = preprocess_message(message.body)
-
-            for sentence in sentences:
-                if is_how_are_you(sentence):
-                    disruptions.append("has_question_how_are_you")  
-                if is_greeting(sentence):
-                    disruptions.append("has_greeting")
-
-            time_since_last_message = message.timestamp - user["message_previous"]
-
-            if(
-                time_since_last_message >= 11*60*60*1000
-                ):
-
-                user.update({
-                    "node_previous" : user["node_current"],
-                    "node_current" : "greeting"
-                    })
-
-            elif(
-                    (
-                        time_since_last_message >= 2*60*60*1000
-                        and time_since_last_message < 5*60*60*1000
-                        and (
-                            "has_greeting" in message_facts
-                            or "has_question_how_are_you" in message_facts
-                            )
-                        ) or (
-                        time_since_last_message >= 5*60*60*1000
-                        and time_since_last_message < 11*60*60*1000
-                        )
-                ):
-
-                kik.send_messages([
-                    TextMessage(
-                        to = message.from_user,
-                        chat_id = message.chat_id,
-                        body = "Hi " + user["kik_firstname"] + "!\nWe were just talking about something interesting..."
-                    )
-                ])        
-
-                user["repeat_question"] = True
 
 
              #######                                                               #     #                      
@@ -222,12 +167,15 @@ def incoming():
 
             print "Message: " + message.body
 
-            answer, next_node, user = eval(user["node_current"])(sentences, user)
+            #answer, next_node, user = eval(user["node_current"])(sentences, user)
+            node_main = eval(user["node_current"])(message.body, user)
+
+            answer    = node_main.answer
+            next_node = node_main.next_node
+            user      = node_main.user
 
             print "Answer: " + " | ".join(answer)
             print "Next node: " + next_node
-            user["node_previous"] = user["node_current"]
-            user["node_current"]  = next_node
 
 
 
@@ -260,26 +208,22 @@ def incoming():
           #####  #      #####  #    #   #   # #    #  ####     ######  #    #   #   #    # #####  #    #  ####  ###### 
                                                                                                                        
 
-        user["message_previous"] = message.timestamp
-
-        print user
-
         user_attributes = user.keys()
         user_values = user.values()
 
         if (
-            "unknown_user" in message_facts
+            "unknown_user" in connection_facts
             ):  
-            db.execute( "INSERT INTO users (kik_id) VALUES (%s );", (message.from_user,))
+            db.execute( "INSERT INTO users (username) VALUES (%s );", (message.from_user,))
 
         for key in user.keys():
             if user[key]:
-                db.execute("UPDATE users SET " + key + " = %s WHERE kik_id = %s;", (user[key], message.from_user))
+                db.execute("UPDATE users SET " + key + " = %s WHERE username = %s;", (user[key], message.from_user))
 
         if(
             user["node_current"]  == "dummy"
             ):
-            db.execute( "DELETE FROM users WHERE kik_id = %s;", (message.from_user,))
+            db.execute( "DELETE FROM users WHERE username = %s;", (message.from_user,))
 
 
     #####################################################################
