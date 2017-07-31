@@ -279,7 +279,7 @@ def has_danger_to_self(sentence):
         if(
             not has_negation( intention_match.group(1))
             and re.search( hurts, intention_match.group(len(intention_match.groups())))
-            and re.search(  r"\W(me|myself)\W", intention_match.group(len(intention_match.groups())))
+            and re.search(  r"\W(me|myself)(\W|$)", intention_match.group(len(intention_match.groups())))
             ):
             return True
         else:
@@ -289,12 +289,12 @@ def has_danger_to_self(sentence):
             not has_negation( desire_match.group(1))
             and (
                 (
-                    re.search(  r"\W(dead)\W", desire_match.group(len(desire_match.groups())))
+                    re.search(  r"\W(dead|die)(\W|$)", desire_match.group(len(desire_match.groups())))
                     and re.search(  r"\W(i)\W", desire_match.group(len(desire_match.groups())))
                     )
                 or(
                     re.search( hurts, desire_match.group( len( desire_match.groups())))
-                    and re.search(  r"\W(me|myself)\W", desire_match.group( len( desire_match.groups())))
+                    and re.search(  r"\W(me|myself)(\W|$)", desire_match.group( len( desire_match.groups())))
                     )
                 )
             ):

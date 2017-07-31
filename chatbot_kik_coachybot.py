@@ -136,9 +136,11 @@ def incoming():
                 print "No user data in database. Looking up " + message.from_user + " in Kik..."
 
                 kik_user = kik.get_user(message.from_user)
-                print "User firstname: " + str(kik_user.first_name)
-                print "User lastname: " + str(kik_user.last_name)
-                print "User timezone: " + str(kik_user.timezone)                
+                print "Username          : 'foo'"# + str(kik_user.first_name) + "'"
+                print "User firstname    : 'bar'"# + str(kik_user.first_name) + "'"
+                print "User lastname     : 'baz'"# + str(kik_user.last_name) + "'"
+                print "User timezone     : '" + str(kik_user.timezone) + "'"   
+                print "Message timestamp : '" + str(message.timestamp) + "'"
 
                 user.update({
                     "username" : message.from_user,
