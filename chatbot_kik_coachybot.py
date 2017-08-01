@@ -136,9 +136,9 @@ def incoming():
                 print "No user data in database. Looking up " + message.from_user + " in Kik..."
 
                 kik_user = kik.get_user(message.from_user)
-                print "Username          : 'foo'"# + str(kik_user.first_name) + "'"
-                print "User firstname    : 'bar'"# + str(kik_user.first_name) + "'"
-                print "User lastname     : 'baz'"# + str(kik_user.last_name) + "'"
+                print "Username          : '" + str(kik_user.first_name) + "'"
+                print "User firstname    : '" + str(kik_user.first_name) + "'"
+                print "User lastname     : '" + str(kik_user.last_name) + "'"
                 print "User timezone     : '" + str(kik_user.timezone) + "'"   
                 print "Message timestamp : '" + str(message.timestamp) + "'"
 
@@ -193,14 +193,15 @@ def incoming():
             print " | ".join(answer)
 
             for line in answer:
+                type_time = random.randint(500,3500)
                 kik.send_messages([
                     TextMessage(
                         to        = message.from_user,
                         chat_id   = message.chat_id,
                         body      = line,
-                        type_time = random.randint(500,4500))
+                        type_time = type_time)
                 ])        
-                sleep(random.randint(0, 2))              
+                sleep(int(round(type_time+500.)/1000.)              
 
 
          #     #                                               ######                                                  
