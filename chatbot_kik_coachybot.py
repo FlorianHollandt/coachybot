@@ -201,7 +201,7 @@ def incoming():
                         body      = line,
                         type_time = type_time)
                 ])        
-                sleep(int(round(type_time+500.)/1000.)              
+                sleep(int(round(type_time+500.)/1000.))              
 
 
          #     #                                               ######                                                  
