@@ -190,10 +190,10 @@ def incoming():
               #####  ###### #    # #####  # #    #  ####     #     # ######  ####   ####  #    #  ####  ###### 
                                                                                                    
 
-            print " | ".join(answer)
+            #print " | ".join(answer)
 
             for line in answer:
-                type_time = random.randint(500,3500)
+                type_time = random.randint(1100,3500)
                 kik.send_messages([
                     TextMessage(
                         to        = message.from_user,
