@@ -491,28 +491,39 @@ def has_protest_to_question(sentence):
   #### #  ####  ######  ####    #   #  ####  #    #  ####  
                                                            
 
-def has_question_why(sentence):
+def has_request_to_explain(sentence):
     if(
-        (
-            re.search(r"(why|(what.*(for|reason)))", sentence)
+        ( # why are you asking this? / why would you want to know this?
+            re.search(r"(why|(what.*(for|reason|purpose)))", sentence)
             and
-            re.search(r"(ask|know|question|curious|nosy|inquisitive)",sentence)
+            re.search(r"(ask|know|question|curious|nosy|inquisitive)", sentence)
             )
-        or(
-            re.search(r"(why|(how.*(is|be)))", sentence)
+        or( # in how far is that relevant?
+            re.search(r"(why|(how(\w|\s)+(is|be)))", sentence)
             and
             re.search(r"(important|relevant|interesting|fascinating)", sentence)
             )
-        or(
-            re.search(r"(what|(not.*get))", sentence)
-            and
-            re.search(r"you", sentence)
-            and
-            re.search(r"(point|mean)", sentence)
+        or( # what do you mean / i do not get your point?
+            re.search(r"(what|((^|\W)i\W).*(not.*(get|understand|follow)))", sentence)
+            and(
+                re.search(r"(talk|question|this)(\w|\s)+about", sentence)
+                or
+                re.search(r"you.*(point|mean|ask|question)", sentence)
+                )
             )        
+        or(
+            re.search(r"(question|ask)", sentence)
+            and
+            re.search(r"(you|this).*(has|make)", sentence)
+            and
+            re.search(r"no(\w|\s)+(sense)", sentence)
+            ) 
         or(
             re.search(r"why\?", sentence)
             )        
+        or(
+            re.search(r"sorry\?", sentence)
+            )             
         ):
         return True
     else:

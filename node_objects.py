@@ -1,8 +1,9 @@
+import random
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from pytz import timezone
-import random
+
 
 from skills import *
 
@@ -117,8 +118,8 @@ class Template(object):
         for sentence in self.sentences:
             if verbose: print str(sentence_counter) + ".: " + sentence
             if verbose: sentence_counter += 1
-            if has_question_why(sentence):
-                self.message_facts.append("has_question_why")  
+            if has_request_to_explain(sentence):
+                self.message_facts.append("has_request_to_explain")  
             if has_protest_to_question(sentence):
                 self.message_facts.append("has_protest_to_question")
             if is_question_how_are_you(sentence):
@@ -545,15 +546,16 @@ class How_are_you(Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-                    if has_desire( sentence):
-                        self.message_facts.append("has_desire")  
+            if has_desire( sentence):
+                self.message_facts.append("has_desire")  
 
         if(
             "has_danger_to_self" in self.message_facts
             ):
             self.next_node ="Terminator" # Danger_to_self            ):
+
         elif(
-            "has_question_why" in self.message_facts
+            "has_request_to_explain" in self.message_facts
             ):
 
             self.answer.append(random.choice([
@@ -569,12 +571,75 @@ class How_are_you(Template):
             ):
 
             self.answer.append(random.choice([
-                "Okay. So... is that something that would really make a difference in you life, "
-                "and that you can achieve when you set your mind to it?"
+                "If that wish came true... What problem in your life would that solve?"
                 ]))
 
             self.answer_facts.append("is_questioning_desire")
             self.next_node = "Terminator" #"Goal"
+
+        else:
+
+            self.answer.append(random.choice([
+                "Can you tell me some more about this?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_question")            
+
+        self.update_user()
+
+        if self.verbose: self.summary()        
+
+
+
+ ######                                
+ #     # ######  ####  # #####  ###### 
+ #     # #      #      # #    # #      
+ #     # #####   ####  # #    # #####  
+ #     # #           # # #####  #      
+ #     # #      #    # # #   #  #      
+ ######  ######  ####  # #    # ###### 
+
+
+class Desire(Template):
+    """
+    Desire node
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        if(
+            "has_danger_to_self" in self.message_facts
+            ):
+            self.next_node ="Terminator" # Danger_to_self            ):
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "That's what wishes and goals are about, right? There's something in life that is not quite right."
+                "What's that something for you?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Desire" 
+
+        else:
+            self.answer.append(random.choice([
+                "Can you tell me some more about this?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_question")            
 
         self.update_user()
 
