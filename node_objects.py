@@ -575,7 +575,7 @@ class How_are_you(Template):
                 ]))
 
             self.answer_facts.append("is_questioning_desire")
-            self.next_node = "Terminator" #"Goal"
+            self.next_node = "Desire" #"Goal"
 
         else:
 
