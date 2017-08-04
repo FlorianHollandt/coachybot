@@ -133,6 +133,9 @@ class Template(object):
             if has_danger_to_self(sentence):
                 self.message_facts.append("has_danger_to_self")   
 
+        if has_hesitation( text.lower()):
+            self.message_facts.append("has_hesitation")   
+
 
         # Greeting logic (without "How are you?")
 
@@ -292,6 +295,23 @@ class Template(object):
                 self.answer_facts.append("use_user_firstname")  
 
             self.answer_facts.append("has_question_how_are_you") 
+
+
+        # Repeat node in case of hesitation / filler
+
+        if(
+            "has_hesitation" in self.message_facts
+            and not "interruption_long" in self.message_facts
+            and not "has_question_how_are_you" in self.answer_facts
+            and not "has_greeting" in self.answer_facts
+            ):
+            self.answer.append(random.choice([
+                "So... ?",
+                "Yes... ?",
+                "Okay... ?"
+            ])) 
+            self.answer_facts.append("is_waiting_for_answer") 
+            self.next_node = type(self).__name__ 
 
 
         # Danger to self! --> Flush all accumulated answers!

@@ -213,6 +213,28 @@ def is_bad(sentence):
         return False
 
 
+
+ #     #                                                    
+ #     # ######  ####  # #####   ##   ##### #  ####  #    # 
+ #     # #      #      #   #    #  #    #   # #    # ##   # 
+ ####### #####   ####  #   #   #    #   #   # #    # # #  # 
+ #     # #           # #   #   ######   #   # #    # #  # # 
+ #     # #      #    # #   #   #    #   #   # #    # #   ## 
+ #     # ######  ####  #   #   #    #   #   #  ####  #    # 
+                                                            
+
+def has_hesitation( sentence):
+    if(
+        re.search( r"^(\W)*(u+m+|e+r+|h+m+|so+|well)?(\W)*"
+            r"(actually|"
+            r"((" + intensifiers + r" )?" + goods + r") question|"
+            r"let me think)?"
+            r"(\W)*$", sentence)
+        ):
+        return True
+    else:
+        return False                                                            
+
  ######                                
  #     # ######  ####  # #####  ###### 
  #     # #      #      # #    # #      
