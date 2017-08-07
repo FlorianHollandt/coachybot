@@ -213,6 +213,172 @@ def is_bad(sentence):
         return False
 
 
+                                                                         
+
+
+ ######                                            
+ #     # #####   ####  #####  #      ###### #    # 
+ #     # #    # #    # #    # #      #      ##  ## 
+ ######  #    # #    # #####  #      #####  # ## # 
+ #       #####  #    # #    # #      #      #    # 
+ #       #   #  #    # #    # #      #      #    #
+ #       #    #  ####  #####  ###### ###### #    # 
+                   
+
+problem_grammar = nltk.CFG.fromstring(r"""
+  problem -> subject VP | subject modifier VP
+  VP -> verb_group
+  VP -> verb_group object_clause
+  VP -> verb_group quantifier_j object_clause
+  VP -> verb_group quantifier_r 
+  VP -> verb_group modifier_r quantifier_r
+  PP -> P object
+  verb_group -> verb_simple 
+  verb_group -> moderator verb_simple
+  verb_group -> verb_aux verb_gerund
+  verb_group -> verb_aux modifier verb_gerund
+  verb_group -> verb_aux moderator verb_gerund
+  verb_group -> verb_aux moderator modifier verb_gerund
+  verb_group -> verb_aux verb_simple
+  verb_group -> verb_aux modifier verb_simple
+  verb_group -> verb_aux moderator verb_simple
+  verb_group -> verb_aux moderator modifier verb_simple  
+  verb_group -> verb_aux "to" verb_simple
+  verb_group -> "do" modifier verb_aux "to" verb_simple
+  verb_group -> verb_aux
+  verb_simple -> "drink" 
+  verb_gerund -> "drinking"
+  verb_aux -> "have" verb_pastprog
+  verb_aux -> "have" modifier verb_pastprog
+  verb_aux -> "am" | "do" | "have" 
+  verb_aux -> "use" | "fail" | "can" | "want" | "get"
+  verb_pastprog -> "been" | "done"
+  subject ->  "i"
+  object_simple ->  "milk" 
+  object_np -> determiner object_simple
+  object_clause -> object_simple | object_np 
+  object_clause -> comparison_base object_simple "than" comparison
+  object_clause -> comparison_base preposition object_np "than" comparison  
+  object_clause -> quantifier_j object_simple
+  object_clause -> modifier_r quantifier_j object_simple
+  object_clause -> quantifier_j preposition object_np
+  object_clause -> modifier_r quantifier_j preposition object_np  
+  determiner -> "a" | "an" | "the" | "this" | "these" | "those" | "that"
+  determiner ->  "my" | "our" | "his" | "her" | "its" | "our" | "their"
+  preposition -> "of" | "from" 
+  modifier -> negation | temporal | negation temporal
+  modifier_r -> "much" | "way" | "far" | "by" "far" | "a" "lot" | "a" "bit"
+  negation -> "no" | "not" | "never"
+  temporal -> "always" | "sometimes" | "often"
+  quantifier_j -> "a" "lot" "of" | "a" "lot"| "enough"
+  quantifier_j -> "too" "much" | "too" "many"
+  quantifier_j -> "too" "few" | "too" "little" 
+  quantifier_r -> "too" adverb | "too" "little" | "too" "much" | 
+  quantifier_r -> comparison_base adverb "than" comparison
+  quantifier_r -> comparison_base "than" comparison 
+  adverb -> "seldom" | "often" 
+  comparison -> "i" "should"
+  comparison_base -> "more" | "less" | modifier_r "more" | modifier_r "less"
+  moderator -> "kind" "of" | "somehow"
+  """)
+
+problem_parser = nltk.RecursiveDescentParser( problem_grammar)
+
+def matches_problem_grammar(sentence):
+    sentence = re.sub( r"(\.|\,|\!|\?|\;|\:)", "", sentence)
+    return False
+    # work in progress
+
+def extract_defined_problem( sentence):
+    return sentence 
+    # work in progress     
+
+problems = "|".join([
+    "(problems?",
+    "issues?",
+    "topics?",
+    "somethings?",
+    "itch(es)?",
+    "irritations?",
+    "troubles?",
+    "challenges?",
+    "topics?",
+    "fears?",
+    "pains?)"
+    ])
+
+problem_keywords = "|".join([
+    "(too much",
+    "too many",
+    "too often",
+    "too little",
+    "too few",
+    "too seldom",
+    "not get",
+    "being",
+    "lack of",
+    "need",
+    "satisf",
+    "unhealthy",
+    "stress",
+    "pressure",
+    "struggle",
+    "barely"
+    "hardly",
+    "pain",
+    "alone",
+    "awkward",
+    "deserve",
+    "more (\w+ )than",
+    "less (\w+ )than",
+    "survive",
+    "enough)"
+    ])
+
+problem_patterns = [
+r".*(my|the) (\w|\s|\-|\,)?" \
+    + problems \
+    + r" (is|are|would be|might be)"\
+    + "(?! not)( that( i))? ([^\.\!\?$]+)",
+r".* (is|are|would be|might be)(?! not) "\
+    + "(my|the|an?|one of my) (\w|\s|\-|\,)?" \
+    + problems \
+    + r"( for me)?(\,|\.|\-|\!|\?|$)",
+r"(it (would|might|could|will)"\
+    + "(( \w+)?( allow| enable| empower) me to)?"\
+    + "( (solve|reduce|improve|increase)) )?"\
+    + "(my|the|an?|one of my)( \w+)? "\
+    + problems\
+    + "\,? (of|that|the|in|not)"
+    ]
+
+problem_antipatterns = [
+r".*(my|the) (\w|\s|\-|\,)*" \
+    + problems \
+    + r" (is|are|would be|might be)( that( i))? (not|never) ([^\.\!\?$]+)",
+r".* (is|are|would be|might be) (not|never) (my|the|an?|one of my) (\w|\s|\-|\,)*" \
+    + problems \
+    + r"( for me)?(\,|\.|\-|\!|\?|$)"
+    ]    
+
+def has_problem_statement( sentence):
+    if(
+        any( re.search( antipattern, sentence) for antipattern in problem_antipatterns)
+        ):
+        return False
+    elif(
+        (
+            any( re.search( pattern, sentence) for pattern in problem_patterns)
+            or re.search( problem_keywords, sentence)
+        )
+        and not re.search( r"you", sentence)
+        ):
+        return True
+    else:
+        return False
+
+                                             
+
 
  #     #                                                    
  #     # ######  ####  # #####   ##   ##### #  ####  #    # 
@@ -340,14 +506,14 @@ judgement_grammar = """
         Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
         Judgement : {<.*>* <S_and_V> <Object>}
     """
-PChunker = nltk.RegexpParser(judgement_grammar)
+judgement_chunker = nltk.RegexpParser(judgement_grammar)
 
 def is_judgement_positive(sentence):
     return_value = False
     equivalence = False    
     sentence = re.sub(r"(\,)",r"",sentence)
     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
-    tree = PChunker.parse(sentence_pos)
+    tree = judgement_chunker.parse(sentence_pos)
     if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
         for subtree in tree.subtrees():
             if subtree.label() == unicode("Object"):
@@ -367,7 +533,7 @@ def is_judgement_negative(sentence):
     equivalence = False
     sentence = re.sub(r"(\,)",r"",sentence)    
     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
-    tree = PChunker.parse(sentence_pos)
+    tree = judgement_chunker.parse(sentence_pos)
     if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
         for subtree in tree.subtrees():
             if subtree.label() == unicode("Object"):
@@ -926,7 +1092,8 @@ fluffs = [
     re.compile(r"really"),    
     re.compile(r"literal?ly"),    
     re.compile(r"certainly"),    
-    re.compile(r"in fact"),
+    re.compile(r"in fact"),    
+    re.compile(r"somehow"),        
     re.compile(r"basical?ly")
     #re.compile(r"just")
 ]
@@ -973,6 +1140,7 @@ def cleanup_sentence(text):
 def expand_contractions(text):
     "Replace contractions of pronoun and auxiliary verb with their expanded versions." 
     contractions = [
+        (r"1", "one"),    
         (r"ain't", "is not"),
         (r"aren't", "are not"),
         (r"can't", "can not"),
@@ -1133,5 +1301,33 @@ def expand_contractions(text):
     return text
 
 
+ # #    # ##### #####   ####  #####  #    #  ####  ##### #  ####  #    # 
+ # ##   #   #   #    # #    # #    # #    # #    #   #   # #    # ##   # 
+ # # #  #   #   #    # #    # #    # #    # #        #   # #    # # #  # 
+ # #  # #   #   #####  #    # #    # #    # #        #   # #    # #  # # 
+ # #   ##   #   #   #  #    # #    # #    # #    #   #   # #    # #   ## 
+ # #    #   #   #    #  ####  #####   ####   ####    #   #  ####  #    # 
 
+# simple_sentence_grammar = """
+#         noun_phrase: {((((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>))|<PRP>)}
+#         subject_and_verb : {<noun_phrase> (<R.*> )*(<VBZ>|<VBP>|<VBD>)}  
+#     """
+# simple_sentence_chunker = nltk.RegexpParser(simple_sentence_grammar)                                                                         
+
+# introductions = "|".join([
+#     "(say",
+#     "guess",
+#     "think)"
+#     ]) + r"(\,? that)?"
+
+# def has_introduction( sentence):
+#     return_value = False
+#     intro_match = re.search( r"(.*) " + introductions + r" (.*)", sentence)
+#     if intro_match:
+#         if(
+#             re.search( r"i ", intro_match.group(1))
+#             and not re.search( r"not ", intro_match.group(1))
+#             ):
+#             return_value = True
+#     return return_value
 

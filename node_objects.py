@@ -327,7 +327,8 @@ class Template(object):
                 "In the US, try National Suicide Prevention Lifeline:"
                 "\nWebsite: www.suicidepreventionlifeline.org"
                 "\nPhone: 18002738255",
-                "For other countries, please check https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines"
+                "For other countries, please check"
+                " https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines"
             ]     
             self.answer_facts = ["has_response_to_danger_to_self"]
 
@@ -514,7 +515,8 @@ class Welcome(Template):
 
             self.answer.insert(1, random.choice([
                 "My name is Coachybot, but you can call me Coachy.\n"
-                "I have been programmed to improve your life by providing some basic coaching. So..."
+                "I have been programmed to improve your life"
+                " by providing some basic coaching. So..."
             ]))             
                 
             self.answer_facts.insert(0, "has_introduction") 
@@ -597,13 +599,29 @@ class How_are_you(Template):
             self.answer_facts.append("is_questioning_desire")
             self.next_node = "Desire" #"Goal"
 
+        elif(
+            not self.message_facts
+            and self.user["node_previous"] == "How_are_you"
+            ):
+
+            self.answer.append(random.choice([
+                "Enough of that. Let's move on!",
+                "Ah, nevermind...",
+                "Fascinating!"
+                ]))        
+            self.answer.append(random.choice([
+                "What are your plans for tomorrow?"
+                ]))     
+            self.answer_facts.append("uses_fallback_exit")                
+            self.next_node = "Terminator" 
+
         else:
 
             self.answer.append(random.choice([
                 "Can you tell me some more about this?"
                 ]))
-
-            self.answer_facts.append("uses_fallback_question")            
+            self.answer_facts.append("uses_fallback_question") 
+            self.next_node = "How_are_you"           
 
         self.update_user()
 
@@ -637,22 +655,39 @@ class Desire(Template):
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
-        if(
+        for sentence in self.sentences:
+            if has_problem_statement( sentence):
+                self.message_facts.append("has_problem_statement")  
+
+        if(     # Standard cases
             "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
             ):
-            self.next_node ="Terminator" # Danger_to_self            ):
+            pass        
 
         elif(
             "has_request_to_explain" in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "That's what wishes and goals are about, right? There's something in life that is not quite right."
-                "What's that something for you?"
+                "That's what wishes and goals are about, right?"
+                " There's something in life that is not quite right."
+                " What's that something for you?"
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
             self.next_node = "Desire" 
+
+        elif(
+            "has_problem_statement" in self.message_facts
+            ):
+            self.answer.append(random.choice([
+                "Of all issues in your life, is this among the ones"
+                " with the biggest impact on your overall happyness?"
+                ]))
+
+            self.answer_facts.append("has_question_about_relevance")
+            self.next_node = "Terminator" # Relevance
 
         else:
             self.answer.append(random.choice([
