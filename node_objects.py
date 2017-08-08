@@ -689,12 +689,32 @@ class Desire(Template):
             self.answer_facts.append("has_question_about_relevance")
             self.next_node = "Terminator" # Relevance
 
+        elif(
+            self.user["node_previous"] == "Desire"
+            and not self.message_facts
+            ):
+            self.answer.append(random.choice([
+                "Enough of that. Let's move on!",
+                "Ah, nevermind...",
+                "Fascinating!"
+                ]))        
+            self.answer.append(random.choice([
+                "What are your plans for tomorrow?"
+                ]))     
+            self.answer_facts.append("uses_fallback_exit")                
+            self.next_node = "Terminator" 
+
         else:
             self.answer.append(random.choice([
-                "Can you tell me some more about this?"
+                "Hm, what I had in mind was something like"
+                "'It would solve my problem of always being to tired' or "
+                " 'My actual problem is that I am not satisfied with myself'."
                 ]))
-
-            self.answer_facts.append("uses_fallback_question")            
+            self.answer.append(random.choice([
+                "Could you rephrase your problem in such a way?"
+                ]))
+            self.answer_facts.append("has_explanation_for_question")  
+            self.next_node = "Desire"           
 
         self.update_user()
 
