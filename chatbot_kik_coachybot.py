@@ -203,7 +203,7 @@ def incoming():
                         body      = line,
                         type_time = type_time)
                 ])        
-                sleep(int( round( type_time + random.randint( 350, 650))./1000.))              
+                sleep(int( round( type_time + float(random.randint( 350, 650)))/1000.))              
 
 
          #     #                                               ######                                                  
