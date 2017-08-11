@@ -597,7 +597,7 @@ class How_are_you(Template):
                 ]))
 
             self.answer_facts.append("is_questioning_desire")
-            self.next_node = "Desire" #"Goal"
+            self.next_node = "Problem" #"Goal"
 
         elif(
             not self.message_facts
@@ -629,18 +629,18 @@ class How_are_you(Template):
 
 
 
- ######                                
- #     # ######  ####  # #####  ###### 
- #     # #      #      # #    # #      
- #     # #####   ####  # #    # #####  
- #     # #           # # #####  #      
- #     # #      #    # # #   #  #      
- ######  ######  ####  # #    # ###### 
+ ######                                            
+ #     # #####   ####  #####  #      ###### #    # 
+ #     # #    # #    # #    # #      #      ##  ## 
+ ######  #    # #    # #####  #      #####  # ## # 
+ #       #####  #    # #    # #      #      #    # 
+ #       #   #  #    # #    # #      #      #    # 
+ #       #    #  ####  #####  ###### ###### #    # 
+                                                   
 
-
-class Desire(Template):
+class Problem(Template):
     """
-    Desire node
+    Problem node
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
@@ -676,7 +676,7 @@ class Desire(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Desire" 
+            self.next_node = "Problem" 
 
         elif(
             "has_problem_statement" in self.message_facts
@@ -687,10 +687,10 @@ class Desire(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_relevance")
-            self.next_node = "Terminator" # Relevance
+            self.next_node = "Relevance" 
 
         elif(
-            self.user["node_previous"] == "Desire"
+            self.user["node_previous"] == "Problem"
             and not self.message_facts
             ):
             self.answer.append(random.choice([
@@ -714,8 +714,88 @@ class Desire(Template):
                 "Could you rephrase your problem in such a way?"
                 ]))
             self.answer_facts.append("has_explanation_for_question")  
-            self.next_node = "Desire"           
+            self.next_node = "Problem"           
 
         self.update_user()
 
         if self.verbose: self.summary()        
+
+
+
+ ######                                                          
+ #     # ###### #      ###### #    #   ##   #    #  ####  ###### 
+ #     # #      #      #      #    #  #  #  ##   # #    # #      
+ ######  #####  #      #####  #    # #    # # #  # #      #####  
+ #   #   #      #      #      #    # ###### #  # # #      #      
+ #    #  #      #      #       #  #  #    # #   ## #    # #      
+ #     # ###### ###### ######   ##   #    # #    #  ####  ###### 
+                                                                 
+
+class Relevance(Template):
+    """
+    Relevance node
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "The problem you just mentioned is obviously on your mind right now."
+                ]))
+            self.answer.append(random.choice([                
+                "But... if you found a magic lamp, and could magically solve just three issues"
+                " in your life... Would this be one of them?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Relevance" 
+
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Okay, great! And is it also one that you can solve, if you"
+                " set your mind to it?"
+                ]))
+
+            self.answer_facts.append("has_question_about_feasability")
+            self.next_node = "Relevance" # Feasability
+
+        else:
+            self.answer.append(random.choice([
+                "Let's keep focused. I really feel that we're getting somewhere."
+                ]))
+            self.answer.append(random.choice([                    
+                "So... is this a problem that really matters in your life?"
+                ]))
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Relevance"           
+
+        self.update_user()
+
+        if self.verbose: self.summary()                

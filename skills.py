@@ -821,8 +821,9 @@ affirmations = "|".join([
     r"entirely",
     r"fully",
     r"highly",
-    r"ok"
-    r"okay"
+    r"ok",
+    r"okay",
+    r"agree",
     r"alright)"
     ])   
 
@@ -852,15 +853,27 @@ negations_adjective = "|".join([
 negations = r"(("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
 
 def has_negation(sentence):
-    if re.search(negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
+    if re.search( negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
         return False
-    elif re.search(negations,sentence):
+    elif re.search( negations,sentence):
         return True
     else:
         return False
 
-def has_affirmation(sentence):
-    if re.search(affirmations,sentence) and not has_negation(sentence):
+def has_affirmation( sentence):
+    if(
+        re.search( affirmations+r"(\W|$)",sentence) 
+        and not has_negation( sentence)
+        ):
+        return True
+    elif(
+        re.search( r"why not(\?|\!)", sentence)
+        or re.search( intensifiers + r" so(\W|$)", sentence)
+        or (
+            re.search( r"(\W|^)i (.* )?(think|say|hope) so(\W|$)", sentence)
+            and not has_negation(sentence)
+            )
+        ):
         return True
     else:
         return False
