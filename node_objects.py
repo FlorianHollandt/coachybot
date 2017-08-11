@@ -706,7 +706,7 @@ class Problem(Template):
         else:
             self.answer.append(random.choice([
                 "Hm, what I had in mind was something like"
-                "'It would solve my problem of always being to tired' or "
+                " 'It would solve my problem of always being to tired' or"
                 " 'My actual problem is that I am not satisfied with myself'."
                 ]))
             self.answer.append(random.choice([
@@ -818,46 +818,6 @@ class Relevance(Template):
 
 
 
- #######                                                           
- #       ######   ##    ####    ##   #####  # #      # ##### #   # 
- #       #       #  #  #       #  #  #    # # #      #   #    # #  
- #####   #####  #    #  ####  #    # #####  # #      #   #     #   
- #       #      ######      # ###### #    # # #      #   #     #   
- #       #      #    # #    # #    # #    # # #      #   #     #   
- #       ###### #    #  ####  #    # #####  # ###### #   #     #   
-                                                                   
-
-class Feasability(Template):
-    """
-    Feasability node
-
-    From Relevance:
-    "Okay, great! And is it [the problem] also one that you can solve, if you"
-    " set your mind to it?"
-    """                
-
-    def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
-
-        Template.__init__(self, text=text, user=user, verbose=verbose)
-
-        for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
-
-        self.update_user()
-
-        if self.verbose: self.summary()   
-
  #######          
  #       # #    # 
  #       #  #  #  
@@ -921,28 +881,35 @@ class Fix( Template):
             ):
 
             self.answer.append(random.choice([
-                "Okay, great! And is it also one that you can solve, if you"
-                " set your mind to it?"
+                "Okay, so... On the short term, I could image that you might be able to get"
+                " some distance between you and the source of this problem."
+                ]))
+            self.answer.append(random.choice([
+                "As a more sustainable, mid-term improvement, I think we can find the one thing"
+                " where a small change can make a rather big difference."
+                ]))
+            self.answer.append(random.choice([
+                "Which of these two sounds best for you right now?"
                 ]))
 
-            self.answer_facts.append("has_question_about_feasability")
-            self.next_node = "Fix" 
+            self.answer_facts.append("has_question_about_timeframe")
+            self.next_node = "Terminator" # Timeframe 
 
         elif(
             "has_negation" in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "I see... Are you interested in exploring the possibilities"
-                " of making living with that issue a bit easier?"
+                "Alright. What do you want to talk about?"
                 ]))
 
-            self.answer_facts.append("has_question_about_fix")
-            self.next_node = "Fix"
-            
+            self.answer_facts.append("has_change_of_topic")
+            self.next_node = "Terminator"
+
         else:
             self.answer.append(random.choice([
-                "What is your conclusion? Should we give it a shot?"
+                "What is your conclusion? Should we give it a shot?",
+                "Okay...?"
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
@@ -951,3 +918,199 @@ class Fix( Template):
         self.update_user()
 
         if self.verbose: self.summary()           
+
+
+
+ #######                                                    
+    #    # #    # ###### ###### #####    ##   #    # ###### 
+    #    # ##  ## #      #      #    #  #  #  ##  ## #      
+    #    # # ## # #####  #####  #    # #    # # ## # #####  
+    #    # #    # #      #      #####  ###### #    # #      
+    #    # #    # #      #      #   #  #    # #    # #      
+    #    # #    # ###### #      #    # #    # #    # ###### 
+
+
+class Timeframe( Template):
+    """
+    Timeframe node
+
+    From Fix:
+    "Okay, so... On the short term, I could image that you might be able to get"
+    " some distance between you and the source of this problem."
+    "As a more sustainable, mid-term improvement, I think we can find the one thing"
+    " where a small change can make a rather big difference."
+    "Which of these two sounds best for you right now?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if prefers_timeframe_long( sentence):
+                self.message_facts.append("prefers_timeframe_long") 
+            if prefers_timeframe_short( sentence):
+                self.message_facts.append("prefers_timeframe_short") 
+       
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "We are still talking about this issue of yours, right?"
+                ]))
+            self.answer.append(random.choice([                
+                "There might be other approaches to your issue, but if we go with the two"
+                " options I just describred... Which of them feels better for you?"
+                ]))         
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Timeframe" 
+
+        elif(
+            "prefers_timeframe_short" in self.message_facts
+            and not "prefers_timeframe_long" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Sure! So... What options come to your mind if you think about how you might"
+                " decrease the pressure of this situation from you?"
+                ]))
+
+            self.answer_facts.append("asks_for_short_term_options")
+            self.next_node = "Options" # Timeframe 
+
+        elif(
+            "prefers_timeframe_long" in self.message_facts
+            and not "prefers_timeframe_short" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Alright, sounds good! Let's brainstorm some ideas about which small changes"
+                " miht affect this situation in a positive way?"
+                ]))
+
+
+            self.answer_facts.append("asks_for_mid_term_options")
+            self.next_node = "Options"
+
+        else:
+            self.answer.append(random.choice([
+                "So... Which option do you prefer?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Timeframe"    
+
+    
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+
+ #######                                                           
+ #       ######   ##    ####    ##   #####  # #      # ##### #   # 
+ #       #       #  #  #       #  #  #    # # #      #   #    # #  
+ #####   #####  #    #  ####  #    # #####  # #      #   #     #   
+ #       #      ######      # ###### #    # # #      #   #     #   
+ #       #      #    # #    # #    # #    # # #      #   #     #   
+ #       ###### #    #  ####  #    # #####  # ###### #   #     #   
+                                                                   
+
+class Feasability(Template):
+    """
+    Feasability node
+
+    From Relevance:
+    "Okay, great! And is it [the problem] also one that you can solve, if you"
+    " set your mind to it?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Given the time, energy, money and support you have access to..."
+                " Do you think you can solve that problem in a sustainable way?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Feasability" 
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "That's great! So... What are your options?"
+                ]))
+
+            self.answer_facts.append("has_question_about_options")
+            self.next_node = "Options"
+
+        elif( # Needs work!
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Ah, nevermind! Let's talk about something else then."
+                ]))
+
+            self.answer_facts.append("has_change_of_topic")
+            self.next_node = "Terminator"
+
+        else:
+            self.answer.append(random.choice([
+                "I know, it's difficult to predict... Just take a second to listen inside"
+                " yourself. Do you hear a little 'I can totally solve this!'?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Feasability"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+

@@ -391,10 +391,12 @@ def has_problem_statement( sentence):
 
 def has_hesitation( sentence):
     if(
-        re.search( r"^(\W)*(u+m+|e+r+|h+m+|so+|well)?(\W)*"
+        re.search( r"^(\W)*(e+r*m*|h*u*m+|so+|well)?(\W)*"
             r"(actually|"
             r"((" + intensifiers + r" )?" + goods + r") question|"
-            r"let me think)?"
+            r"let me think|"
+            r"(\w+ )?hard to say|"
+            r"i do ?n(o|\')t( \w+)? know)?"
             r"(\W)*$", sentence)
         ):
         return True
@@ -707,11 +709,8 @@ def has_request_to_explain(sentence):
             re.search(r"no(\w|\s)+(sense)", sentence)
             ) 
         or(
-            re.search(r"why\?", sentence)
-            )        
-        or(
-            re.search(r"sorry\?", sentence)
-            )             
+            re.search(r"(why|sorry|what|wtf)\?", sentence)
+            )                 
         ):
         return True
     else:
@@ -872,6 +871,9 @@ def has_affirmation( sentence):
         or (
             re.search( r"(\W|^)i (.* )?(think|say|hope) so(\W|$)", sentence)
             and not has_negation(sentence)
+            )
+        or(
+            re.search(  r"(\W|^)(sounds|feels) (" + intensifiers + " )?" + goods, sentence)
             )
         ):
         return True
@@ -1074,6 +1076,55 @@ def is_question_you_had_good_time(sentence):
     sentence = sentence.replace( "how did", "how  did")
     sentence = sentence.replace( "who did", "who  did")
     if re.search( you_had_good_time, sentence):
+        return True
+    else:
+        return False
+
+
+
+ #######                                                    
+    #    # #    # ###### ###### #####    ##   #    # ###### 
+    #    # ##  ## #      #      #    #  #  #  ##  ## #      
+    #    # # ## # #####  #####  #    # #    # # ## # #####  
+    #    # #    # #      #      #####  ###### #    # #      
+    #    # #    # #      #      #   #  #    # #    # #      
+    #    # #    # ###### #      #    # #    # #    # ###### 
+
+
+timeframe_shorts = r"|".join([
+    r"(short",
+    r"first",
+    r"quick",
+    r"distance",
+    r"a",
+    r"1)"
+    ])                                                            
+
+timeframe_longs = r"|".join([
+    r"(long",
+    r"mid",
+    r"second",
+    r"sustainable",
+    r"difference",
+    r"b",
+    r"2)"
+    ])  
+
+def prefers_timeframe_short( sentence):
+    sentence = sentence.split("but")[-1]
+    if( 
+        re.search( r"(\W|^)" + timeframe_shorts + r"(\W|$)", sentence)
+        and not has_negation( sentence)
+        ):
+        return True
+    else:
+        return False
+
+def prefers_timeframe_long( sentence):
+    sentence = sentence.split("but")[-1]
+    if( re.search( r"(\W|^)" + timeframe_longs + r"(\W|$)", sentence)
+        and not has_negation( sentence)
+        ):
         return True
     else:
         return False
@@ -1296,7 +1347,8 @@ def expand_contractions(text):
         (r"y'all'd", "you all would"),
         (r"y'all'd've", "you all would have"),
         (r"y'all're", "you all are"),
-        (r"y'all've", "you all have"),
+        (r"y'all're", "you all are"),
+        (r"y'know", "you know"),
         (r"you'd", "you would"),
         (r"youd", "you would"),
         (r"you'd've", "you would have"),
