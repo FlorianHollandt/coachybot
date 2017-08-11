@@ -131,8 +131,7 @@ class Template(object):
             if is_greeting(sentence):
                 self.message_facts.append("has_greeting")   
             if has_danger_to_self(sentence):
-                self.message_facts.append("has_danger_to_self")   
-
+                self.message_facts.append("has_danger_to_self") 
         if has_hesitation( text.lower()):
             self.message_facts.append("has_hesitation")   
 
@@ -734,6 +733,10 @@ class Problem(Template):
 class Relevance(Template):
     """
     Relevance node
+
+    From Problem:
+    "Of all issues in your life, is this among the ones"
+    " with the biggest impact on your overall happyness?"    
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
@@ -748,9 +751,12 @@ class Relevance(Template):
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
+
         for sentence in self.sentences:
             if has_affirmation( sentence):
                 self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation")         
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -773,7 +779,6 @@ class Relevance(Template):
             self.answer_facts.append("has_explanation_for_question")
             self.next_node = "Relevance" 
 
-
         elif(
             "has_affirmation" in self.message_facts
             ):
@@ -784,8 +789,19 @@ class Relevance(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_feasability")
-            self.next_node = "Relevance" # Feasability
+            self.next_node = "Feasability" 
 
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "I see... Are you interested in exploring the possibilities"
+                " of making living with that issue a bit easier?"
+                ]))
+
+            self.answer_facts.append("has_question_about_fix")
+            self.next_node = "Fix"
         else:
             self.answer.append(random.choice([
                 "Let's keep focused. I really feel that we're getting somewhere."
@@ -799,3 +815,139 @@ class Relevance(Template):
         self.update_user()
 
         if self.verbose: self.summary()                
+
+
+
+ #######                                                           
+ #       ######   ##    ####    ##   #####  # #      # ##### #   # 
+ #       #       #  #  #       #  #  #    # # #      #   #    # #  
+ #####   #####  #    #  ####  #    # #####  # #      #   #     #   
+ #       #      ######      # ###### #    # # #      #   #     #   
+ #       #      #    # #    # #    # #    # # #      #   #     #   
+ #       ###### #    #  ####  #    # #####  # ###### #   #     #   
+                                                                   
+
+class Feasability(Template):
+    """
+    Feasability node
+
+    From Relevance:
+    "Okay, great! And is it [the problem] also one that you can solve, if you"
+    " set your mind to it?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+ #######          
+ #       # #    # 
+ #       #  #  #  
+ #####   #   ##   
+ #       #   ##   
+ #       #  #  #  
+ #       # #    # 
+                  
+
+class Fix( Template):
+    """
+    Fix node
+
+    From Relevance:
+    "I see... Are you interested in exploring the possibilities"
+    " of making living with that issue a bit easier?"        
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+        """
+        Evaluates user input under consideration of the user history.
+
+        Arguments:
+            - text            Mandatory                    A string, can contain several sentences
+            - user            Optional (empty dict)        A dictionary of facts about the user and their history
+            - verbose         Optional (True)              A flag to hide or display state information
+        """
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)                
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+       
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "We are still talking about this issue of yours, right?"
+                ]))
+            self.answer.append(random.choice([                
+                "I understand that it is not the number one problem of your life right now, but..."
+                "  What if there was a little something you could do about it?"
+                ]))         
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Fix" 
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Okay, great! And is it also one that you can solve, if you"
+                " set your mind to it?"
+                ]))
+
+            self.answer_facts.append("has_question_about_feasability")
+            self.next_node = "Fix" 
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "I see... Are you interested in exploring the possibilities"
+                " of making living with that issue a bit easier?"
+                ]))
+
+            self.answer_facts.append("has_question_about_fix")
+            self.next_node = "Fix"
+            
+        else:
+            self.answer.append(random.choice([
+                "What is your conclusion? Should we give it a shot?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Fix"    
+
+        self.update_user()
+
+        if self.verbose: self.summary()           

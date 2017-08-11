@@ -193,7 +193,9 @@ def incoming():
             #print " | ".join(answer)
 
             for line in answer:
-                type_time = random.randint(1100,3500)
+                #type_time = random.randint(1100,3500)
+                type_time = random.randint( 25, 40)*len(line) 
+                # random number is miliseconds per character, giving coachybot a superhuman typing speed
                 kik.send_messages([
                     TextMessage(
                         to        = message.from_user,
@@ -201,7 +203,7 @@ def incoming():
                         body      = line,
                         type_time = type_time)
                 ])        
-                sleep(int(round(type_time+500.)/1000.))              
+                sleep(int( round( type_time + random.randint( 350, 650))./1000.))              
 
 
          #     #                                               ######                                                  
