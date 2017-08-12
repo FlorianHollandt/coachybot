@@ -439,12 +439,45 @@ class Terminator(Template):
         if verbose_argument: text_argument = text
         if verbose_argument: print "Terminator node - Restarting conversation"
 
-        Template.__init__(self, text=".", user=user, verbose=False)
+        Template.__init__(self, text=text, user=user, verbose=False)
+
+        for sentence in self.sentences:
+            if has_thanks( sentence):
+                self.message_facts.append("has_thanks")  
+
+        if(
+            "has_thanks" in self.message_facts
+            and self.user["node_previous"] == "Action"
+            ):
+
+            self.answer.append(random.choice([
+                "You're very welcome - It was my pleasure!"
+                ]))
+            self.answer.append(random.choice([
+                "I look forward to our next conversation!"
+                ]))
+
+            self.answer_facts.append("welcomes")
+            self.next_node = "Welcome" 
+
+        elif(
+            "has_thanks" not in self.message_facts
+            and self.user["node_previous"] == "Action"
+            ):
+
+            self.answer.append(random.choice([
+                "Is there anything else I can do for your?"
+                ]))
+
+            self.answer_facts.append("asks_for_new_topics")
+            self.next_node = "Welcome" 
 
 
-        self.answer =[
-            "Sorry, that was it. Thanks for this pleasant conversation, though! "
-            ]
+        else:
+
+            self.answer =[
+                "Sorry, that was it. Thanks for this pleasant conversation, though! "
+                ]
 
         self.update_user()
 
@@ -845,7 +878,7 @@ class Fix( Template):
                 ]))
 
             self.answer_facts.append("has_question_about_timeframe")
-            self.next_node = "Terminator" # Timeframe 
+            self.next_node = "Timeframe"
 
         elif(
             "has_negation" in self.message_facts
@@ -1077,6 +1110,7 @@ class Options(Template):
     " and of which you are confident that it can be solved."
     "Let's continue by exploring your range of action. What is the first option"
     " that comes to your mind?"
+
     From Timeframe, short-term option:
     "Sure! So... What options come to your mind if you think about how you might"
     " decrease the pressure of this situation from you?"
@@ -1084,6 +1118,15 @@ class Options(Template):
     "Alright, sounds good! Let's brainstorm some ideas about which small changes"
     " might affect this situation in a positive way?"
 
+    From Choice:
+    "Alright, sounds like we need to get back to the chalkboard."
+    "Maybe we need to think even more divergently. Think about your options from"
+    " another perspective, like other people, or the past, or the future, or if you were rich."    
+
+    From Committment:
+    "Then this is obviously not the right solution for you. :)"
+    "Let's go back to exploring you options. I know we've done this before, but"
+    " now let's look for very small changes that could already make a difference."    
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
@@ -1130,6 +1173,21 @@ class Options(Template):
 
         elif(
             "has_request_to_explain" in self.message_facts
+            and self.user["node_previous"] == "Choice"
+            ):
+
+            self.answer.append(random.choice([
+                "I just cannot believe that there is nothing we can do about this issue - Can you?"
+                ]))
+            self.answer.append(random.choice([
+                "Let's think about it even bolder! What options would there be if you were rich?"
+                " Or if you could take a week off? Or if there was someone willing ot help?"
+                ]))
+            self.answer_facts.append("has_explanation_for_question_in_choice_context")
+            self.next_node = "Options" 
+
+        elif(
+            "has_request_to_explain" in self.message_facts
             and self.user["node_previous"] == "Options"
             ):
 
@@ -1139,6 +1197,25 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_options_context")
+            self.next_node = "Options" 
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            and self.user["node_previous"] == "Committment"
+            ):
+
+            self.answer.append(random.choice([
+                "Obviously, the last option we picked was too big for us..."
+                ]))
+            self.answer.append(random.choice([
+                "I think it is better to start small first - Make small changes that have gradual"
+                " positive effects. This also generates confidence and a positive momentum."
+                ]))
+            self.answer.append(random.choice([
+                "So... What option for a small change can you think of?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question_in_committment_context")
             self.next_node = "Options" 
 
         elif(
@@ -1249,5 +1326,523 @@ class Options(Template):
         self.update_user()
 
         if self.verbose: self.summary()   
+
+
+
+  #####                                
+ #     # #    #  ####  #  ####  ###### 
+ #       #    # #    # # #    # #      
+ #       ###### #    # # #      #####  
+ #       #    # #    # # #      #      
+ #     # #    # #    # # #    # #      
+  #####  #    #  ####  #  ####  ###### 
+
+
+class Choice( Template):
+    """
+    Choice node
+
+    From Options:
+    "That was really it, you say? Okay, great job! :)"
+    "Now if you look back on the options you listed:"
+    " Which one sounds most promising to you?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)                
+
+        counter_selected_items = 0
+
+        for sentence in self.sentences:
+            if has_option( sentence):
+                self.message_facts.append("has_option")
+                counter_selected_items += 1
+            if has_choice_of_enumerated_item( sentence):
+                self.message_facts.append("has_choice_of_enumerated_item")                 
+                counter_selected_items += 1
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([                
+                "You just did an excellent job of listing a number of options for solving"
+                " the problem we talked about."
+                ]))         
+            self.answer.append(random.choice([
+                "Now, what do you think: Which of these options works best for you?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Choice" 
+
+        elif(
+            counter_selected_items == 1
+            ):
+
+            self.answer.append(random.choice([
+                "Great! :)"
+                ]))
+            self.answer.append(random.choice([
+                "Well... I guess if implementing this option was easy, you would have done it already, right?"
+                ]))
+            self.answer.append(random.choice([
+                "Now... What makes it hard? Which obstables do you see?"
+                ]))
+
+            self.answer_facts.append("asks_about_obstacles")
+            self.next_node = "Obstacles"
+
+        elif(
+            counter_selected_items > 1
+            ):
+
+            self.answer.append(random.choice([
+                "I'm glad that you like more than one option!"
+                ]))
+            self.answer.append(random.choice([
+                "I suggest that we choose just one of those - It is twice as hard to commit to"
+                " two things compared to committing to one."
+                ]))
+            self.answer.append(random.choice([
+                "What do you think, which option are you most likely to succeed with?"
+                ]))            
+
+            self.answer_facts.append("asks_about_single_option")
+            self.next_node = "Choice"
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Alright, sounds like we need to get back to the chalkboard."
+                ]))
+            self.answer.append(random.choice([
+                "Maybe we need to think even more divergently. Think about your options from"
+                " another perspective, like other people, or the past, or the future, or if you were rich."
+                ]))
+
+            self.answer_facts.append("asks_about_more_options")
+            self.next_node = "Options"
+
+        else:
+            self.answer.append(random.choice([
+                "Which option does that correspond to?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Choice"    
+
+        self.update_user()
+
+        if self.verbose: self.summary()           
+
+
+
+ #######                                                        
+ #     # #####   ####  #####   ##    ####  #      ######  ####  
+ #     # #    # #        #    #  #  #    # #      #      #      
+ #     # #####   ####    #   #    # #      #      #####   ####  
+ #     # #    #      #   #   ###### #      #      #           # 
+ #     # #    # #    #   #   #    # #    # #      #      #    # 
+ ####### #####   ####    #   #    #  ####  ###### ######  ####  
+
+
+class Obstacles( Template):
+    """
+    Obstacles node
+
+    From Choice:
+    "Great! :)"
+    "Well... I guess if implementing this option was easy, you would have done it already, right?"
+    "Now... What makes it hard? Which obstables do you see?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)                
+
+        for sentence in self.sentences:
+            if has_problem_statement( sentence):
+                self.message_facts.append("has_problem_statement")
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([                
+                "You just did an excellent job of listing a number of options for solving"
+                " the problem we talked about."
+                ]))         
+            self.answer.append(random.choice([
+                "Now, what do you think: Which of these options works best for you?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Obstacles" 
+
+        elif(
+            "has_problem_statement" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "In my experience, most obstacles can be overcome by mobilizing enough"
+                " ressources, like time, energy, money or manpower."
+                ]))
+            self.answer.append(random.choice([
+                "Is it an option for you to shift your priorities towards this issue and"
+                " to devote some more ressources to it?"
+                ]))
+            self.answer.append(random.choice([
+                "Maybe you could block some time for it, or invest some money into a solution,"
+                " or ask someone you trust for support?"
+                ]))            
+
+            self.answer_facts.append("has_suggestion_to_shift_priorities")
+            self.next_node = "Priorities"
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Amazing! Sounds like we have totally developed a plan"
+                " to change your life for the better! :)"
+                ]))
+            self.answer.append(random.choice([
+                "Are you committed and positive about executing this plan?"
+                " Or are you still unsure?"
+                ]))
+
+            self.answer_facts.append("ask_for_committment")
+            self.next_node = "Committment"
+
+        else:
+            self.answer.append(random.choice([
+                "Is this an obstacle for you? If so, in how far?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Obstacles"    
+
+        self.update_user()
+
+        if self.verbose: self.summary()           
+                             
+
+
+ ######                                                 
+ #     # #####  #  ####  #####  # ##### # ######  ####  
+ #     # #    # # #    # #    # #   #   # #      #      
+ ######  #    # # #    # #    # #   #   # #####   ####  
+ #       #####  # #    # #####  #   #   # #           # 
+ #       #   #  # #    # #   #  #   #   # #      #    # 
+ #       #    # #  ####  #    # #   #   # ######  ####  
+
+
+class Priorities( Template):
+    """
+    Priorities node
+
+    From Obstacles:
+    "In my experience, most obstacles can be overcome by mobilizing enough"
+    " ressources, like time, energy, money or manpower."
+    "Is it an option for you to shift your priorities towards this issue and"
+    " to devote some more ressources to it?"
+    "Maybe you could block some time for it, or invest some money into a solution,"
+    " or ask someone you trust for support?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Given the time, energy, money and support you have access to..."
+                " Do you think you can solve that problem in a sustainable way?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Priorities" 
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Amazing! Sounds like we have totally developed a plan"
+                " to change your life for the better! :)"
+                ]))
+            self.answer.append(random.choice([
+                "Are you committed and positive about executing this plan?"
+                " Or are you still unsure?"
+                ]))
+
+            self.answer_facts.append("asks_for_committment")
+            self.next_node = "Committment"
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Hm, I see... Then maybe this option is too big for us right now."
+                ]))
+            self.answer.append(random.choice([
+                "Maybe we should think about smaller, more feasable ways so"
+                " gradually improve this situation for you."
+                ]))
+
+            self.answer_facts.append("asks_about_more_options")
+            self.next_node = "Options"
+
+        else:
+            self.answer.append(random.choice([
+                "Sure, this is a difficult question. Maybe investing ressources"
+                " and solving this issue really wouldn't make you any happier..."
+                ]))
+            self.answer.append(random.choice([
+                "But what if it did?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Priorities"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+
+  #####                                                                
+ #     #  ####  #    # #    # # ##### ##### #    # ###### #    # ##### 
+ #       #    # ##  ## ##  ## #   #     #   ##  ## #      ##   #   #   
+ #       #    # # ## # # ## # #   #     #   # ## # #####  # #  #   #   
+ #       #    # #    # #    # #   #     #   #    # #      #  # #   #   
+ #     # #    # #    # #    # #   #     #   #    # #      #   ##   #   
+  #####   ####  #    # #    # #   #     #   #    # ###### #    #   #   
+
+
+class Committment( Template):
+    """
+    Committment node
+
+    From Obstacles:
+    "In my experience, most obstacles can be overcome by mobilizing enough"
+    " ressources, like time, energy, money or manpower."
+    "Is it an option for you to shift your priorities towards this issue and"
+    " to devote some more ressources to it?"
+    "Maybe you could block some time for it, or invest some money into a solution,"
+    " or ask someone you trust for support?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Given the time, energy, money and support you have access to..."
+                " Do you think you can solve that problem in a sustainable way?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Committment" 
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Perfect! When is your next opportunity to set this plan into action?"
+                ]))
+
+            self.answer_facts.append("asks_for_next_step")
+            self.next_node = "Action"
+
+        elif(
+            "has_negation" in self.message_facts
+            and self.user["node_previous"] != "Committment"
+            ):
+
+            self.answer.append(random.choice([
+                "Now I want you to close you eyes, and to envision yourself"
+                " after you have done this."
+                ]))
+            self.answer.append(random.choice([
+                "Is there a feeling of relief? Of pride in yourself? Of enhanced connection"
+                " to your environment? Of more control over your life?"
+                ]))
+            self.answer.append(random.choice([
+                "So... I'm asking you again: Do you care about this issue? Can you"
+                " commit on solving it?"
+                ]))
+
+            self.answer_facts.append("encourages_by_envisioning")
+            self.next_node = "Committment"
+
+        elif(
+            "has_negation" in self.message_facts
+            and self.user["node_previous"] == "Committment"
+            ):
+
+            self.answer.append(random.choice([
+                "Then this is obviously not the right solution for you. :)"
+                ]))
+            self.answer.append(random.choice([
+                "Let's go back to exploring you options. I know we've done this before, but"
+                " now let's look for very small changes that could already make a difference."
+                ]))
+
+            self.answer_facts.append("asks_for_options")
+            self.next_node = "Options"
+
+        else:
+            self.answer.append(random.choice([
+                "Sure, this is a difficult question. Maybe investing ressources"
+                " and solving this issue really wouldn't make you any happier..."
+                ]))
+            self.answer.append(random.choice([
+                "But what if it did?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Committment"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+
+    #                                 
+   # #    ####  ##### #  ####  #    # 
+  #   #  #    #   #   # #    # ##   # 
+ #     # #        #   # #    # # #  # 
+ ####### #        #   # #    # #  # # 
+ #     # #    #   #   # #    # #   ## 
+ #     #  ####    #   #  ####  #    # 
+                                      
+
+class Action( Template):
+    """
+    Action node
+
+    From Committment:
+    "Perfect! When is your next opportunity to set this plan into action?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_specific_time( sentence):
+                self.message_facts.append("has_specific_time") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Goals work best for most people if they are linked to a specific"
+                " time. It also increases the committment."
+                ]))
+            self.answer.append(random.choice([
+                "So... When is your moment of truth? :)"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Action" 
+
+        elif(
+            "has_specific_time" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Okay, sounds good! :)"
+                ]))
+            self.answer.append(random.choice([
+                "Until then, keep this issue in your mind... Envision yourself having taken"
+                " this first step! And maybe prepare, mentally and materially."
+                ]))
+
+            self.answer_facts.append("gives_advice_for_goal_orientation")
+            self.next_node = "Terminator"
+
+        else:
+            self.answer.append(random.choice([
+                "Oh, you shouldn't be vague here. The more specific you can be now,"
+                " th more likely you are to take action at the right time."
+                ]))
+            self.answer.append(random.choice([
+                "When is that time for you?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Action"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
 
 

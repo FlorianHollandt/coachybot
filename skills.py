@@ -520,8 +520,40 @@ def has_option( sentence):
         return True
     else:
         return False
-                                                                         
 
+numbers = r"|".join([
+    r"(first",
+    r"second",
+    r"third",
+    r"two",
+    r"three",    
+    r"four(th)?",
+    r"six(th)?",
+    r"seven(th)?",
+    r"eighth?",
+    r"nine?(th)?",
+    r"ten(th)?",
+    r"(number|option|item) (one|a|b|c)(\W|$)",
+    r"last",
+    r"end",
+    r"beginning",
+    r"start)"
+    ])
+                                                                         
+def has_choice_of_enumerated_item( sentence):
+    sentence_fragments = sentence.split("but")
+    if (
+        re.search( numbers, sentence_fragments[-1])
+        and not has_negation( sentence_fragments[-1])
+        ):
+        return True
+    elif(
+        re.search( numbers, sentence)
+        and not has_negation( sentence)        
+        ):
+        return True
+    else:
+        return False
 
  ######                                            
  #     # #####   ####  #####  #      ###### #    # 
@@ -614,32 +646,76 @@ problems = "|".join([
     "pains?)"
     ])
 
-problem_keywords = "|".join([
-    "(too much",
-    "too many",
-    "too often",
-    "too little",
-    "too few",
-    "too seldom",
-    "not get",
-    "being",
-    "lack of",
-    "need",
-    "satisf",
-    "unhealthy",
-    "stress",
-    "pressure",
-    "struggle",
-    "barely"
-    "hardly",
-    "pain",
-    "alone",
-    "awkward",
-    "deserve",
-    "more (\w+ )than",
-    "less (\w+ )than",
-    "survive",
-    "enough)"
+problem_keywords = r"|".join([
+    r"(too much",
+    r"too many",
+    r"too often",
+    r"too little",
+    r"too few",
+    r"too seldom",
+    r"not get",
+    r"being",
+    r"lack of",
+    r"need",
+    r"satisf",
+    r"unhealthy",
+    r"stress",
+    r"pressure",
+    r"struggle",
+    r"barely"
+    r"hardly",
+    r"pain",
+    r"alone",
+    r"awkward",
+    r"deserve",
+    r"more (\w+ )than",
+    r"less (\w+ )than",
+    r"survive",
+    r"enough)"
+    ])
+
+problem_quantifiers = r"|".join([
+    r"(no",
+    r"not hav(e|ing)",
+    r"never hav(e|ing)",
+    r"lack of",
+    r"too much",
+    r"too many",
+    r"too few",
+    r"not enough",
+    r"more than enough",
+    r"lack of",
+    r"want (more|less)",
+    r"need (more|less)",
+    r"have (more|less)"
+    r"overmuch",
+    r"too little)"
+    ])
+
+problem_ressources = r"|".join([
+    r"(money",
+    r"(\w+ )?time",
+    r"(\w+ )?opportinit(y|ies)",
+    r"respect",
+    r"recognition",
+    r"support",
+    r"help",
+    r"backup",
+    r"ressources",
+    r"sex",
+    r"love",
+    r"thrill",
+    r"process",
+    r"food",
+    r"fun",
+    r"contact",
+    r"connections?",
+    r"energy",
+    r"willpower",
+    r"endurance",
+    r"fitness",
+    r"strenght",
+    r"power)"
     ])
 
 problem_patterns = [
@@ -677,6 +753,7 @@ def has_problem_statement( sentence):
         (
             any( re.search( pattern, sentence) for pattern in problem_patterns)
             or re.search( problem_keywords, sentence)
+            or re.search( problem_quantifiers + r" " + problem_ressources, sentence)
         )
         and not re.search( r"you", sentence)
         ):
@@ -684,7 +761,60 @@ def has_problem_statement( sentence):
     else:
         return False
 
+
+
+  #####                                            #######                 
+ #     # #####  ######  ####  # ###### #  ####        #    # #    # ###### 
+ #       #    # #      #    # # #      # #    #       #    # ##  ## #      
+  #####  #    # #####  #      # #####  # #            #    # # ## # #####  
+       # #####  #      #      # #      # #            #    # #    # #      
+ #     # #      #      #    # # #      # #    #       #    # #    # #      
+  #####  #      ######  ####  # #      #  ####        #    # #    # ###### 
+                                                                           
                                              
+timepoints = r"|".join([
+    r"(monday",
+    r"tuesday",
+    r"wednesday",
+    r"thursday",
+    r"friday",
+    r"saturday",
+    r"sunday",
+    r"week",
+    r"tonight",
+    r"today",
+    r"tomorrow",
+    r"afternoon",
+    r"morning",
+    r"evening",
+    r"night",
+    r"break",
+    r"session",
+    r"meeting",
+    r"training",
+    r"presentation",
+    r"test",
+    r"lunch",
+    r"breakfast",
+    r"supper",
+    r"dinner",
+    r"coffee",
+    r"party",
+    r"gathering",
+    r"event",
+    r"trip",
+    r"barbecue",
+    r"picnic)"
+    ])
+
+def has_specific_time( sentence):
+    if (
+        re.search( timepoints, sentence)
+        or re.search( r"(at|on) the ", sentence)
+        ):
+        return True
+    else: 
+        return False
 
 
  #     #                                                    
@@ -709,6 +839,25 @@ def has_hesitation( sentence):
         return True
     else:
         return False                                                            
+
+
+
+ #######                                    
+    #    #    #   ##   #    # #    #  ####  
+    #    #    #  #  #  ##   # #   #  #      
+    #    ###### #    # # #  # ####    ####  
+    #    #    # ###### #  # # #  #        # 
+    #    #    # #    # #   ## #   #  #    # 
+    #    #    # #    # #    # #    #  ####  
+
+
+def has_thanks( sentence):
+    if re.search( r"thank", sentence):
+        return True
+    else:
+        return False
+
+
 
  ######                                
  #     # ######  ####  # #####  ###### 
