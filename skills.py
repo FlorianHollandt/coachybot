@@ -1,4 +1,5 @@
 import re
+import regex as re2
 from regex import sub as sub2
 
 from datetime import datetime
@@ -213,6 +214,312 @@ def is_bad(sentence):
         return False
 
 
+
+
+
+  #####                                                   
+ #     # #    #   ##   #    # ##### # ##### # ##### #   # 
+ #     # #    #  #  #  ##   #   #   #   #   #   #    # #  
+ #     # #    # #    # # #  #   #   #   #   #   #     #   
+ #   # # #    # ###### #  # #   #   #   #   #   #     #   
+ #    #  #    # #    # #   ##   #   #   #   #   #     #   
+  #### #  ####  #    # #    #   #   #   #   #   #     #   
+                                                          
+
+quantifier_much = "|".join([
+    r"(a [^\.\;]*lot",
+    r"lots",
+    r"enough",
+    r"(?:^|\s)sufficient",
+    r"great [^\.\;]*deal of",
+    r"some",
+    r"extensively",
+    r"several",
+    r"a few",
+    r"a [^\.\;]*couple of",
+    r"a [^\.\;]*bit of",
+    r"several",
+    r"multiple",
+    r"various",
+    r"fold",
+    r"numerous",
+    r"plent[iy]",
+    r"copious",
+    r"abundant",
+    r"ample",
+    r"any",
+    r"many",
+    r"much)"
+    ])   
+
+quantifier_insufficient = "|".join([
+    r"(insufficient",
+    r"lack of",
+    r"lacked",
+    r"defici",
+    r"(?<!a\s)few",     # match only if not preceded by "a "
+    r"(?<!a\s)little",
+    r"scant",
+    r"miss)"
+    ])   
+
+def has_quantifier_much(sentence):
+    if re.search(r"not[^\.\;]+" + quantifier_much,sentence):
+        return False
+    if re.search(quantifier_much,sentence):
+        return True
+    elif re.search(r"no[^\.\;]+(complain|lack|miss|defici|insufficient)",sentence):
+        return True
+    else:
+        return False
+
+def has_quantifier_insufficient(sentence):
+    if re.search(r"no[^\.\;]+" + quantifier_insufficient,sentence):
+        return False
+    if re.search(quantifier_insufficient,sentence):
+        return True        
+    elif re.search(r"not[^\.\;]+"+quantifier_much,sentence):
+        return True
+    else:
+        return False
+
+def has_quantifier_excessive(sentence):
+    if re.search(r"(too much|overmuch)",sentence):
+        return True
+    else:
+        return False
+
+
+
+ #     #                        #    #     #        
+  #   #  ######  ####          #     ##    #  ####  
+   # #   #      #             #      # #   # #    # 
+    #    #####   ####        #       #  #  # #    # 
+    #    #           #      #        #   # # #    # 
+    #    #      #    #     #         #    ## #    # 
+    #    ######  ####     #          #     #  ####  
+                                                    
+# Maybe intensifiers can be viewed as a subset of affirmations?
+affirmations = "|".join([
+    r"(yes",
+    r"yeah",
+    r"aye",
+    r"absolutely",
+    r"total?ly",
+    r"certainly",
+    r"probably",
+    r"definitely",
+    r"maybe",
+    r"right",
+    r"correct",
+    r"true",
+    r"possible",
+    r"possibly",
+    r"sure",
+    r"almost",
+    r"entirely",
+    r"fully",
+    r"highly",
+    r"ok",
+    r"okay",
+    r"agree",
+    r"alright)"
+    ])   
+
+negations_short = "|".join([
+    r"(no",
+    r"not",
+    r"nay",
+    r"nope)"
+    ])   
+
+negations_pronoun = "|".join([
+    r"(never",
+    r"no?one",
+    r"nobody",
+    r"nowhere",
+    r"nothing)"
+    ])   
+
+negations_adjective = "|".join([
+    r"(impossible",
+    r"wrong",
+    r"false",
+    r"bullshit",
+    r"incorrect)"
+    ])   
+
+negations = r"(("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
+
+def has_negation(sentence):
+    if re.search( negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
+        return False
+    elif re.search( negations,sentence):
+        return True
+    else:
+        return False
+
+def has_affirmation( sentence):
+    if(
+        re.search( affirmations+r"(\W|$)",sentence) 
+        and not has_negation( sentence)
+        ):
+        return True
+    elif(
+        re.search( r"why not(\?|\!)", sentence)
+        or re.search( intensifiers + r" so(\W|$)", sentence)
+        or (
+            re.search( r"(\W|^)i (.* )?(think|say|hope) so(\W|$)", sentence)
+            and not has_negation(sentence)
+            )
+        or(
+            re.search(  r"(\W|^)(sounds|feels) (" + intensifiers + " )?" + goods, sentence)
+            )
+        ):
+        return True
+    else:
+        return False
+
+
+def has_elaboration(sentences):
+    text = "".join(sentences)
+    for pattern in [goods,bads,intensifiers,affirmations,negations]:
+        text=re.sub(pattern,"",text)
+
+    if len(text) > 20:
+        return True
+    else:
+        return False
+
+
+ #######                                     
+ #     # #####  ##### #  ####  #    #  ####  
+ #     # #    #   #   # #    # ##   # #      
+ #     # #    #   #   # #    # # #  #  ####  
+ #     # #####    #   # #    # #  # #      # 
+ #     # #        #   # #    # #   ## #    # 
+ ####### #        #   #  ####  #    #  ####  
+                                             
+
+action_verbs = r"|".join([
+    r"(ask(ing)?",
+    r"go(ing)?",
+    r"demand(ing)?",
+    r"driv(e|ing)",
+    r"chang(e|ing)",
+    r"behav(e|ing)",
+    r"perform(ing)?",
+    r"work(ing)?",
+    r"meet(ing)?",
+    r"prepar(e|ing)",
+    r"smil(e|ing)",
+    r"help(ing)?",
+    r"support(ing)?",
+    r"aid(ing)?",
+    r"consult(ing)?",
+    r"coach(ing)?",
+    r"car(e|ing)",
+    r"bring(ing)?",
+    r"tak(e|ing)",
+    r"get(ting)?",
+    r"carry(ing)?",
+    r"solv(e|ing)",
+    r"creat(e|ing)",
+    r"initiat(e|ing)?",
+    r"engag(e|ing)",
+    r"set(ting)?",
+    r"motivat(e|ing)",
+    r"inspir(e|ing)",
+    r"eat(ing)?",
+    r"drink(ing)?",
+    r"consum(e|ing)",
+    r"sleep(ing)?",
+    r"see(ing)?",
+    r"invent(ing)?",
+    r"rehears(e|ing)",
+    r"dress(ing)?",
+    r"break(ing)?",
+    r"fill(ing)?",
+    r"fulfill(ing)?",
+    r"develop(ing)?",
+    r"rest(ing)?",
+    r"stop(ing)?",
+    r"increas(e|ing)",
+    r"decreas(e|ing)",
+    r"listen(ing)?",
+    r"meditat(e|ing)",
+    r"us(e|ing)",
+    r"spen.(ing)?",
+    r"wast(e|ing)",
+    r"organiz(e|ing)",
+    r"plan(ing)?",
+    r"invest(ing)?",
+    r"learn(ing)?",
+    r"join(ing)?",            
+    r"practi.(e|ing)",            
+    r"play(ing)?",
+    r"hik(e|ing)",
+    r"climb(ing)?",
+    r"walk(ing)?",
+    r"bik(e|ing)",
+    r"sail(ing)?",            
+    r"jump(ing)?",
+    r"laugh(ing)?",
+    r"surf(ing)?",
+    r"swim(ing)?",
+    r"fly(ing)?",
+    r"writ(e|ing)",            
+    r"reply(ing)?",
+    r"send(ing)?",
+    r"fight(ing)?",
+    r"buy(ing)?",
+    r"repair(ing)?",
+    r"continu(e|ing)",
+    r"lower(ing)?",
+    r"rais(e|ing)",
+    r"improv(e|ing)",
+    r"read(ing)?",
+    r"explor(ing)?",
+    r"travel(ing)?",
+    r"exchang(e|ing)",
+    r"invest(ing)?",
+    r"transfer(ing)?",
+    r"balanc(ing)?",
+    r"danc(e|ing)",
+    r"wear(ing)?",
+    r"mak(e|ing)",
+    r"keep(ing)?",
+    r"writ(e|ing)",
+    r"jump(ing)?",
+    r"stand(ing)?",
+    r"pos(e|ing)",
+    r"fake(e|ing)?",
+    r"pretend(ing)?",
+    r"tell(ing)?",
+    r"nap(ping)?",
+    r"research(ing)?",
+    r"find(ing)?",
+    r"discuss(ing)?",
+    r"argue(ing)?",
+    r"provoc(e|ing)",
+    r"suggest(ing)?",
+    r"start(ing)?",
+    r"apply(ing)?",
+    r"connect(ing)?",
+    r"lov(e|ing)?)"
+    ])
+
+def has_option( sentence):
+    if(
+        re2.search( action_verbs, sentence)
+        and not has_negation( sentence)
+        and not has_quantifier_excessive( sentence)
+        and not has_quantifier_insufficient( sentence)
+        and not re.search( r"(too late)", sentence)
+        ):
+        return True
+    else:
+        return False
                                                                          
 
 
@@ -662,10 +969,12 @@ def extract_named_entities(text):
 
 def has_protest_to_question(sentence):
     if(
-        re.search(r"no[^\.\,\;(is)]+you[^\.\,\;]+(busines|concern)",sentence)
-        or re.search(r"mind[^\.\,\;(is)]+own[^\.\,\;]+busines",sentence)
-        or re.search(r"(never|no)[^\.\,\;(is)]+mind",sentence)
-        or re.search(r"no[^\.\,\;]+((talk[^\.\,\;]+about)|discuss)",sentence)        
+        re.search( r"no[^\.\,\;(is)]+you[^\.\,\;]+(busines|concern)",sentence)
+        or re.search( r"mind[^\.\,\;(is)]+own[^\.\,\;]+busines",sentence)
+        or re.search( r"(never|no)[^\.\,\;(is)]+mind",sentence)
+        or re.search( r"no[^\.\,\;]+((talk[^\.\,\;]+about)|discuss)",sentence)        
+        or re.search( r"(fuck|screw|stop) this", sentence)
+        or re.search( r"(annoying|stupid|idiotic|absurd|meaningless|fucking) (questions?|conversation)", sentence)
         ):
         return True
     else:
@@ -715,182 +1024,6 @@ def has_request_to_explain(sentence):
         return True
     else:
         return False
-
-
-
-  #####                                                   
- #     # #    #   ##   #    # ##### # ##### # ##### #   # 
- #     # #    #  #  #  ##   #   #   #   #   #   #    # #  
- #     # #    # #    # # #  #   #   #   #   #   #     #   
- #   # # #    # ###### #  # #   #   #   #   #   #     #   
- #    #  #    # #    # #   ##   #   #   #   #   #     #   
-  #### #  ####  #    # #    #   #   #   #   #   #     #   
-                                                          
-
-quantifier_much = "|".join([
-    r"(a [^\.\;]*lot",
-    r"lots",
-    r"enough",
-    r"(?:^|\s)sufficient",
-    r"great [^\.\;]*deal of",
-    r"some",
-    r"extensively",
-    r"several",
-    r"a few",
-    r"a [^\.\;]*couple of",
-    r"a [^\.\;]*bit of",
-    r"several",
-    r"multiple",
-    r"various",
-    r"fold",
-    r"numerous",
-    r"plent[iy]",
-    r"copious",
-    r"abundant",
-    r"ample",
-    r"any",
-    r"many",
-    r"much)"
-    ])   
-
-quantifier_insufficient = "|".join([
-    r"(insufficient",
-    r"lack of",
-    r"lacked",
-    r"defici",
-    r"(?<!a\s)few",     # match only if not preceded by "a "
-    r"(?<!a\s)little",
-    r"scant",
-    r"miss)"
-    ])   
-
-def has_quantifier_much(sentence):
-    if re.search(r"not[^\.\;]+" + quantifier_much,sentence):
-        return False
-    if re.search(quantifier_much,sentence):
-        return True
-    elif re.search(r"no[^\.\;]+(complain|lack|miss|defici|insufficient)",sentence):
-        return True
-    else:
-        return False
-
-def has_quantifier_insufficient(sentence):
-    if re.search(r"no[^\.\;]+" + quantifier_insufficient,sentence):
-        return False
-    if re.search(quantifier_insufficient,sentence):
-        return True        
-    elif re.search(r"not[^\.\;]+"+quantifier_much,sentence):
-        return True
-    else:
-        return False
-
-def has_quantifier_excessive(sentence):
-    if re.search(r"(too much|overmuch)",sentence):
-        return True
-    else:
-        return False
-
-
- #     #                        #    #     #        
-  #   #  ######  ####          #     ##    #  ####  
-   # #   #      #             #      # #   # #    # 
-    #    #####   ####        #       #  #  # #    # 
-    #    #           #      #        #   # # #    # 
-    #    #      #    #     #         #    ## #    # 
-    #    ######  ####     #          #     #  ####  
-                                                    
-# Maybe intensifiers can be viewed as a subset of affirmations?
-affirmations = "|".join([
-    r"(yes",
-    r"yeah",
-    r"aye",
-    r"absolutely",
-    r"total?ly",
-    r"certainly",
-    r"probably",
-    r"definitely",
-    r"maybe",
-    r"right",
-    r"correct",
-    r"true",
-    r"possible",
-    r"possibly",
-    r"sure",
-    r"almost",
-    r"entirely",
-    r"fully",
-    r"highly",
-    r"ok",
-    r"okay",
-    r"agree",
-    r"alright)"
-    ])   
-
-negations_short = "|".join([
-    r"(no",
-    r"not",
-    r"nay",
-    r"nope)"
-    ])   
-
-negations_pronoun = "|".join([
-    r"(never",
-    r"no?one",
-    r"nobody",
-    r"nowhere",
-    r"nothing)"
-    ])   
-
-negations_adjective = "|".join([
-    r"(impossible",
-    r"wrong",
-    r"false",
-    r"bullshit",
-    r"incorrect)"
-    ])   
-
-negations = r"(("+negations_short+r"(\W|$))|" + negations_pronoun + "|" + negations_adjective + ")"
-
-def has_negation(sentence):
-    if re.search( negations_short + r"[^\.\,\;(is)]+" + negations_adjective,sentence):
-        return False
-    elif re.search( negations,sentence):
-        return True
-    else:
-        return False
-
-def has_affirmation( sentence):
-    if(
-        re.search( affirmations+r"(\W|$)",sentence) 
-        and not has_negation( sentence)
-        ):
-        return True
-    elif(
-        re.search( r"why not(\?|\!)", sentence)
-        or re.search( intensifiers + r" so(\W|$)", sentence)
-        or (
-            re.search( r"(\W|^)i (.* )?(think|say|hope) so(\W|$)", sentence)
-            and not has_negation(sentence)
-            )
-        or(
-            re.search(  r"(\W|^)(sounds|feels) (" + intensifiers + " )?" + goods, sentence)
-            )
-        ):
-        return True
-    else:
-        return False
-
-
-def has_elaboration(sentences):
-    text = "".join(sentences)
-    for pattern in [goods,bads,intensifiers,affirmations,negations]:
-        text=re.sub(pattern,"",text)
-
-    if len(text) > 20:
-        return True
-    else:
-        return False
-
 
  ######                                                           
  #     # ###### ###### #      ######  ####  ##### #  ####  #    # 

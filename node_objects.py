@@ -434,14 +434,6 @@ class Terminator(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         verbose_argument = verbose
         if verbose_argument: text_argument = text
@@ -475,14 +467,6 @@ class Welcome(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -555,14 +539,6 @@ class How_are_you(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -643,14 +619,6 @@ class Problem(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -740,14 +708,6 @@ class Relevance(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -837,14 +797,6 @@ class Fix( Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)                
 
@@ -943,14 +895,7 @@ class Timeframe( Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
 
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -1002,7 +947,7 @@ class Timeframe( Template):
 
             self.answer.append(random.choice([
                 "Alright, sounds good! Let's brainstorm some ideas about which small changes"
-                " miht affect this situation in a positive way?"
+                " might affect this situation in a positive way?"
                 ]))
 
 
@@ -1043,14 +988,6 @@ class Feasability(Template):
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
-        """
-        Evaluates user input under consideration of the user history.
-
-        Arguments:
-            - text            Mandatory                    A string, can contain several sentences
-            - user            Optional (empty dict)        A dictionary of facts about the user and their history
-            - verbose         Optional (True)              A flag to hide or display state information
-        """
 
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
@@ -1083,22 +1020,28 @@ class Feasability(Template):
             ):
 
             self.answer.append(random.choice([
-                "That's great! So... What are your options?"
+                "That's great! We have just identified a problem that matters in your life,"
+                " and of which you are confident that it can be solved."
+                ]))
+            self.answer.append(random.choice([
+                "Let's continue by exploring your range of action. What is the first option"
+                " that comes to your mind?"
                 ]))
 
             self.answer_facts.append("has_question_about_options")
             self.next_node = "Options"
 
-        elif( # Needs work!
+        elif(
             "has_negation" in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "Ah, nevermind! Let's talk about something else then."
+                "I see... Are you interested in exploring the possibilities"
+                " of making living with that issue a bit easier?"
                 ]))
 
-            self.answer_facts.append("has_change_of_topic")
-            self.next_node = "Terminator"
+            self.answer_facts.append("has_question_about_fix")
+            self.next_node = "Fix"
 
         else:
             self.answer.append(random.choice([
@@ -1113,4 +1056,198 @@ class Feasability(Template):
         self.update_user()
 
         if self.verbose: self.summary()   
+
+
+
+ #######                                     
+ #     # #####  ##### #  ####  #    #  ####  
+ #     # #    #   #   # #    # ##   # #      
+ #     # #    #   #   # #    # # #  #  ####  
+ #     # #####    #   # #    # #  # #      # 
+ #     # #        #   # #    # #   ## #    # 
+ ####### #        #   #  ####  #    #  ####  
+                                             
+
+class Options(Template):
+    """
+    Options node
+
+    From Feasability:
+    "That's great! We have just identified a problem that matters in your life,"
+    " and of which you are confident that it can be solved."
+    "Let's continue by exploring your range of action. What is the first option"
+    " that comes to your mind?"
+    From Timeframe, short-term option:
+    "Sure! So... What options come to your mind if you think about how you might"
+    " decrease the pressure of this situation from you?"
+    From Timeframe, mid-term option:
+    "Alright, sounds good! Let's brainstorm some ideas about which small changes"
+    " might affect this situation in a positive way?"
+
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_option( sentence):
+                self.message_facts.append("has_option") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            and self.user["node_previous"] == "Feasability"
+            ):
+
+            self.answer.append(random.choice([
+                "I really think we are on track here. Let's brainstorm some ideas for ways"
+                " to solve this problem of yours in a sustainable way!"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question_in_feasability_context")
+            self.next_node = "Options" 
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            and self.user["node_previous"] == "Timeframe"
+            ):
+
+            self.answer.append(random.choice([
+                "We're exploring your range of action to improve this issue of yours in your"
+                " prefered timeframe. What is the first option that comes to your mind?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question_in_timeframe_context")
+            self.next_node = "Options" 
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            and self.user["node_previous"] == "Options"
+            ):
+
+            self.answer.append(random.choice([
+                "I know this is hard, but I want you to consider all of your options and not"
+                " just the obvious ones. You can do this! At least one more! :)"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question_in_options_context")
+            self.next_node = "Options" 
+
+        elif(
+            self.message_facts.count("has_option") == 1
+            and self.user["node_previous"] != "Options"
+            ):
+
+            self.answer.append(random.choice([
+                "Okay, sounds good! Let's keep that one in mind."
+                ]))
+            self.answer.append(random.choice([
+                "What's the next option that you can think of?"
+                ]))
+
+            self.answer_facts.append("confirms_single_option")
+            self.next_node = "Options" 
+
+        elif(
+            self.message_facts.count("has_option") > 1
+            and self.user["node_previous"] != "Options"
+            ):
+
+            counter_string = "several"
+            if self.message_facts.count("has_option") == 2:
+                counter_string = "two"
+            elif self.message_facts.count("has_option") == 3:
+                counter_string = "three"
+
+            self.answer.append(random.choice([
+                "Wow, there are already " + counter_string + " options! Let's keep those in mind."
+                ]))
+            self.answer.append(random.choice([
+                "What other option that you can think of?"
+                ]))
+
+            self.answer_facts.append("confirms_multiple_options")
+            self.next_node = "Options" 
+
+        elif(
+            "has_option" in self.message_facts
+            and self.user["node_previous"] == "Options"
+            ):
+
+            self.answer.append(random.choice([
+                "Alright, that doesn't sound too bad either. What other option can you think of?",
+                "Very nice! And yet another option?",
+                "I see... Can you give me still one more option?",
+                "Yeah, this option also makes sense. What else do you have?",
+                "Okay, let's keep that one in mind as well. What's the next option you can think of?",
+                "OK, got it. I bet you can come up with another one...?",
+                "Sure, why not? What other ideas do you have, in terms of options?",
+                "This one also sounds good. What other option comes to your mind?"
+                ]))
+
+            self.answer_facts.append("confirms_option_on_iteration")
+            self.next_node = "Options" 
+
+        elif(
+            ("has_negation" in self.message_facts
+                or "has_protest_to_question" in self.message_facts)
+            and self.user["node_previous"] == "Options"
+            and not self.user["node_option_exit"]
+            ):
+
+            self.answer.append(random.choice([
+                "You see, I really want to challenge you to think outside the box."
+                ]))
+            self.answer.append(random.choice([
+                "Maybe the best solution is the one that came to your mind first, but maybe"
+                "there is a really sweet solution out there that you haven't even thought of yet."
+                ]))
+            self.answer.append(random.choice([
+                "So... Can I ask you to be creative and come up with one more option? :)"
+                ]))
+
+            self.answer_facts.append("explains_exploration_of_options")
+            self.user["node_option_exit"] = True
+            self.next_node = "Options" 
+
+        elif(
+            ("has_negation" in self.message_facts
+                or "has_protest_to_question" in self.message_facts)
+            and self.user["node_option_exit"]
+            ):
+
+            self.answer.append(random.choice([
+                "That was really it, you say? Okay, great job! :)"
+                ]))
+            self.answer.append(random.choice([
+                "Now if you look back on the options you listed:"
+                " Which one sounds most promising to you?"
+                ]))
+
+            self.answer_facts.append("asks_for_best_option")
+            self.next_node = "Choice" 
+
+        else:
+            self.answer.append(random.choice([
+                "I see... Alright, let's focus. What are your options here?",
+                "How does that translate into an option to solve your issue?",
+                "Let's stick to our exploration of options for a moment. What else can you think of?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Options"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
 
