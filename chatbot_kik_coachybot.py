@@ -113,7 +113,8 @@ def incoming():
                 "message_current",                
                 "how_are_you_last",
                 "node_previous",
-                "node_current"
+                "node_current".
+                "node_option_exit"
             ]
 
             db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE username = %s;", (message.from_user,))

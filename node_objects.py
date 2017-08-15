@@ -419,6 +419,147 @@ class Template(object):
 
 
 
+ #######                                      
+ #     # #####  ###### #    # # #    #  ####  
+ #     # #    # #      ##   # # ##   # #    # 
+ #     # #    # #####  # #  # # # #  # #      
+ #     # #####  #      #  # # # #  # # #  ### 
+ #     # #      #      #   ## # #   ## #    # 
+ ####### #      ###### #    # # #    #  ####  
+
+
+class Opening( Template):
+    """
+    Terminator node
+    """                
+
+    def __init__( self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_story( sentence):
+                self.message_facts.append( "has_story") 
+            if has_story_negative( sentence):
+                self.message_facts.append( "has_story_negative") 
+            if has_problem_statement( sentence):
+                self.message_facts.append("has_problem_statement")
+            if has_desire( sentence):
+                self.message_facts.append("has_desire")
+            if has_fear( sentence):
+                self.message_facts.append("has_fear")
+            if has_feeling_negative( sentence):
+                self.message_facts.append("has_feeling_negative")
+            if has_dislike( sentence):
+                self.message_facts.append("has_dislike")                
+
+
+        if(
+            "has_problem_statement" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Of all issues in your life, is this among the ones"
+                " with the biggest impact on your overall happyness?"
+                ]))
+
+            self.answer_facts.append("asks_for_relevance")
+            self.next_node = "Relevance" # "Problem"
+
+        elif(
+            "has_story_negative" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "I see. So... This is a very specific situation..."
+                ]))
+            self.answer.append(random.choice([
+                "But underneath the surface of every difficult situation, there is"
+                " a pattern that makes it difficult."
+                ]))
+            self.answer.append(random.choice([
+                "You know what I mean, right? What is your personal challenge,"
+                " or our deeper problem about this situation?"
+                ]))
+
+            self.answer_facts.append("asks_for_background_problem")
+            self.next_node = "Problem" # "Story"
+
+        elif(
+            "has_fear" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "What is the source of that fear?"
+                ]))
+            self.answer.append(random.choice([
+                "If what you were afraid of would never happen... Which problem"
+                " in your life would that solve?"
+                ]))
+
+            self.answer_facts.append("asks_for_source_of_fear")
+            self.next_node = "Problem" # "Projection"
+
+        elif(
+            "has_desire" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "If that wish came true... What problem in your life would that solve?"
+                ]))
+
+            self.answer_facts.append("asks_for_source_of_desire")
+            self.next_node = "Problem" # "Projection"
+
+        elif(
+            "has_feeling_negative" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Hm, I see... What is the source of this feeling?"
+                ]))
+            self.answer.append(random.choice([
+                "And is it a regular thing? OK, the actual question is:"
+                " What's the actual challenge here for your?"
+                ]))
+
+            self.answer_facts.append("asks_for_source_of_negative_feeling")
+            self.next_node = "Problem" # "Feeling"
+
+        elif(
+            "has_dislike" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "This seems to be an issue that you really care about, guessing by"
+                " the intensity of your statement."
+                ]))
+            self.answer.append(random.choice([
+                "How does this situation impact you? I mean, what is your"
+                " actual challenge here?"
+                ]))
+
+            self.answer_facts.append("asks_for_source_of_dislike")
+            self.next_node = "Problem" # "Judgement"
+
+
+        # Updating user dictionary
+
+        if(
+            type(self).__name__ == "Opening"
+            ):
+
+            self.update_user()
+
+        # Printing summary
+
+        if(
+            type(self).__name__ == "Opening"
+            and verbose
+            ):
+
+            self.summary()
+
  #######                                                          
     #    ###### #####  #    # # #    #   ##   #####  ####  #####  
     #    #      #    # ##  ## # ##   #  #  #    #   #    # #    # 
@@ -428,12 +569,12 @@ class Template(object):
     #    ###### #    # #    # # #    # #    #   #    ####  #    # 
                                                                   
 
-class Terminator(Template):
+class Terminator( Template):
     """
-    Welcome node
+    Terminator node
     """                
 
-    def __init__(self, text, user=defaultdict(bool), verbose=True):
+    def __init__( self, text, user=defaultdict(bool), verbose=True):
 
         verbose_argument = verbose
         if verbose_argument: text_argument = text
@@ -494,9 +635,10 @@ class Terminator(Template):
   ## ##  ###### ######  ####   ####  #    # ###### 
                                                    
 
-class Welcome(Template):
+class Welcome( Template):
     """
     Welcome node
+
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
@@ -566,67 +708,132 @@ class Welcome(Template):
  #     #  ####  #    #    #     # #    # ######       #     ####   ####  
 
 
-class How_are_you(Template):
+class How_are_you( Opening):
     """
     How_are_you node
+
+    From Template (inherited):
+    "How is your day/morning/afternoon/evening?",
+    "How was your day/night/day so far?",
+    "How are you today?",
+    "How have you been lately?"
+    "How are you right now, [username]?"
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
 
-        Template.__init__(self, text=text, user=user, verbose=verbose)
+        Opening.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_desire( sentence):
-                self.message_facts.append("has_desire")  
+            if is_positive( sentence):
+                self.message_facts.append("is_positive")  
+            if is_negative( sentence):
+                self.message_facts.append("is_negative")  
+                             
 
-        if(
+        if(     # Standard cases
             "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            or "has_story_negative" in self.message_facts
+            or "has_dislike" in self.message_facts
+            or "has_feeling_negative" in self.message_facts
+            or "has_problem_statement" in self.message_facts
+            or "has_desire" in self.message_facts
+            or "has_fear" in self.message_facts
             ):
-            self.next_node ="Terminator" # Danger_to_self            ):
+            pass          
 
         elif(
             "has_request_to_explain" in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "Oh, that's a great way to start a conversation, right?"
-                "\nWhat would you rather talk about?"
+                "Why not? It's a great way to start a conversation."
+                ]))
+            self.answer.append(random.choice([
+                "So... How *was* your day? :)"
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Terminator" #"How_are_you"
+            self.next_node = "How_are_you"
 
         elif(
-            "has_desire" in self.message_facts
+            "is_negative" in self.message_facts
+            and "has_story"  in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "If that wish came true... What problem in your life would that solve?"
+                "Oh no! :(",
+                "Really?",
                 ]))
+            self.answer.append(random.choice([
+                "How does this influence you?",
+                "What's the impact of this on your life?",
+                "What makes this a challenge for you?"
+                ]))            
 
-            self.answer_facts.append("is_questioning_desire")
-            self.next_node = "Problem" #"Goal"
+            self.answer_facts.append("asks_about_impact")
+            self.next_node = "Problem"
 
         elif(
-            not self.message_facts
-            and self.user["node_previous"] == "How_are_you"
+            "is_positive" in self.message_facts
+            and "has_story"  in self.message_facts
             ):
 
             self.answer.append(random.choice([
-                "Enough of that. Let's move on!",
-                "Ah, nevermind...",
-                "Fascinating!"
-                ]))        
+                "Wow, sounds good! :)",
+                "That's great to hear!",
+                "Oh, wonderful!"
+                ]))
             self.answer.append(random.choice([
-                "What are your plans for tomorrow?"
-                ]))     
-            self.answer_facts.append("uses_fallback_exit")                
-            self.next_node = "Terminator" 
+                "Was that the highlight of your " + previous_daytime(self.current_hour) + "?",
+                ]))            
+
+            self.answer_facts.append("asks_to_confirm_highlight")
+            self.next_node = "Highlight"
+
+        elif(
+            "is_negative" in self.message_facts
+            and not "has_story" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Oh no! :(",
+                "Really?",
+                ]))
+            self.answer.append(random.choice([
+                "What happened?"
+                ]))            
+
+            self.answer_facts.append("asks_about_reason")
+            self.next_node = "Bad"
+
+        elif(
+            "is_positive" in self.message_facts
+            and not "has_story"  in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Wonderful!",
+                "I'm glad to hear that!",
+                "Great! :)"
+                ]))
+            self.answer.append(random.choice([
+                "What was the highlight of your " + previous_daytime(self.current_hour) + "?",
+                "What is the highlight of your " + current_daytime(self.current_hour) + "?",
+                "What was your personal highlight?"
+                ]))            
+
+            self.answer_facts.append("asks_about_highlight")
+            self.next_node = "Good"
 
         else:
 
             self.answer.append(random.choice([
-                "Can you tell me some more about this?"
+                "Can you tell me some more about this?",
+                "And?",
+                "Tell me more...",
+                "What else?"
                 ]))
             self.answer_facts.append("uses_fallback_question") 
             self.next_node = "How_are_you"           
@@ -646,9 +853,32 @@ class How_are_you(Template):
  #       #    #  ####  #####  ###### ###### #    # 
                                                    
 
-class Problem(Template):
+class Problem( Template):
     """
     Problem node
+
+    From Opening-derived nodes:
+    - on negative story
+    "I see. So... This is a very specific situation..."
+    "But underneath the surface of every difficult situation, there is"
+    " a pattern that makes it difficult."
+    "You know what I mean, right? What is your personal challenge,"
+    " or our deeper problem about this situation?"
+    - on fear
+    "What is the source of that fear?"
+    "If what you were afraid of would never happen... Which problem"
+    " in your life would that solve?"
+    - on desire
+    "If that wish came true... What problem in your life would that solve?"
+    - on negative feeling
+    "Hm, I see... What is the source of this feeling?"
+    "And is it a regular thing? OK, the actual question is:"
+    " What's the actual challenge here for your?"
+    -on dislike
+    "This seems to be an issue that you really care about, guessing by"
+    " the intensity of your statement."
+    "How does this situation impact you? I mean, what is your"
+    " actual challenge here?"
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
@@ -669,10 +899,17 @@ class Problem(Template):
             "has_request_to_explain" in self.message_facts
             ):
 
+            #self.answer.append(random.choice([
+            #    "Day-to-day issues are like the foam on the waves that are caused by deep"
+            #    " currents of personal issues and challenges."
+            #    ]))
             self.answer.append(random.choice([
-                "That's what wishes and goals are about, right?"
-                " There's something in life that is not quite right."
-                " What's that something for you?"
+                "Behind the situation you described, there is some discrepancy between how you"
+                " think the world and your life should be, and how they really are."
+                ]))
+            self.answer.append(random.choice([
+                "What is that discrepancy for you? It could be something like 'I eat too much cookie"
+                " dough' or 'I don't get the recognition I deserve'."
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
@@ -1830,7 +2067,7 @@ class Action( Template):
         else:
             self.answer.append(random.choice([
                 "Oh, you shouldn't be vague here. The more specific you can be now,"
-                " th more likely you are to take action at the right time."
+                " the more likely you are to take action at the right time."
                 ]))
             self.answer.append(random.choice([
                 "When is that time for you?"
@@ -1846,3 +2083,320 @@ class Action( Template):
 
 
 
+  #####                       
+ #     #  ####   ####  #####  
+ #       #    # #    # #    # 
+ #  #### #    # #    # #    # 
+ #     # #    # #    # #    # 
+ #     # #    # #    # #    # 
+  #####   ####   ####  #####  
+                              
+
+class Good( Opening):
+    """
+    Good node
+
+    From How_are_you:
+    "Wonderful!",
+    "I'm glad to hear that!",
+    "Great! :)"
+    "What was the highlight of your day/day so far/night?",
+    "What is the highlight of your day/morning/afternoon/evening?",
+    "What was your personal highlight?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Opening.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_negation( sentence):
+                self.message_facts.append("has_negation")
+                              
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            or "has_story_negative" in self.message_facts
+            or "has_dislike" in self.message_facts
+            or "has_feeling_negative" in self.message_facts
+            or "has_problem_statement" in self.message_facts
+            or "has_desire" in self.message_facts
+            or "has_fear" in self.message_facts
+            ):
+            pass         
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "A highlight what made this day stand out from others in a positive way."
+                " Or anything that contributed most to making this day a good one."
+                ]))
+            self.answer.append(random.choice([
+                "What was such a highlight for you?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Good" 
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Really, no personal highlight?"
+                ]))
+            self.answer.append(random.choice([
+                "What about lowlights? What was your most negative experience recently?"
+                ]))            
+
+            self.answer_facts.append("asks_about_lowlight")
+            self.next_node = "Bad"
+
+        elif(
+            "has_story" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Wow, sounds good! :)",
+                "That's great to hear!",
+                "Oh, wonderful!"
+                ]))
+            self.answer.append(random.choice([
+                "So that was the highlight of your " + previous_daytime(self.current_hour) + "?",
+                ]))            
+
+            self.answer_facts.append("asks_to_confirm_highlight")
+            self.next_node = "Highlight"
+
+        else:
+            self.answer.append(random.choice([
+                "Okay... Let's focus more on yourself."
+                " What made this a highlight for you personally?"
+                ]))
+
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Good"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+
+ #     #                                              
+ #     # #  ####  #    # #      #  ####  #    # ##### 
+ #     # # #    # #    # #      # #    # #    #   #   
+ ####### # #      ###### #      # #      ######   #   
+ #     # # #  ### #    # #      # #  ### #    #   #   
+ #     # # #    # #    # #      # #    # #    #   #   
+ #     # #  ####  #    # ###### #  ####  #    #   #   
+                                                      
+
+class Highlight( Opening):
+    """
+    Highlight node
+
+    From How_are_you or Good::
+    "Wow, sounds good! :)",
+    "That's great to hear!",
+    "Oh, wonderful!"
+    "So that was the highlight of your day/day so far/night?"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Opening.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_affirmation( sentence):
+                self.message_facts.append("has_affirmation")
+            if has_negation( sentence):
+                self.message_facts.append("has_negation")
+            if has_story( sentence) and not has_negation( sentence):
+                # Background: "No, it was not my highlight" has story + negation!
+                self.message_facts.append("has_story")
+
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            or "has_story_negative" in self.message_facts
+            or "has_dislike" in self.message_facts
+            or "has_feeling_negative" in self.message_facts
+            or "has_problem_statement" in self.message_facts
+            or "has_desire" in self.message_facts
+            or "has_fear" in self.message_facts
+            ):
+            pass      
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "A highlight what made this day stand out from others in a positive way."
+                " Or anything that contributed most to making this day a good one."
+                ]))
+            self.answer.append(random.choice([
+                "What was such a highlight for you?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Highlight" 
+
+        elif(
+            "has_affirmation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Wonderful! It's great that you can appreciate the good things in life,"
+                " and I can only recommend to preserve this positive spin! :)"
+                ]))
+            self.answer.append(random.choice([
+                "What about lowlights? What was your most negative experience recently?"
+                ]))            
+
+            self.answer_facts.append("asks_about_lowlight")
+            self.next_node = "Bad"
+
+        elif(
+            "has_negation" in self.message_facts
+            and not "has_story" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "No? What was you highlight instead?",
+                ]))            
+
+            self.answer_facts.append("asks_about_other_highlight")
+            self.next_node = "Good"
+
+        elif(
+            "has_story" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Ah, I see... So was that you highlight instead?",
+                ]))            
+
+            self.answer_facts.append("asks_to_confirm_other_highlight")
+            self.next_node = "Highlight"
+
+        else:
+            self.answer.append(random.choice([
+                "Hm, I see... So this is what made it a highlight for you?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Highlight"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+
+ ######                
+ #     #   ##   #####  
+ #     #  #  #  #    # 
+ ######  #    # #    # 
+ #     # ###### #    # 
+ #     # #    # #    # 
+ ######  #    # #####  
+
+
+class Bad( Opening):
+    """
+    Bad node
+
+    From How_are_you:
+    ...
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Opening.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_negation( sentence):
+                self.message_facts.append("has_negation")
+        
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            or "has_story_negative" in self.message_facts
+            or "has_dislike" in self.message_facts
+            or "has_feeling_negative" in self.message_facts
+            or "has_problem_statement" in self.message_facts
+            or "has_desire" in self.message_facts
+            or "has_fear" in self.message_facts
+            ):
+            pass        
+
+        elif(
+            "has_request_to_explain" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "This is pretty much the reason why I was programmed: To explore why"
+                " people have negative experiences, and to help them dealing with"
+                " it a little bit better."
+                ]))
+            self.answer.append(random.choice([
+                "So... What was the reason for your negative experience?"
+                ]))
+
+            self.answer_facts.append("has_explanation_for_question")
+            self.next_node = "Bad" 
+
+        elif(
+            "has_story" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "I see. So... This is a very specific situation..."
+                ]))
+            self.answer.append(random.choice([
+                "But underneath the surface of every difficult situation, there is"
+                " a pattern that makes it difficult."
+                ]))
+            self.answer.append(random.choice([
+                "You know what I mean, right? What is your personal challenge,"
+                " or our deeper problem about this situation?"
+                ]))
+
+            self.answer_facts.append("asks_for_background_problem")
+            self.next_node = "Problem"
+
+        elif(
+            "has_negation" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Well, OK..."
+                ]))
+            self.answer.append(random.choice([
+                "What was another significant experience in your life recently?"
+                ]))
+
+            self.answer_facts.append("asks_for_significant_event")
+            self.next_node = "How_are_you"
+
+        else:
+            self.answer.append(random.choice([
+                "OK... What contributed to this negative experience?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "Bad"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   

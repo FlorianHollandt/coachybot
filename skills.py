@@ -91,8 +91,9 @@ def capitalize_fragment(sentence):
                                                                   
 
 intensifiers = "|".join([
-    r"(pretty( much)?",
+    r"(?:pretty(?: much)?",
     r"quite",
+    r"so",
     r"very",
     r"absolutely",
     r"total?ly",
@@ -100,6 +101,7 @@ intensifiers = "|".join([
     r"somewhat",
     r"kind of",
     r"perfectly",
+    r"incredibly",
     r"positively",
     r"definitely",
     r"completely",
@@ -113,7 +115,7 @@ intensifiers = "|".join([
     r"a bit)"
     ])   
 
-goods = "|".join([
+positives = "|".join([
     r"(good",
     r"better",
     r"best",
@@ -154,7 +156,7 @@ goods = "|".join([
     r"alright)"
     ])                                                                 
 
-bads = "|".join([
+negatives = "|".join([
     r"(bad",
     r"terrible",
     r"awful",
@@ -185,28 +187,28 @@ bads = "|".join([
     r"troubled)"
     ])      
 
-def is_good(sentence):
+def is_positive( sentence):
     if(
         (
-            re.search(goods,sentence)
-            and not has_negation(sentence)
+            re.search( positives, sentence)
+            and not has_negation( sentence)
             )or(
-            re.search(bads,sentence)
-            and has_negation(sentence)            
+            re.search( negatives, sentence)
+            and has_negation( sentence)            
             )
         ):
         return True
     else:
         return False
 
-def is_bad(sentence):
+def is_negative( sentence):
     if(
         (
-            re.search(bads,sentence)
-            and not has_negation(sentence)
+            re.search( negatives, sentence)
+            and not has_negation( sentence)
             )or(
-            re.search(goods,sentence)
-            and has_negation(sentence)            
+            re.search( positives, sentence)
+            and has_negation( sentence)            
             )
         ):
         return True
@@ -214,6 +216,40 @@ def is_bad(sentence):
         return False
 
 
+
+  #####                            
+ #     # #####  ####  #####  #   # 
+ #         #   #    # #    #  # #  
+  #####    #   #    # #    #   #   
+       #   #   #    # #####    #   
+ #     #   #   #    # #   #    #   
+  #####    #    ####  #    #   #   
+                                   
+
+def has_story( sentence):
+    if(
+        re.search( r"(^|\W)(i|me|mine|myself|my|we|our|oursel(f|v)(es)?|us)(\W|$)", sentence)
+        and not re.search( r"\?$", sentence)
+        ):
+        return True
+    else:
+        return False
+
+story_negatives = r"|".join([
+    r"(too late",
+    r"(lost|missed|broke|hurt|killed|failed|misplaced|forgot) (.* )?(my|ours?|mine|hers?|his|theirs?)",
+    r"failed (\w+ )?at)"
+    ])
+
+def has_story_negative( sentence):
+    if(
+        re.search( r"(^|\W)(i|we|my|our|me) ", sentence)
+        and not re.search( r"\?$", sentence)
+        and re.search( story_negatives, sentence)
+        ):
+        return True
+    else:
+        return False
 
 
 
@@ -373,7 +409,7 @@ def has_affirmation( sentence):
             and not has_negation(sentence)
             )
         or(
-            re.search(  r"(\W|^)(sounds|feels) (" + intensifiers + " )?" + goods, sentence)
+            re.search(  r"(\W|^)(sounds|feels) (" + intensifiers + " )?" + positives, sentence)
             )
         ):
         return True
@@ -383,7 +419,7 @@ def has_affirmation( sentence):
 
 def has_elaboration(sentences):
     text = "".join(sentences)
-    for pattern in [goods,bads,intensifiers,affirmations,negations]:
+    for pattern in [ positives, negatives, intensifiers, affirmations, negations]:
         text=re.sub(pattern,"",text)
 
     if len(text) > 20:
@@ -506,6 +542,15 @@ action_verbs = r"|".join([
     r"start(ing)?",
     r"apply(ing)?",
     r"connect(ing)?",
+    r"(out|crowd)?sourc(e|ing)",
+    r"fun(ing)?",
+    r"found(ing)",
+    r"shar(e|ing)",
+    r"tap(ping)?",
+    r"invit(e|ing)",
+    r"investigat(e|ing)",
+    r"giv(e|ing)",
+    r"donat(e|ing)",
     r"lov(e|ing)?)"
     ])
 
@@ -676,8 +721,6 @@ problem_keywords = r"|".join([
 
 problem_quantifiers = r"|".join([
     r"(no",
-    r"not hav(e|ing)",
-    r"never hav(e|ing)",
     r"lack of",
     r"too much",
     r"too many",
@@ -685,10 +728,9 @@ problem_quantifiers = r"|".join([
     r"not enough",
     r"more than enough",
     r"lack of",
-    r"want (more|less)",
-    r"need (more|less)",
-    r"have (more|less)"
     r"overmuch",
+    r"(want(ing)?|need(ing)?|hav(e|ing)) (more|less)",
+    r"(not|never) (hav(e|ing)|get(ting)?)( my( (\w+ )?share of)| the| enough( of))?",
     r"too little)"
     ])
 
@@ -701,7 +743,8 @@ problem_ressources = r"|".join([
     r"support",
     r"help",
     r"backup",
-    r"ressources",
+    r"ressources?",
+    r"sources?",
     r"sex",
     r"love",
     r"thrill",
@@ -830,7 +873,7 @@ def has_hesitation( sentence):
     if(
         re.search( r"^(\W)*(e+r*m*|h*u*m+|so+|well)?(\W)*"
             r"(actually|"
-            r"((" + intensifiers + r" )?" + goods + r") question|"
+            r"((" + intensifiers + r" )?" + positives + r") question|"
             r"let me think|"
             r"(\w+ )?hard to say|"
             r"i do ?n(o|\')t( \w+)? know)?"
@@ -859,6 +902,175 @@ def has_thanks( sentence):
 
 
 
+ #######                                             
+ #       ###### ###### #      # #    #  ####   ####  
+ #       #      #      #      # ##   # #    # #      
+ #####   #####  #####  #      # # #  # #       ####  
+ #       #      #      #      # #  # # #  ###      # 
+ #       #      #      #      # #   ## #    # #    # 
+ #       ###### ###### ###### # #    #  ####   ####  
+
+
+feelings_negative = r"|".join([
+    r"(a?lone(?:ly|some)?",
+    r"hungry",
+    r"thirsty",
+    r"tired",
+    r"starv(?:ed|ing)",
+    r"ravished",
+    r"angry",
+    r"furious",
+    r"raging",
+    r"mad",
+    r"sad",
+    r"unhappy",
+    r"blue",
+    r"sorrowful",
+    r"mournful",
+    r"miserable",
+    r"depressed",
+    r"frustrated",
+    r"glum",
+    r"weak",
+    r"down",
+    r"disappointed",
+    r"desparate",
+    r"despairing",
+    r"exhausted",
+    r"worn.out",
+    r"drained",
+    r"displeased",
+    r"dissatisfied",
+    r"discontent",        
+    r"unlucky",
+    r"unwell",
+    r"uneasy",
+    r"annoyed",
+    r"irritated",
+    r"infuriated",
+    r"bothered",
+    r"nervous",
+    r"shocked",
+    r"perplexed",
+    r"confused",
+    r"troubled",
+    r"outraged",
+    r"shaken",
+    r"scandalized",
+    r"disgusted",
+    r"deprived",
+    r"hurt",
+    r"injured",
+    r"insulted",
+    r"degraded",
+    r"humiliated",
+    r"shamed",
+    r"ashame",
+    r"pathetic",
+    r"rotten",
+    r"disgusting",
+    r"foul",
+    r"defeated",
+    r"powerless",
+    r"inferior",
+    r"inappropriate",
+    r"awkward",
+    r"clumsy",
+    r"ugly",
+    r"embarrass(?:ed|ing)",
+    r"inept",
+    r"helpless",
+    r"upset",
+    r"unwelcome)"
+    ])                                                     
+
+def has_feeling_negative( sentence):
+    return_value = False
+    if re.search( feelings_negative, sentence):
+        feeling_match = re.match( r"(.*?)(" + intensifiers + r".*)?" + feelings_negative + r"(.*?$)", sentence)
+        if(
+            not has_negation( feeling_match.group(1))
+            and
+            (re.search( r"(^|\W)(i|we)\W", feeling_match.group(1))
+                or re.search( r"^\W*$", feeling_match.group(1)))                         
+            ):
+                return_value = True
+    return return_value
+
+ #######                      
+ #       ######   ##   #####  
+ #       #       #  #  #    # 
+ #####   #####  #    # #    # 
+ #       #      ###### #####  
+ #       #      #    # #   #  
+ #       ###### #    # #    # 
+                              
+
+fear_pattern = r"|".join([
+    r"(fear",
+    r"afraid",
+    r"scared of",
+    r"scare(?:s|\W|ing)?",
+    r"terrified",
+    r"terrif(?:ies|ying)",
+    r"frightened",
+    r"concerned",
+    r"concern(?:s|\W|ing)?",
+    r"frighten(?:s|\W|ing)?)"
+    ])                              
+
+def has_fear( sentence):
+    return_value = False
+    if re.search( fear_pattern, sentence):
+        fear_match = re.match( r"(.*?)" + fear_pattern + r"(.*?$)", sentence)
+        if(
+            (re.search( r"(fear|afraid|scared|terrified|concerned|frightened)" ,fear_match.group(2))
+                and re.search( r"(^|\W)(i|we)\W", fear_match.group(1))
+                and not has_negation( fear_match.group(1)))
+            or
+            (re.search( r"(scare( |s|ing)|terrif(y|ies|ying)|concern( |s|ing)|frighten( |s|ing))" ,fear_match.group(2))
+                and re.search( r"(^|\W)(me|us|i|we)(\W|$)", fear_match.group(3))
+                and not has_negation( fear_match.group(1)))                
+            or
+            (re.search( r"(ing|fear)" ,fear_match.group(2))
+                and re.search( r"(^|\W)(me|us|i|we|my)\W", fear_match.group(0))
+                and not has_negation( fear_match.group(1)))                            
+            ):
+                return_value = True
+    return return_value
+
+
+
+ #                                
+ #       # #    # # #    #  ####  
+ #       # #   #  # ##   # #    # 
+ #       # ####   # # #  # #      
+ #       # #  #   # #  # # #  ### 
+ #       # #   #  # #   ## #    # 
+ ####### # #    # # #    #  ####  
+                                  
+
+dislikes = r"|".join([
+    r"(i (?:\w+ )?hate",
+    r"i (?:\w+ )?dislike",
+    r"i (?:\w+ )?can not stand",
+    r"i (?:\w+ )?detest",
+    r"i (?:\w+ )?loathe",
+    r"(freak|creep)(?:s|ing)? me out",
+    r"get(?:s|ting)? on my nerves",
+    r"i(?: have)(?: \w+)? had enough of",
+    r"i(?: \w+) can not see any more of)"
+    ])
+
+def has_dislike( sentence):
+    if(
+        re.search( dislikes, sentence)
+        and not has_negation( re.sub( dislikes, " good ", sentence))
+        ):
+        return True
+    else:
+        return False
+
  ######                                
  #     # ######  ####  # #####  ###### 
  #     # #      #      # #    # #      
@@ -873,7 +1085,7 @@ desires = "|".join([
     r"if only",
     r"my (\w+ )?goal is (that|for|to|when|.w+ing)",
     r"i (\w+ )?hope(?! for)",
-    r"it would (\w+ )?be (\w+ )?"+goods +r" (if|when))",
+    r"it would (\w+ )?be (\w+ )?" + positives + r" (if|when))",
     ])
 
 def has_desire(sentence):
@@ -989,7 +1201,9 @@ def is_judgement_positive(sentence):
 def is_judgement_negative(sentence):
     return_value = False
     equivalence = False
-    sentence = re.sub(r"(\,)",r"",sentence)    
+    sentence = re.sub( r"(\,)",r"", sentence)
+    sentence = re.sub( r"(\.|\!|\?|\)|\(|\:|\-)*$", r"!", sentence)    
+    sentence = re.sub( r"!+", r"!", sentence)   
     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
     tree = judgement_chunker.parse(sentence_pos)
     if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
@@ -1339,7 +1553,7 @@ you_had_good_time = r"(?<!(why  |how  |who  |what |when ))" + "|".join([r"(did y
     "have you had)"]) + r"\s" + "|".join([
     r"(a",
     r"some",
-    r"a few)" ]) + "\s" + intensifiers + r"?\s?" + goods + r"\s" + temporal_units + r"((\s|\,)[\,\s\w]+)?\?"
+    r"a few)" ]) + "\s" + intensifiers + r"?\s?" + positives + r"\s" + temporal_units + r"((\s|\,)[\,\s\w]+)?\?"
 
 def is_question_how_are_you(sentence):
     if re.search( how_are_you, sentence):
