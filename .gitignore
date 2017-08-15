@@ -1,3 +1,5 @@
 nlp_functions.pyc
 venv*
 cheatsheet.sql
+ngrams.pyc
+*.pyc
