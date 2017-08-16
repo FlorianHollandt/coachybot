@@ -119,7 +119,7 @@ def webhook():
                     user      = node_main.user
 
                     for line in answer:
-                        send_message(sender_id, answer)
+                        send_message(user_id, answer)
 
                     print "Inserting user data to database"
                     if (
@@ -172,19 +172,6 @@ def webhook():
                                 type(user_information[key]).__name__, 
                                 w1=w1, 
                                 w2=w2)                            
-
-                    sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
-                    recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-                    message_text = messaging_event["message"]["text"]  # the message's text
-                    timestamp = messaging_event["timestamp"]
-
-                    user = get_user_information( sender_id)
-
-                    timezone_offset = user["timezone"]
-                    utc_hour = datetime.utcfromtimestamp( timestamp/1000).hour
-                    answer = "Your current time is... " + str(utc_hour + timezone_offset)
-
-                    #send_message(sender_id, answer)
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
