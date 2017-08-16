@@ -25,12 +25,12 @@ from node_objects import *
 # ===========================================================================================
 
 username = os.environ['BOT_USERNAME'] 
-api_key = os.environ['BOT_API_KEY']
+api_key = os.environ['KIK_BOT_API_KEY']
 
 app = Flask(__name__)
 kik = KikApi(username, api_key)
 
-config = Configuration(webhook=os.environ['WEBHOOK'])
+config = Configuration(webhook=os.environ['KIK_WEBHOOK'])
 kik.set_configuration(config)
 
 urlparse.uses_netloc.append("postgres")
