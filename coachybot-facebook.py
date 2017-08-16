@@ -135,7 +135,7 @@ def webhook():
                     if(
                         user["node_previous"]  == "Terminator"
                         ):
-                        db.execute( "DELETE FROM users WHERE username = %s;", (message.from_user,))
+                        db.execute( "DELETE FROM users WHERE username = %s;", (user_id,))
 
                     conn.commit()
                     db.close()
