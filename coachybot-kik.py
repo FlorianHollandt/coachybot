@@ -5,9 +5,6 @@ from kik.messages import messages_from_json, TextMessage, IsTypingMessage
 
 import os 
 
-from ngrams import corrections
-import nltk
-
 from datetime import datetime
 from time import sleep
 from pytz import timezone
@@ -17,8 +14,6 @@ import random
 import psycopg2
 import urlparse
 
-#from nlp_functions import *
-#from nodes import *
 from node_objects import *
 
 # http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
