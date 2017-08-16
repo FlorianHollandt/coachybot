@@ -81,7 +81,7 @@ def webhook():
                     timestamp = messaging_event["timestamp"]
 
 
-                    answer = "Your current time is... " + timestamp/1000
+                    answer = "Your current time is... " + str(timestamp/1000)
 
                     send_message(sender_id, answer)
 
