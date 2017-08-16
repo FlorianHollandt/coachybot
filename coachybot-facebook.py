@@ -48,8 +48,12 @@ def webhook():
                             "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
                         for key in messaging_event.keys():
                             if type(messaging_event[key]).__name__ != "dict":
-                                print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
+                                print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
                                     key, "", messaging_event[key], type(messaging_event[key]).__name__, w1=w1, w2=w2)
+                            else:
+                                for subkey in messaging_event[key].keys():
+                                    print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                                        key, subkey, messaging_event[key], type(messaging_event[key]).__name__, w1=w1, w2=w2)
                             
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
