@@ -81,7 +81,9 @@ def webhook():
                         del user["lastname"]
                         del user["profile_pic"]
                         del user["locale"]
-                        user["message_current"] = facebook_timestamp                    
+                        user["message_current"] = facebook_timestamp
+                        if not user["message_previous"]:
+                            user["message_previous"] = facebook_timestamp                 
 
                     else: # User is unknown
                         connection_facts.append("unknown_user") 
