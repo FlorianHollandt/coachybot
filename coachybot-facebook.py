@@ -80,7 +80,7 @@ def webhook():
                     message_text = messaging_event["message"]["text"]  # the message's text
                     timestamp = messaging_event["timestamp"]
 
-                    user = get_user_information( recipient_id)
+                    user = get_user_information( sender_id)
 
                     timezone_offset = user["timezone"]
                     utc_hour = datetime.utcfromtimestamp( timestamp).hour
