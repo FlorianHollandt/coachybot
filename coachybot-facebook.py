@@ -67,8 +67,9 @@ def webhook():
                     user_id            = messaging_event["sender"]["id"]
 
                     db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
+                    user_keys = [column[0] for column in db.description]
                     user_values = db.fetchone()
-                    print "Retrieved user data: " + str(user_values)
+                    print "Retrieved user keys: " + str(user_keys) + " and values:" + str(user_values)
 
                     if True: # If user is unknown
                         connection_facts.append("unknown_user") 
