@@ -35,18 +35,19 @@ def webhook():
 
     data = request.get_json()
 
-    print "Recieved data! :)"
-
     if data["object"] == "page":
-
-        print "Uh! Looks like a page object..."
 
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
 
                 if messaging_event.get("message"):  # someone sent us a message
 
-                    print "Someone sent us a message!!!"
+                    if True: # Explore the data at hand...
+                        " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format("Key", "Subkey", "Value", "Type", w=12, w2=24)
+                        for key in messaging_event.keys():
+                            if type(messaging_event[key]).__name__ != "dict":
+                                " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format( key, "", messaging_event[key], messaging_event[key].__name__, w=12, w2=24)
+                            
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     print "It was " + messaging_event["sender"]["id"]
