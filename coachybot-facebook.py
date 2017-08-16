@@ -53,7 +53,7 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     print "My own ID is " + messaging_event["sender"]["id"]
                     message_text = messaging_event["message"]["text"]  # the message's text
-                    timestamp = messaging_event["message"]["timestamp"]
+                    timestamp = messaging_event["timestamp"]
                     print "Look, there is a timestamp " + str(timestamp) + " of type " +type(timestamp).__name__
 
                     send_message(sender_id, "roger that!")
