@@ -83,7 +83,7 @@ def webhook():
                     user = get_user_information( sender_id)
 
                     timezone_offset = user["timezone"]
-                    utc_hour = datetime.utcfromtimestamp( timestamp).hour
+                    utc_hour = datetime.utcfromtimestamp( timestamp/1000).hour
                     answer = "Your current time is... " + str(utc_hour + timezone_offset)
 
                     send_message(sender_id, answer)
