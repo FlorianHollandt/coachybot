@@ -43,8 +43,18 @@ class Template(object):
             if verbose: print "Argument 'text' must be a (unicode) string."
             if verbose: print "Instead, text argument of type '" + type(text).__name__ + "' was given."
             raise TypeError
-            
 
+        # Standard user for development and debugging     
+        # 
+        # Unit tests pass also with default "dict()" user argument, but
+        #  get inerpreted as new user and receive full greeting        
+
+        if isinstance(user, str):
+            if user == "dev_standard_user":
+                user = {
+                    "message_previous" : 1501221600, # Friday, July 28, 2017 6:00:00 AM
+                    "message_current"  : 1501225200  # Friday, July 28, 2017 7:00:00 AM          
+                }  
 
         # Making sure that 'user' is a dictionary
 
@@ -79,19 +89,19 @@ class Template(object):
             if(
                 time_since_last_message >= 11*60*60
                 ):
-                self.message_facts.append("interruption_long")
+                self.message_facts.append("has_interruption_long")
                 if verbose: print "Long interruption of more than 11 hours..."
             elif(
                 time_since_last_message < 11*60*60
                 and time_since_last_message >= 5*60*60
                 ):
-                self.message_facts.append("interruption_medium")
+                self.message_facts.append("has_interruption_medium")
                 if verbose: print "Medium interruption of more than 5 hours..."
             elif(
                 time_since_last_message < 5*60*60
                 and time_since_last_message >= 2*60*60
                 ):
-                self.message_facts.append("interruption_short")      
+                self.message_facts.append("has_interruption_short")      
                 if verbose: print "Short interruption of more than 2 hours..."
 
 
@@ -139,7 +149,7 @@ class Template(object):
         # Greeting logic (without "How are you?")
 
         if (
-            "interruption_long" in self.message_facts
+            "has_interruption_long" in self.message_facts
             or not self.user["message_previous"]
             ):
 
@@ -165,7 +175,7 @@ class Template(object):
             if verbose: print "Extensive greeting after long interruption."
 
         elif(
-            "interruption_medium" in self.message_facts
+            "has_interruption_medium" in self.message_facts
             and(
                 "has_greeting" in self.message_facts
                 or "has_question_how_are_you" in self.message_facts
@@ -192,7 +202,7 @@ class Template(object):
             if verbose: print "Greeting after medium interruption."       
 
         elif(
-            "interruption_short" in self.message_facts
+            "has_interruption_short" in self.message_facts
             and "has_greeting" in self.message_facts
             ):
 
@@ -264,9 +274,9 @@ class Template(object):
 
         if(
             not self.user["message_previous"]
-            or "interruption_long" in self.message_facts
+            or "has_interruption_long" in self.message_facts
             or (
-                "interruption_medium" in self.message_facts
+                "has_interruption_medium" in self.message_facts
                 and (
                     "has_greeting" in self.message_facts
                     or "has_question_how_are_you" in self.message_facts
@@ -293,14 +303,15 @@ class Template(object):
                 ])) 
                 self.answer_facts.append("use_user_firstname")  
 
-            self.answer_facts.append("has_question_how_are_you") 
+            self.answer_facts.append("has_question_how_are_you")
+            self.next_node = "HowAreYou"
 
 
         # Repeat node in case of hesitation / filler
 
         if(
             "has_hesitation" in self.message_facts
-            and not "interruption_long" in self.message_facts
+            and not "has_interruption_long" in self.message_facts
             and not "has_question_how_are_you" in self.answer_facts
             and not "has_greeting" in self.answer_facts
             ):
@@ -681,7 +692,7 @@ class Welcome( Template):
             if verbose: print "Introduction to new user, deleting greeting (if present)."   
 
 
-        # Determining next node, typically "How_are_you"
+        # Determining next node, typically "HowAreYou"
 
         if(
             "has_danger_to_self" in self.message_facts
@@ -690,7 +701,7 @@ class Welcome( Template):
         elif(
             "has_question_how_are_you" in self.answer_facts
             ):
-            self.next_node ="How_are_you"
+            self.next_node ="HowAreYou"
 
 
         self.update_user()
@@ -708,9 +719,9 @@ class Welcome( Template):
  #     #  ####  #    #    #     # #    # ######       #     ####   ####  
 
 
-class How_are_you( Opening):
+class HowAreYou( Opening):
     """
-    How_are_you node
+    HowAreYou node
 
     From Template (inherited):
     "How is your day/morning/afternoon/evening?",
@@ -755,7 +766,7 @@ class How_are_you( Opening):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "How_are_you"
+            self.next_node = "HowAreYou"
 
         elif(
             "is_negative" in self.message_facts
@@ -836,7 +847,7 @@ class How_are_you( Opening):
                 "What else?"
                 ]))
             self.answer_facts.append("uses_fallback_question") 
-            self.next_node = "How_are_you"           
+            self.next_node = "HowAreYou"           
 
         self.update_user()
 
@@ -892,6 +903,7 @@ class Problem( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -991,6 +1003,7 @@ class Relevance(Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1080,6 +1093,7 @@ class Fix( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1179,6 +1193,7 @@ class Timeframe( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1208,7 +1223,7 @@ class Timeframe( Template):
                 ]))
 
             self.answer_facts.append("asks_for_short_term_options")
-            self.next_node = "Options" # Timeframe 
+            self.next_node = "OptionsOne" # Timeframe 
 
         elif(
             "prefers_timeframe_long" in self.message_facts
@@ -1222,7 +1237,7 @@ class Timeframe( Template):
 
 
             self.answer_facts.append("asks_for_mid_term_options")
-            self.next_node = "Options"
+            self.next_node = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1270,6 +1285,7 @@ class Feasability(Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1299,7 +1315,7 @@ class Feasability(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_options")
-            self.next_node = "Options"
+            self.next_node = "OptionsOne"
 
         elif(
             "has_negation" in self.message_facts
@@ -1338,9 +1354,9 @@ class Feasability(Template):
  ####### #        #   #  ####  #    #  ####  
                                              
 
-class Options(Template):
+class OptionsOne(Template):
     """
-    Options node
+    OptionsOne node
 
     From Feasability:
     "That's great! We have just identified a problem that matters in your life,"
@@ -1379,6 +1395,7 @@ class Options(Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1393,7 +1410,7 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_feasability_context")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1406,7 +1423,7 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_timeframe_context")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1421,11 +1438,11 @@ class Options(Template):
                 " Or if you could take a week off? Or if there was someone willing ot help?"
                 ]))
             self.answer_facts.append("has_explanation_for_question_in_choice_context")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
-            and self.user["node_previous"] == "Options"
+            and self.user["node_previous"] == "OptionsOne"
             ):
 
             self.answer.append(random.choice([
@@ -1434,7 +1451,7 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_options_context")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1453,11 +1470,11 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_committment_context")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             self.message_facts.count("has_option") == 1
-            and self.user["node_previous"] != "Options"
+            and self.user["node_previous"] != "OptionsOne"
             ):
 
             self.answer.append(random.choice([
@@ -1468,11 +1485,11 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("confirms_single_option")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             self.message_facts.count("has_option") > 1
-            and self.user["node_previous"] != "Options"
+            and self.user["node_previous"] != "OptionsOne"
             ):
 
             counter_string = "several"
@@ -1489,11 +1506,11 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("confirms_multiple_options")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             "has_option" in self.message_facts
-            and self.user["node_previous"] == "Options"
+            and self.user["node_previous"] == "OptionsOne"
             ):
 
             self.answer.append(random.choice([
@@ -1508,12 +1525,12 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("confirms_option_on_iteration")
-            self.next_node = "Options" 
+            self.next_node = "OptionsOne" 
 
         elif(
             ("has_negation" in self.message_facts
                 or "has_protest_to_question" in self.message_facts)
-            and self.user["node_previous"] == "Options"
+            and self.user["node_previous"] == "OptionsOne"
             and not self.user["node_option_exit"]
             ):
 
@@ -1529,13 +1546,73 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("explains_exploration_of_options")
-            self.user["node_option_exit"] = True
-            self.next_node = "Options" 
+            self.next_node = "OptionsTwo" 
+
+        else:
+            self.answer.append(random.choice([
+                "I see... Alright, let's focus. What are your options here?",
+                "How does that translate into an option to solve your issue?",
+                "Let's stick to our exploration of options for a moment. What else can you think of?"
+                ]))
+
+            self.answer_facts.append("uses_fallback_repetition")  
+            self.next_node = "OptionsOne"    
+
+
+        self.update_user()
+
+        if self.verbose: self.summary()   
+
+
+class OptionsTwo( Template):
+    """
+    OptionsTwo node
+
+    From OptionsOne:
+    "You see, I really want to challenge you to think outside the box."
+    "Maybe the best solution is the one that came to your mind first, but maybe"
+    "there is a really sweet solution out there that you haven't even thought of yet."
+    "So... Can I ask you to be creative and come up with one more option? :)"
+    """                
+
+    def __init__(self, text, user=defaultdict(bool), verbose=True):
+
+        Template.__init__(self, text=text, user=user, verbose=verbose)
+
+        for sentence in self.sentences:
+            if has_option( sentence):
+                self.message_facts.append("has_option") 
+            if has_negation( sentence):
+                self.message_facts.append("has_negation") 
+
+        if(     # Standard cases
+            "has_danger_to_self" in self.message_facts
+            or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
+            ):
+            pass        
 
         elif(
-            ("has_negation" in self.message_facts
-                or "has_protest_to_question" in self.message_facts)
-            and self.user["node_option_exit"]
+            "has_option" in self.message_facts
+            ):
+
+            self.answer.append(random.choice([
+                "Alright, that doesn't sound too bad either. What other option can you think of?",
+                "Very nice! And yet another option?",
+                "I see... Can you give me still one more option?",
+                "Yeah, this option also makes sense. What else do you have?",
+                "Okay, let's keep that one in mind as well. What's the next option you can think of?",
+                "OK, got it. I bet you can come up with another one...?",
+                "Sure, why not? What other ideas do you have, in terms of options?",
+                "This one also sounds good. What other option comes to your mind?"
+                ]))
+
+            self.answer_facts.append("confirms_option")
+            self.next_node = "OptionsTwo" 
+
+        elif(
+            "has_negation" in self.message_facts
+            or "has_protest_to_question" in self.message_facts
             ):
 
             self.answer.append(random.choice([
@@ -1557,7 +1634,7 @@ class Options(Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Options"    
+            self.next_node = "OptionsTwo"    
 
 
         self.update_user()
@@ -1579,7 +1656,7 @@ class Choice( Template):
     """
     Choice node
 
-    From Options:
+    From OptionsOne:
     "That was really it, you say? Okay, great job! :)"
     "Now if you look back on the options you listed:"
     " Which one sounds most promising to you?"
@@ -1604,6 +1681,7 @@ class Choice( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1670,7 +1748,7 @@ class Choice( Template):
                 ]))
 
             self.answer_facts.append("asks_about_more_options")
-            self.next_node = "Options"
+            self.next_node = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1718,6 +1796,7 @@ class Obstacles( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1821,6 +1900,7 @@ class Priorities( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1865,7 +1945,7 @@ class Priorities( Template):
                 ]))
 
             self.answer_facts.append("asks_about_more_options")
-            self.next_node = "Options"
+            self.next_node = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1921,6 +2001,7 @@ class Committment( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -1982,7 +2063,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("asks_for_options")
-            self.next_node = "Options"
+            self.next_node = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -2031,6 +2112,7 @@ class Action( Template):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             ):
             pass        
 
@@ -2096,7 +2178,7 @@ class Good( Opening):
     """
     Good node
 
-    From How_are_you:
+    From HowAreYou:
     "Wonderful!",
     "I'm glad to hear that!",
     "Great! :)"
@@ -2117,6 +2199,7 @@ class Good( Opening):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             or "has_story_negative" in self.message_facts
             or "has_dislike" in self.message_facts
             or "has_feeling_negative" in self.message_facts
@@ -2201,7 +2284,7 @@ class Highlight( Opening):
     """
     Highlight node
 
-    From How_are_you or Good::
+    From HowAreYou or Good::
     "Wow, sounds good! :)",
     "That's great to hear!",
     "Oh, wonderful!"
@@ -2225,6 +2308,7 @@ class Highlight( Opening):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             or "has_story_negative" in self.message_facts
             or "has_dislike" in self.message_facts
             or "has_feeling_negative" in self.message_facts
@@ -2315,7 +2399,7 @@ class Bad( Opening):
     """
     Bad node
 
-    From How_are_you:
+    From HowAreYou:
     ...
     """                
 
@@ -2330,6 +2414,7 @@ class Bad( Opening):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.answer_facts
             or "has_story_negative" in self.message_facts
             or "has_dislike" in self.message_facts
             or "has_feeling_negative" in self.message_facts
@@ -2386,7 +2471,7 @@ class Bad( Opening):
                 ]))
 
             self.answer_facts.append("asks_for_significant_event")
-            self.next_node = "How_are_you"
+            self.next_node = "HowAreYou"
 
         else:
             self.answer.append(random.choice([
