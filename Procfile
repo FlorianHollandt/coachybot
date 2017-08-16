@@ -1,1 +1,1 @@
-web: python chatbot_kik_coachybot.py
+web: python coachybot-kik.py
