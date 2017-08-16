@@ -43,17 +43,29 @@ def webhook():
                 if messaging_event.get("message"):  # someone sent us a message
 
                     if True: # Explore the data at hand...
-                        (w1, w2) = (12, 24)
+                        (w1, w2) = (12, 36)
                         print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
                             "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
                         for key in messaging_event.keys():
                             if type(messaging_event[key]).__name__ != "dict":
                                 print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                                    key, "", messaging_event[key], type(messaging_event[key]).__name__, w1=w1, w2=w2)
+                                    key, 
+                                    "", 
+                                    messaging_event[key], 
+                                    type(messaging_event[key]).__name__, 
+                                    w1=w1, 
+                                    w2=w2)
                             else:
                                 for subkey in messaging_event[key].keys():
                                     print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                                        key, subkey, messaging_event[key][subkey], type(messaging_event[key][subkey]).__name__, w1=w1, w2=w2)
+                                        key,
+                                        subkey,
+                                        messaging_event[key][subkey],
+                                        type(messaging_event[key][subkey]).__name__,
+                                        w1=w1,
+                                        w2=w2)
+                        user_information = get_user_information( messaging_event["sender"]["id"])
+                        print "User info dump: " + str(user_information)
                             
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
@@ -99,6 +111,14 @@ def send_message(recipient_id, message_text):
     })
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
+
+@app.route('/', methods=['GET'])
+def get_user_information( recipient_id):
+    query_string = ('https://graph.facebook.com/v2.6/' 
+        + recipient_id
+        + "?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token="
+        + page_access_token) 
+    return requests.get( query_string).content
 
 # ===========================================================================================
 
