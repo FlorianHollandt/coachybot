@@ -96,15 +96,16 @@ def webhook():
                         print "User localization : '" + str(facebook_user["locale"]) + "'"   
 
                         user.update({
-                            "user_id"         : user_id,
-                            "firstname"       : facebook_user["first_name"],
-                            "lastname"        : facebook_user["last_name"],
-                            "timezone"        : facebook_user["timezone"],
-                            "locale"          : facebook_user["locale"],
-                            "profile_pic"     : facebook_user["profile_pic"],
-                            "message_first"   : facebook_timestamp,
-                            "message_current" : facebook_timestamp,
-                            "node_current"    : "Welcome"
+                            "user_id"          : user_id,
+                            "firstname"        : facebook_user["first_name"],
+                            "lastname"         : facebook_user["last_name"],
+                            "timezone"         : facebook_user["timezone"],
+                            "locale"           : facebook_user["locale"],
+                            "profile_pic"      : facebook_user["profile_pic"],
+                            "message_first"    : facebook_timestamp,
+                            "message_previous" : facebook_timestamp,
+                            "message_current"  : facebook_timestamp,
+                            "node_current"     : "Welcome"
                             })
 
                     node_main = eval(user["node_current"])(messaging_event["message"]["text"], user)
