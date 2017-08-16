@@ -6,6 +6,7 @@ from flask import Flask, request, Response
 import requests
 
 from datetime import datetime
+from collections import defaultdict
 
 import psycopg2
 import urlparse
