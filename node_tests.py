@@ -57,6 +57,10 @@ class Test_Template(unittest.TestCase):
         with self.assertRaises( TypeError):
             test_node = Template( ".", ("foo", "bar"), verbose=False)
 
+    def test_expects_numeric_timestamp( self):
+        with self.assertRaises( TypeError):
+            test_node = Template( ".", {"timezone", "Berlin/Europe"}, verbose=False)
+
     def test_returns_answer_and_next_node_and_user( self):
         test_node = Template( ".", dict(), verbose=False)
         self.failUnless( 
@@ -139,7 +143,7 @@ class Test_Template(unittest.TestCase):
     def test_recognize_morning_in_berlin( self):
         test_user = {
             "message_current"  : 1501221600, # Friday, July 28, 2017 8:00:00 AM GMT+02:00
-            "timezone"     : "Europe/Berlin"
+            "timezone"         : 2
         }
         test_node = Template( ".", test_user, verbose=False)
         self.assertEqual(test_node.current_hour, 8)
@@ -295,7 +299,7 @@ class Test_Template(unittest.TestCase):
         test_user = {
             "message_previous" : 1501221600, # Friday, July 28, 2017 6:00:00 AM
             "message_current"  : 1501264800, # Friday, July 28, 2017 6:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Peter"
         }
         test_node = Template( message, test_user, verbose=False)
@@ -311,7 +315,7 @@ class Test_Template(unittest.TestCase):
         test_user = {
             "message_previous" : 1501221600, # Friday, July 28, 2017 6:00:00 AM
             "message_current"  : 1501243200, # Friday, July 28, 2017 12:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Peter"
         }
         test_node = Template( message, test_user, verbose=False)
@@ -327,7 +331,7 @@ class Test_Template(unittest.TestCase):
         test_user = {
             "message_previous" : 1501221600, # Friday, July 28, 2017 6:00:00 AM
             "message_current"  : 1501243200, # Friday, July 28, 2017 12:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Peter"
         }
         test_node = Template( message, test_user, verbose=False)
@@ -553,7 +557,7 @@ class Test_Welcome( unittest.TestCase):
         message = "Hello! Anyone there? :)"
         test_user = {
             "message_current"  : 1501243200, # Friday, July 28, 2017 12:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Magda",
             "username"         : "test_magda", 
             "node_current"     : "Welcome",           
@@ -572,7 +576,7 @@ class Test_Welcome( unittest.TestCase):
         message = "So... what is this about?"
         test_user = {
             "message_current"  : 1501243200, # Friday, July 28, 2017 12:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Magda",
             "username"         : "test_magda", 
             "node_current"     : "Welcome",           
@@ -618,7 +622,7 @@ class Test_HowAreYou(unittest.TestCase):
     def test_realistic_data_recognize_danger_to_self( self): # General Template response
         test_user = {
             "message_current"  : 1501243200, # Friday, July 28, 2017 12:00:00 PM
-            "timezone"         : "Europe/Berlin",        
+            "timezone"         : 2,        
             "firstname"        : "Magda",
             "username"         : "test_magda", 
             "node_current"     : "HowAreYou",           

@@ -68,6 +68,15 @@ class Template(object):
             user = defaultdict(bool)
             user.update(user_backup)
 
+        # Making sure that timestamp is numeric
+
+        if (
+            "timestamp" in user.keys()
+            and not isinstance( user["timestamp"], int)
+            ):
+            if verbose: print "Timestamp value must be an integer (offset from UTC)."
+            if verbose: print "Instead, timestamp of type '" + type(user["timestamp"]).__name__ + "' was given."
+            raise TypeError
 
         # Instance attributes
 
@@ -107,10 +116,15 @@ class Template(object):
 
         # Recognizing time of day
 
-        if all(key in user.keys() for key in ("message_current", "timezone")):
-            current_time = datetime.fromtimestamp(user["message_current"],tz=timezone(user["timezone"])).time()
-            self.current_hour = int(str(current_time)[:2])
-            if verbose: print "Current time in " + user["timezone"] + ": " + str(self.current_hour)
+        if(
+            "timezone" in user.keys()
+            and "message_current" in user.keys()
+            ):
+            #current_time = datetime.fromtimestamp(user["message_current"],tz=timezone(user["timezone"])).time()
+            #self.current_hour = int(str(current_time)[:2])
+            utc_hour = datetime.utcfromtimestamp( user["message_current"]).hour
+            self.current_hour = utc_hour + user["timezone"]
+            if verbose: print "Current time in timezone UTC+" + str(user["timezone"]) + ": " + str(self.current_hour)
         else:
             if verbose: print "No known time zone for user, using generic time references."
 
