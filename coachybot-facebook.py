@@ -2,9 +2,10 @@ import os
 import sys
 import json
 
-from flask import Flask, request
+from flask import Flask, request, Response
 import requests
 
+from datetime import datetime
 
 # http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
 # ===========================================================================================
@@ -42,7 +43,7 @@ def webhook():
 
                 if messaging_event.get("message"):  # someone sent us a message
 
-                    if True: # Explore the data at hand...
+                    if False: # Explore the data at hand...
                         (w1, w2) = (12, 36)
                         print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
                             "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
@@ -67,23 +68,22 @@ def webhook():
                         user_information = get_user_information( messaging_event["sender"]["id"])
                         for key in user_information.keys():
                             print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                                "user", 
                                 key, 
-                                "", 
                                 user_information[key], 
                                 type(user_information[key]).__name__, 
                                 w1=w1, 
-                                w2=w2)
-                            
+                                w2=w2)                            
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
-                    print "It was " + messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-                    print "My own ID is " + messaging_event["sender"]["id"]
                     message_text = messaging_event["message"]["text"]  # the message's text
                     timestamp = messaging_event["timestamp"]
-                    print "Look, there is a timestamp " + str(timestamp) + " of type " +type(timestamp).__name__
 
-                    send_message(sender_id, "roger that!")
+
+                    answer = "Your current time is... " + timestamp/1000
+
+                    send_message(sender_id, answer)
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
@@ -94,7 +94,7 @@ def webhook():
                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
                     pass
 
-    return "ok", 200
+    return Response(status=200)
 
 
 
