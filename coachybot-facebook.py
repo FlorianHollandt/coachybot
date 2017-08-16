@@ -92,15 +92,16 @@ def webhook():
 
                     # This is where the magic happens :D
 
+                    print "Inserting user data to database"
                     if (
                         "unknown_user" in connection_facts
                         or True
                         ):  
-                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
+                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (str(user_id),))
 
                     for key in user.keys():
                         if user[key]:
-                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], str(user_id)))
 
 
                     if False: # Explore the data at hand...
