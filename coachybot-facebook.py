@@ -126,7 +126,7 @@ def get_user_information( recipient_id):
         + "?fields=first_name,last_name,profile_pic,locale,timezone,gender"
         + "&access_token="
         + page_access_token) 
-    return requests.get( query_string).content
+    return json.loads( requests.get( query_string).content)
 
 # ===========================================================================================
 
