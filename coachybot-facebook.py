@@ -99,7 +99,7 @@ def webhook():
 
                     for key in user.keys():
                         if user[key]:
-                            db.execute("UPDATE users SET " + key + " = %s WHERE username = %s;", (user[key], user_id))
+                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
 
 
                     if False: # Explore the data at hand...
