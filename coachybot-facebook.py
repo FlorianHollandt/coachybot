@@ -44,11 +44,11 @@ def webhook():
 
                     if True: # Explore the data at hand...
                         (w1, w2) = (12, 24)
-                        " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
+                        print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
                             "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
                         for key in messaging_event.keys():
                             if type(messaging_event[key]).__name__ != "dict":
-                                " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
+                                print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
                                     key, "", messaging_event[key], type(messaging_event[key]).__name__, w1=w1, w2=w2)
                             
 
