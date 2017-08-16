@@ -92,8 +92,8 @@ def webhook():
 
                     # This is where the magic happens :D
 
-                    db.execute( "INSERT INTO users (user_id) VALUES (abcdefg );")
-                    db.execute( "UPDATE users SET timezone = 2 WHERE user_id = abcdefg;")
+                    db.execute( "INSERT INTO users (user_id) VALUES (%s );", (123, ))
+                    db.execute( "UPDATE users SET timezone = 2 WHERE user_id = %s;", (123, ))
 
                     print "Inserting user data to database"
                     if (
