@@ -65,7 +65,14 @@ def webhook():
                                         w1=w1,
                                         w2=w2)
                         user_information = get_user_information( messaging_event["sender"]["id"])
-                        print "User info dump: " + str(user_information)
+                        for key in user_information.keys():
+                            print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                                key, 
+                                "", 
+                                user_information[key], 
+                                type(user_information[key]).__name__, 
+                                w1=w1, 
+                                w2=w2)
                             
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
@@ -116,7 +123,8 @@ def send_message(recipient_id, message_text):
 def get_user_information( recipient_id):
     query_string = ('https://graph.facebook.com/v2.6/' 
         + recipient_id
-        + "?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token="
+        + "?fields=first_name,last_name,profile_pic,locale,timezone,gender"
+        + "&access_token="
         + page_access_token) 
     return requests.get( query_string).content
 
