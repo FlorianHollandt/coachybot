@@ -94,6 +94,7 @@ def webhook():
 
                     if (
                         "unknown_user" in connection_facts
+                        or True
                         ):  
                         db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
 
