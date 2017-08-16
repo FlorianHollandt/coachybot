@@ -66,7 +66,7 @@ def webhook():
                     facebook_timestamp = messaging_event["timestamp"]/1000
                     user_id            = messaging_event["sender"]["id"]
 
-                    db.execute("SELECT firstname FROM users WHERE user_id = %s;", (user_id,))
+                    db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
                     user_values = db.fetchone()
                     print "Retrieved user data: " + str(user_values)
 
@@ -99,8 +99,8 @@ def webhook():
                     print "Inserting user data to database"
                     if (
                         "unknown_user" in connection_facts
-                        or True
-                        ):  
+                        and False
+                            ):  
                         db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
 
                     for key in user.keys():
