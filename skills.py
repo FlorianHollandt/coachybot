@@ -5,7 +5,7 @@ from regex import sub as sub2
 from datetime import datetime
 from pytz import timezone
 
-from ngrams import corrections, Pw
+from ngrams.ngrams import corrections, Pw
 
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
