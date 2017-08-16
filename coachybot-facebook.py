@@ -108,7 +108,7 @@ def webhook():
                             "node_current"     : "Welcome"
                             })
 
-                    node_main = eval(user["node_current"])(messaging_event["message"]["text"], user)
+                    node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
 
                     answer    = node_main.answer
                     next_node = node_main.next_node
