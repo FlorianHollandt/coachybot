@@ -11,6 +11,8 @@ from collections import defaultdict
 import psycopg2
 import urlparse
 
+from node_objects import *
+
 # ===========================================================================================
 
 page_access_token = os.environ['FACEBOOK_PAGE_ACCESS_TOKEN']
