@@ -66,6 +66,10 @@ def webhook():
                     facebook_timestamp = messaging_event["timestamp"]/1000
                     user_id            = messaging_event["sender"]["id"]
 
+                    db.execute("SELECT firstname FROM users WHERE username = %s;", (user_id,))
+                    user_values = db.fetchone()
+                    print "Retrieved user data: " + str(user_values)
+
                     if True: # If user is unknown
                         connection_facts.append("unknown_user") 
                         print "No user data in database. Looking up user profile..."
@@ -97,11 +101,16 @@ def webhook():
                         "unknown_user" in connection_facts
                         or True
                         ):  
-                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (str(user_id),))
+                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
 
                     for key in user.keys():
                         if user[key]:
-                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], str(user_id)))
+                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+
+                    if(
+                        user["node_previous"]  == "Terminator"
+                        ):
+                        db.execute( "DELETE FROM users WHERE username = %s;", (message.from_user,))
 
                     conn.commit()
                     db.close()
