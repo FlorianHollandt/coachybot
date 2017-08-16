@@ -69,9 +69,19 @@ def webhook():
                     db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
                     user_keys = [column[0] for column in db.description]
                     user_values = db.fetchone()
-                    print "Retrieved user keys: " + str(user_keys) + " and values:" + str(user_values)
+                    #print "Retrieved user keys: " + str(user_keys) + " and values:" + str(user_values)
 
-                    if True: # If user is unknown
+                    if user_values:
+                        connection_facts.append( "known_user") 
+                        print "Found user data in database."
+
+                        user.update( dict( zip( user_keys, user_values)))
+                        del user["lastname"]
+                        del user["profile_pic"]
+                        del user["locale"]
+                        user["message_current"] = facebook_timestamp                    
+
+                    else: # User is unknown
                         connection_facts.append("unknown_user") 
                         print "No user data in database. Looking up user profile..."
 
@@ -95,7 +105,14 @@ def webhook():
                             "node_current"    : "Welcome"
                             })
 
-                    # This is where the magic happens :D
+                    node_main = eval(user["node_current"])(messaging_event["message"]["text"], user)
+
+                    answer    = node_main.answer
+                    next_node = node_main.next_node
+                    user      = node_main.user
+
+                    for line in answer:
+                        send_message(sender_id, answer)
 
                     print "Inserting user data to database"
                     if (
@@ -160,7 +177,7 @@ def webhook():
                     utc_hour = datetime.utcfromtimestamp( timestamp/1000).hour
                     answer = "Your current time is... " + str(utc_hour + timezone_offset)
 
-                    send_message(sender_id, answer)
+                    #send_message(sender_id, answer)
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
