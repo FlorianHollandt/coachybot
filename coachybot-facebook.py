@@ -7,11 +7,16 @@ import requests
 
 from datetime import datetime
 
-# http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
+import psycopg2
+import urlparse
+
 # ===========================================================================================
 
 page_access_token = os.environ['FACEBOOK_PAGE_ACCESS_TOKEN']
 verify_token      = os.environ['FACEBOOK_VERIFY_TOKEN']
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
 app = Flask(__name__)
 
@@ -34,6 +39,17 @@ def webhook():
 
     # endpoint for processing incoming messaging events
 
+    print "Establishing database connection..."
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+    db = conn.cursor()   
+    print "Database connection established :)"
+
     data = request.get_json()
 
     if data["object"] == "page":
@@ -41,7 +57,49 @@ def webhook():
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
 
+                user = defaultdict(bool)
+                connection_facts = []
+
                 if messaging_event.get("message"):  # someone sent us a message
+
+                    facebook_timestamp = messaging_event["timestamp"]/1000
+                    user_id            = messaging_event["sender"]["id"]
+
+                    if True: # If user is unknown
+                        connection_facts.append("unknown_user") 
+                        print "No user data in database. Looking up user profile..."
+
+                        facebook_user = get_user_information( user_id)
+
+                        print "User ID           : '" + str(user_id) + "'"
+                        print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
+                        print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
+                        print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
+                        print "User localization : '" + str(facebook_user["locale"]) + "'"   
+
+                        user.update({
+                            "user_id"         : user_id,
+                            "firstname"       : facebook_user["firstname"],
+                            "lastname"        : facebook_user["lastname"],
+                            "timezone"        : facebook_user["timezone"],
+                            "locale"          : facebook_user["locale"],
+                            "profile_pic"     : facebook_user["profile_pic"],
+                            "message_first"   : facebook_timestamp,
+                            "message_current" : facebook_timestamp,
+                            "node_current"    : "Welcome"
+                            })
+
+                    # This is where the magic happens :D
+
+                    if (
+                        "unknown_user" in connection_facts
+                        ):  
+                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
+
+                    for key in user.keys():
+                        if user[key]:
+                            db.execute("UPDATE users SET " + key + " = %s WHERE username = %s;", (user[key], user_id))
+
 
                     if False: # Explore the data at hand...
                         (w1, w2) = (12, 36)
