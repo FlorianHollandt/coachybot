@@ -49,8 +49,12 @@ def webhook():
                     print "Someone sent us a message!!!"
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
+                    print "It was " + messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+                    print "My own ID is " + messaging_event["sender"]["id"]
                     message_text = messaging_event["message"]["text"]  # the message's text
+                    timestamp = messaging_event["message"]["timestamp"]
+                    print "Look, there is a timestamp " + str(timestamp) + " of type " +type(timestamp).__name__
 
                     send_message(sender_id, "roger that!")
 
@@ -68,6 +72,8 @@ def webhook():
 
 
 def send_message(recipient_id, message_text):
+
+    print "Sending message..."
 
     params = {
         "access_token": page_access_token
@@ -99,6 +105,6 @@ def send_message(recipient_id, message_text):
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
-    print('Starting the app...') 
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    print "Starting the app..." 
+    port = int( os.environ.get('PORT', 5000))
+    app.run( host='0.0.0.0', port=port)
