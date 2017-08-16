@@ -80,8 +80,8 @@ def webhook():
 
                         user.update({
                             "user_id"         : user_id,
-                            "firstname"       : facebook_user["firstname"],
-                            "lastname"        : facebook_user["lastname"],
+                            "firstname"       : facebook_user["first_name"],
+                            "lastname"        : facebook_user["last_name"],
                             "timezone"        : facebook_user["timezone"],
                             "locale"          : facebook_user["locale"],
                             "profile_pic"     : facebook_user["profile_pic"],
