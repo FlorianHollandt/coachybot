@@ -8,6 +8,7 @@ import requests
 from datetime import datetime
 from collections import defaultdict
 import random
+from time import sleep
 
 import psycopg2
 import urlparse
