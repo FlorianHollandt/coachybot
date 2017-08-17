@@ -126,8 +126,8 @@ def webhook():
 
                     for line in answer:
                         type_time = random.randint( 25, 40)*len(line)
-                        #sleep(int( round(float(random.randint( 350, 650)))/1000.))
                         display_typing_in_miliseconds( user_id, type_time)
+                        sleep( random.randint( 350, 650)/1000. )
                         send_message( user_id, line)
                         
 
@@ -236,7 +236,7 @@ def display_typing_in_miliseconds(recipient_id, time_in_ms=1000):
         params=params, 
         headers=headers, 
         data=typing_on)
-    sleep( float(time_in_ms)/1000.)
+    sleep( time_in_ms/1000.)
     r = requests.post(
         "https://graph.facebook.com/v2.6/me/messages", 
         params=params, 
