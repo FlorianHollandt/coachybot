@@ -155,7 +155,7 @@ def webhook():
                         user_id,
                         messaging_event["message"]["text"],
                         node_previous,
-                        user.node_c,
+                        node_current,
                         node_next
                         ))
 
