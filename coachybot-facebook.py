@@ -110,13 +110,15 @@ def webhook():
                             "node_current"     : "Welcome"
                             })
 
-                    print "User dump: " + str(user)
+                    print "User dump before evaluating node: " + str(user)
 
                     node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
 
                     answer    = node_main.answer
                     next_node = node_main.next_node
                     user      = node_main.user
+
+                    print "User dump after evaluating node: " + str(user)
 
                     for line in answer:
                         send_message(user_id, line)

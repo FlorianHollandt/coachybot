@@ -680,6 +680,7 @@ class Welcome( Template):
 
             if(
                 "has_greeting" in self.answer_facts
+                or "is_waiting_for_answer" in self.answer_facts
                 ):
                 self.answer_facts.remove("has_greeting")
                 del self.answer[0]
