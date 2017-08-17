@@ -150,7 +150,7 @@ def webhook():
 
                     db.execute( "INSERT INTO logs (" + 
                         "messange_timestamp, user_id, message, node_previous, node_current, node_next" +
-                        ") VALUES (%s);",
+                        ") VALUES (%s, %s, %s, %s, %s, %s);",
                      (messaging_event["timestamp"],
                         user_id,
                         messaging_event["message"]["text"],
