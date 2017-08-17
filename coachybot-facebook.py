@@ -70,6 +70,8 @@ def webhook():
                     facebook_timestamp = messaging_event["timestamp"]/1000
                     user_id            = messaging_event["sender"]["id"]
 
+                    mark_message_as_seen( user_id)
+
                     db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
                     user_keys = [column[0] for column in db.description]
                     user_values = db.fetchone()
@@ -124,7 +126,7 @@ def webhook():
 
                     for line in answer:
                         type_time = random.randint( 25, 40)*len(line)
-                        send_action_typing_in_miliseconds( user_id, type_time)
+                        display_typing_in_miliseconds( user_id, type_time)
                         send_message( user_id, line)
                         sleep(int( round( type_time + float(random.randint( 350, 650)))/1000.))
 
@@ -196,9 +198,6 @@ def webhook():
 
 
 def send_message(recipient_id, message_text):
-
-    print "Sending message..."
-
     params = {
         "access_token": page_access_token
     }
@@ -220,10 +219,7 @@ def send_message(recipient_id, message_text):
         data=data)
 
 
-def send_action_typing_in_miliseconds(recipient_id, time_in_ms=1000):
-
-    print "Pretending to type..."
-
+def display_typing_in_miliseconds(recipient_id, time_in_ms=1000):
     params = {
         "access_token": page_access_token
     }
@@ -246,6 +242,20 @@ def send_action_typing_in_miliseconds(recipient_id, time_in_ms=1000):
         headers=headers, 
         data=typing_off)
 
+def mark_message_as_seen(recipient_id):
+    params = {
+        "access_token": page_access_token
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    mark_seen = json.dumps({"recipient": {"id": recipient_id},
+        "sender_action":"mark_seen"})
+    r = requests.post(
+        "https://graph.facebook.com/v2.6/me/messages", 
+        params=params, 
+        headers=headers, 
+        data=mark_seen)
 
 @app.route('/', methods=['GET'])
 def get_user_information( recipient_id):
