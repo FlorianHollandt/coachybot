@@ -133,7 +133,7 @@ def webhook():
                         if user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
-                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (key, user[key], user_id))
+                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (str(key), str(user[key]), str(user_id)))
 
                     if(
                         user["node_previous"]  == "Terminator"
