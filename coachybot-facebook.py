@@ -126,13 +126,13 @@ def webhook():
                     print "Inserting user data to database"
                     if (
                         "unknown_user" in connection_facts
-                        and False
                             ):  
                         db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
 
                     for key in user.keys():
                         if user[key]:
-                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (key, user[key], user_id))
 
                     if(
                         user["node_previous"]  == "Terminator"
