@@ -712,10 +712,34 @@ class Welcome( Template):
             "has_danger_to_self" in self.message_facts
             ):
             self.next_node ="Terminator" # Danger_to_self
+
         elif(
             "has_question_how_are_you" in self.answer_facts
             ):
             self.next_node ="HowAreYou"
+
+        else:
+
+            if (
+                "use_user_firstname" in self.answer_facts
+                or not self.user["firstname"]
+                or random.choice([True,False])
+                ):
+                self.answer.append(random.choice([
+                    "How is your " + current_daytime(self.current_hour) + "?",
+                    "How was your " + previous_daytime(self.current_hour) + "?",
+                    "How are you today?",
+                    "How have you been lately?"
+                ])) 
+            else:
+                self.answer.append(random.choice([
+                    "How are you right now, " + self.user["firstname"] + "?"
+                ])) 
+                self.answer_facts.append("use_user_firstname")  
+
+            self.answer_facts.append("has_question_how_are_you")
+            self.next_node = "HowAreYou"
+
 
 
         self.update_user()
