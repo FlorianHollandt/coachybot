@@ -97,18 +97,18 @@ def webhook():
                         print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
                         print "User localization : '" + str(facebook_user["locale"]) + "'"   
 
-                    user.update({
-                        "user_id"          : user_id,
-                        "firstname"        : facebook_user["first_name"],
-                        "lastname"         : facebook_user["last_name"],
-                        "timezone"         : facebook_user["timezone"],
-                        "locale"           : facebook_user["locale"],
-                        "profile_pic"      : facebook_user["profile_pic"],
-                        "message_first"    : facebook_timestamp,
-                        "message_previous" : facebook_timestamp,
-                        "message_current"  : facebook_timestamp,
-                        "node_current"     : "Welcome"
-                        })
+                        user.update({
+                            "user_id"          : user_id,
+                            "firstname"        : facebook_user["first_name"],
+                            "lastname"         : facebook_user["last_name"],
+                            "timezone"         : facebook_user["timezone"],
+                            "locale"           : facebook_user["locale"],
+                            "profile_pic"      : facebook_user["profile_pic"],
+                            "message_first"    : facebook_timestamp,
+                            "message_previous" : facebook_timestamp,
+                            "message_current"  : facebook_timestamp,
+                            "node_current"     : "Welcome"
+                            })
 
                     print "User dump before evaluating node: " + str(user)
 
