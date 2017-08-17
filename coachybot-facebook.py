@@ -119,7 +119,7 @@ def webhook():
                     user      = node_main.user
 
                     for line in answer:
-                        send_message(user_id, answer)
+                        send_message(user_id, line)
 
                     print "Inserting user data to database"
                     if (
