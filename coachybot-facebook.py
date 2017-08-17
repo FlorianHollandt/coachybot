@@ -149,7 +149,7 @@ def webhook():
                             db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
 
                     db.execute( "INSERT INTO logs (" + 
-                        "messange_timestamp, user_id, message, node_previous, node_current, node_next" +
+                        "message_timestamp, user_id, message, node_previous, node_current, node_next" +
                         ") VALUES (%s, %s, %s, %s, %s, %s);",
                      (messaging_event["timestamp"],
                         user_id,
