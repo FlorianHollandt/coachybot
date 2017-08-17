@@ -7,6 +7,7 @@ import requests
 
 from datetime import datetime
 from collections import defaultdict
+import random
 
 import psycopg2
 import urlparse
@@ -121,7 +122,10 @@ def webhook():
                     print "User dump after evaluating node: " + str(user)
 
                     for line in answer:
-                        send_message(user_id, line)
+                        type_time = random.randint( 25, 40)*len(line)
+                        send_action_typing_in_miliseconds( user_id, type_time)
+                        send_message( user_id, line)
+                        sleep(int( round( type_time + float(random.randint( 350, 650)))/1000.))
 
                     print "Inserting user data to database"
                     if (
@@ -208,7 +212,46 @@ def send_message(recipient_id, message_text):
             "text": message_text
         }
     })
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+    r = requests.post(
+        "https://graph.facebook.com/v2.6/me/messages", 
+        params=params, 
+        headers=headers, 
+        data=data)
+
+
+def send_action_typing_in_miliseconds(recipient_id, time_in_ms=1000):
+
+    print "Pretending to type..."
+
+    params = {
+        "access_token": page_access_token
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    typing_on = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "sender_action":"typing_on"
+    })
+    typing_off = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "sender_action":"typing_off"
+    })    
+    r = requests.post(
+        "https://graph.facebook.com/v2.6/me/messages", 
+        params=params, 
+        headers=headers, 
+        data=typing_on)
+    sleep( time_in_ms)
+    r = requests.post(
+        "https://graph.facebook.com/v2.6/me/messages", 
+        params=params, 
+        headers=headers, 
+        data=typing_off)
 
 
 @app.route('/', methods=['GET'])
