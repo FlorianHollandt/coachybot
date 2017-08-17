@@ -130,10 +130,12 @@ def webhook():
                         db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
 
                     for key in user.keys():
-                        if user[key]:
+                        if key=="user_id":
+                            pass
+                        elif user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
-                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (str(key), str(user[key]), str(user_id)))
+                            db.execute("UPDATE users SET %s = %s WHERE 'user_id' = %s;", (str(key), str(user[key]), str(user_id)))
 
                     if(
                         user["node_previous"]  == "Terminator"
