@@ -127,8 +127,8 @@ def webhook():
                     for line in answer:
                         type_time = random.randint( 25, 40)*len(line)
                         display_typing_in_miliseconds( user_id, type_time)
-                        sleep( random.randint( 350, 650)/1000. )
                         send_message( user_id, line)
+                        sleep( random.randint( 350, 650)/1000. )
                         
 
                     print "Inserting user data to database"
