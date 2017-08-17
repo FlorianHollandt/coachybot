@@ -117,7 +117,8 @@ def webhook():
 
                     print "User dump before evaluating node: " + str(user)
 
-                    node_previous = user["node_previous"]
+                    node_current  = str(user["node_current"])
+                    node_previous = str(user["node_previous"])
 
                     node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
 
@@ -154,8 +155,8 @@ def webhook():
                         user_id,
                         messaging_event["message"]["text"],
                         node_previous,
-                        user.node_previous,
-                        user.node_next
+                        user.node_c,
+                        node_next
                         ))
 
                     if(
