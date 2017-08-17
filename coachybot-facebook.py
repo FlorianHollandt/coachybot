@@ -131,6 +131,7 @@ def webhook():
 
                     for key in user.keys():
                         if user[key]:
+                            print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
                             db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (key, user[key], user_id))
 
