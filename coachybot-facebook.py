@@ -148,16 +148,19 @@ def webhook():
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
 
-                    db.execute( "INSERT INTO logs (" + 
-                        "message_timestamp, user_id, message, node_previous, node_current, node_next" +
-                        ") VALUES (%s, %s, %s, %s, %s, %s);",
-                     (messaging_event["timestamp"],
-                        user_id,
-                        messaging_event["message"]["text"],
-                        node_previous,
-                        node_current,
-                        node_next
-                        ))
+                    try:
+                        db.execute( "INSERT INTO logs (" + 
+                            "message_timestamp, user_id, message, node_previous, node_current, node_next" +
+                            ") VALUES (%s, %s, %s, %s, %s, %s);",
+                         (messaging_event["timestamp"],
+                            user_id,
+                            messaging_event["message"]["text"],
+                            node_previous,
+                            node_current,
+                            node_next
+                            ))
+                    except( IntegrityError):
+                        pass
 
                     if(
                         user["node_previous"]  == "Terminator"
