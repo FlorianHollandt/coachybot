@@ -85,7 +85,7 @@ class Template(object):
         self.answer        = []
         self.answer_facts  = []
         self.current_hour  = None
-        self.next_node     = "Terminator"
+        self.node_next     = "Terminator"
         self.user          = user
         self.user_backup   = user_backup
         self.verbose       = verbose
@@ -318,7 +318,7 @@ class Template(object):
                 self.answer_facts.append("use_user_firstname")  
 
             self.answer_facts.append("has_question_how_are_you")
-            self.next_node = "HowAreYou"
+            self.node_next = "HowAreYou"
 
 
         # Repeat node in case of hesitation / filler
@@ -335,7 +335,7 @@ class Template(object):
                 "Okay... ?"
             ])) 
             self.answer_facts.append("is_waiting_for_answer") 
-            self.next_node = type(self).__name__ 
+            self.node_next = type(self).__name__ 
 
 
         # Danger to self! --> Flush all accumulated answers!
@@ -394,7 +394,7 @@ class Template(object):
         else:
             self.user["node_previous"] = self.user["node_current"]
         
-        self.user["node_current"] = self.next_node
+        self.user["node_current"] = self.node_next
 
         if(
             "message_current" in self.user.keys()
@@ -489,7 +489,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_relevance")
-            self.next_node = "Relevance" # "Problem"
+            self.node_next = "Relevance" # "Problem"
 
         elif(
             "has_story_negative" in self.message_facts
@@ -508,7 +508,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_background_problem")
-            self.next_node = "Problem" # "Story"
+            self.node_next = "Problem" # "Story"
 
         elif(
             "has_fear" in self.message_facts
@@ -523,7 +523,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_source_of_fear")
-            self.next_node = "Problem" # "Projection"
+            self.node_next = "Problem" # "Projection"
 
         elif(
             "has_desire" in self.message_facts
@@ -534,7 +534,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_source_of_desire")
-            self.next_node = "Problem" # "Projection"
+            self.node_next = "Problem" # "Projection"
 
         elif(
             "has_feeling_negative" in self.message_facts
@@ -549,7 +549,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_source_of_negative_feeling")
-            self.next_node = "Problem" # "Feeling"
+            self.node_next = "Problem" # "Feeling"
 
         elif(
             "has_dislike" in self.message_facts
@@ -565,7 +565,7 @@ class Opening( Template):
                 ]))
 
             self.answer_facts.append("asks_for_source_of_dislike")
-            self.next_node = "Problem" # "Judgement"
+            self.node_next = "Problem" # "Judgement"
 
 
         # Updating user dictionary
@@ -624,7 +624,7 @@ class Terminator( Template):
                 ]))
 
             self.answer_facts.append("welcomes")
-            self.next_node = "Welcome" 
+            self.node_next = "Welcome" 
 
         elif(
             "has_thanks" not in self.message_facts
@@ -636,7 +636,7 @@ class Terminator( Template):
                 ]))
 
             self.answer_facts.append("asks_for_new_topics")
-            self.next_node = "Welcome" 
+            self.node_next = "Welcome" 
 
 
         else:
@@ -712,12 +712,12 @@ class Welcome( Template):
         if(
             "has_danger_to_self" in self.message_facts
             ):
-            self.next_node ="Terminator" # Danger_to_self
+            self.node_next ="Terminator" # Danger_to_self
 
         elif(
             "has_question_how_are_you" in self.answer_facts
             ):
-            self.next_node ="HowAreYou"
+            self.node_next ="HowAreYou"
 
         else:
 
@@ -739,7 +739,7 @@ class Welcome( Template):
                 self.answer_facts.append("use_user_firstname")  
 
             self.answer_facts.append("has_question_how_are_you")
-            self.next_node = "HowAreYou"
+            self.node_next = "HowAreYou"
 
 
 
@@ -805,7 +805,7 @@ class HowAreYou( Opening):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "HowAreYou"
+            self.node_next = "HowAreYou"
 
         elif(
             "is_negative" in self.message_facts
@@ -823,7 +823,7 @@ class HowAreYou( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_impact")
-            self.next_node = "Problem"
+            self.node_next = "Problem"
 
         elif(
             "is_positive" in self.message_facts
@@ -840,7 +840,7 @@ class HowAreYou( Opening):
                 ]))            
 
             self.answer_facts.append("asks_to_confirm_highlight")
-            self.next_node = "Highlight"
+            self.node_next = "Highlight"
 
         elif(
             "is_negative" in self.message_facts
@@ -856,7 +856,7 @@ class HowAreYou( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_reason")
-            self.next_node = "Bad"
+            self.node_next = "Bad"
 
         elif(
             "is_positive" in self.message_facts
@@ -875,7 +875,7 @@ class HowAreYou( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_highlight")
-            self.next_node = "Good"
+            self.node_next = "Good"
 
         else:
 
@@ -886,7 +886,7 @@ class HowAreYou( Opening):
                 "What else?"
                 ]))
             self.answer_facts.append("uses_fallback_question") 
-            self.next_node = "HowAreYou"           
+            self.node_next = "HowAreYou"           
 
         self.update_user()
 
@@ -964,7 +964,7 @@ class Problem( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Problem" 
+            self.node_next = "Problem" 
 
         elif(
             "has_problem_statement" in self.message_facts
@@ -975,7 +975,7 @@ class Problem( Template):
                 ]))
 
             self.answer_facts.append("has_question_about_relevance")
-            self.next_node = "Relevance" 
+            self.node_next = "Relevance" 
 
         elif(
             self.user["node_previous"] == "Problem"
@@ -990,7 +990,7 @@ class Problem( Template):
                 "What are your plans for tomorrow?"
                 ]))     
             self.answer_facts.append("uses_fallback_exit")                
-            self.next_node = "Terminator" 
+            self.node_next = "Terminator" 
 
         else:
             self.answer.append(random.choice([
@@ -1002,7 +1002,7 @@ class Problem( Template):
                 "Could you rephrase your problem in such a way?"
                 ]))
             self.answer_facts.append("has_explanation_for_question")  
-            self.next_node = "Problem"           
+            self.node_next = "Problem"           
 
         self.update_user()
 
@@ -1059,7 +1059,7 @@ class Relevance(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Relevance" 
+            self.node_next = "Relevance" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -1071,7 +1071,7 @@ class Relevance(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_feasability")
-            self.next_node = "Feasability" 
+            self.node_next = "Feasability" 
 
         elif(
             "has_negation" in self.message_facts
@@ -1083,7 +1083,7 @@ class Relevance(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_fix")
-            self.next_node = "Fix"
+            self.node_next = "Fix"
         else:
             self.answer.append(random.choice([
                 "Let's keep focused. I really feel that we're getting somewhere."
@@ -1092,7 +1092,7 @@ class Relevance(Template):
                 "So... is this a problem that really matters in your life?"
                 ]))
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Relevance"           
+            self.node_next = "Relevance"           
 
         self.update_user()
 
@@ -1149,7 +1149,7 @@ class Fix( Template):
                 ]))         
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Fix" 
+            self.node_next = "Fix" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -1168,7 +1168,7 @@ class Fix( Template):
                 ]))
 
             self.answer_facts.append("has_question_about_timeframe")
-            self.next_node = "Timeframe"
+            self.node_next = "Timeframe"
 
         elif(
             "has_negation" in self.message_facts
@@ -1179,7 +1179,7 @@ class Fix( Template):
                 ]))
 
             self.answer_facts.append("has_change_of_topic")
-            self.next_node = "Terminator"
+            self.node_next = "Terminator"
 
         else:
             self.answer.append(random.choice([
@@ -1188,7 +1188,7 @@ class Fix( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Fix"    
+            self.node_next = "Fix"    
 
         self.update_user()
 
@@ -1249,7 +1249,7 @@ class Timeframe( Template):
                 ]))         
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Timeframe" 
+            self.node_next = "Timeframe" 
 
         elif(
             "prefers_timeframe_short" in self.message_facts
@@ -1262,7 +1262,7 @@ class Timeframe( Template):
                 ]))
 
             self.answer_facts.append("asks_for_short_term_options")
-            self.next_node = "OptionsOne" # Timeframe 
+            self.node_next = "OptionsOne" # Timeframe 
 
         elif(
             "prefers_timeframe_long" in self.message_facts
@@ -1276,7 +1276,7 @@ class Timeframe( Template):
 
 
             self.answer_facts.append("asks_for_mid_term_options")
-            self.next_node = "OptionsOne"
+            self.node_next = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1284,7 +1284,7 @@ class Timeframe( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Timeframe"    
+            self.node_next = "Timeframe"    
 
     
         self.update_user()
@@ -1338,7 +1338,7 @@ class Feasability(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Feasability" 
+            self.node_next = "Feasability" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -1354,7 +1354,7 @@ class Feasability(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_options")
-            self.next_node = "OptionsOne"
+            self.node_next = "OptionsOne"
 
         elif(
             "has_negation" in self.message_facts
@@ -1366,7 +1366,7 @@ class Feasability(Template):
                 ]))
 
             self.answer_facts.append("has_question_about_fix")
-            self.next_node = "Fix"
+            self.node_next = "Fix"
 
         else:
             self.answer.append(random.choice([
@@ -1375,7 +1375,7 @@ class Feasability(Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Feasability"    
+            self.node_next = "Feasability"    
 
 
         self.update_user()
@@ -1449,7 +1449,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_feasability_context")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1462,7 +1462,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_timeframe_context")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1477,7 +1477,7 @@ class OptionsOne(Template):
                 " Or if you could take a week off? Or if there was someone willing ot help?"
                 ]))
             self.answer_facts.append("has_explanation_for_question_in_choice_context")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1490,7 +1490,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_options_context")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             "has_request_to_explain" in self.message_facts
@@ -1509,7 +1509,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question_in_committment_context")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             self.message_facts.count("has_option") == 1
@@ -1524,7 +1524,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("confirms_single_option")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             self.message_facts.count("has_option") > 1
@@ -1545,7 +1545,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("confirms_multiple_options")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             "has_option" in self.message_facts
@@ -1564,7 +1564,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("confirms_option_on_iteration")
-            self.next_node = "OptionsOne" 
+            self.node_next = "OptionsOne" 
 
         elif(
             ("has_negation" in self.message_facts
@@ -1585,7 +1585,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("explains_exploration_of_options")
-            self.next_node = "OptionsTwo" 
+            self.node_next = "OptionsTwo" 
 
         else:
             self.answer.append(random.choice([
@@ -1595,7 +1595,7 @@ class OptionsOne(Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "OptionsOne"    
+            self.node_next = "OptionsOne"    
 
 
         self.update_user()
@@ -1647,7 +1647,7 @@ class OptionsTwo( Template):
                 ]))
 
             self.answer_facts.append("confirms_option")
-            self.next_node = "OptionsTwo" 
+            self.node_next = "OptionsTwo" 
 
         elif(
             "has_negation" in self.message_facts
@@ -1663,7 +1663,7 @@ class OptionsTwo( Template):
                 ]))
 
             self.answer_facts.append("asks_for_best_option")
-            self.next_node = "Choice" 
+            self.node_next = "Choice" 
 
         else:
             self.answer.append(random.choice([
@@ -1673,7 +1673,7 @@ class OptionsTwo( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "OptionsTwo"    
+            self.node_next = "OptionsTwo"    
 
 
         self.update_user()
@@ -1737,7 +1737,7 @@ class Choice( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Choice" 
+            self.node_next = "Choice" 
 
         elif(
             counter_selected_items == 1
@@ -1754,7 +1754,7 @@ class Choice( Template):
                 ]))
 
             self.answer_facts.append("asks_about_obstacles")
-            self.next_node = "Obstacles"
+            self.node_next = "Obstacles"
 
         elif(
             counter_selected_items > 1
@@ -1772,7 +1772,7 @@ class Choice( Template):
                 ]))            
 
             self.answer_facts.append("asks_about_single_option")
-            self.next_node = "Choice"
+            self.node_next = "Choice"
 
         elif(
             "has_negation" in self.message_facts
@@ -1787,7 +1787,7 @@ class Choice( Template):
                 ]))
 
             self.answer_facts.append("asks_about_more_options")
-            self.next_node = "OptionsOne"
+            self.node_next = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1795,7 +1795,7 @@ class Choice( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Choice"    
+            self.node_next = "Choice"    
 
         self.update_user()
 
@@ -1852,7 +1852,7 @@ class Obstacles( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Obstacles" 
+            self.node_next = "Obstacles" 
 
         elif(
             "has_problem_statement" in self.message_facts
@@ -1872,7 +1872,7 @@ class Obstacles( Template):
                 ]))            
 
             self.answer_facts.append("has_suggestion_to_shift_priorities")
-            self.next_node = "Priorities"
+            self.node_next = "Priorities"
 
         elif(
             "has_negation" in self.message_facts
@@ -1888,7 +1888,7 @@ class Obstacles( Template):
                 ]))
 
             self.answer_facts.append("ask_for_committment")
-            self.next_node = "Committment"
+            self.node_next = "Committment"
 
         else:
             self.answer.append(random.choice([
@@ -1896,7 +1896,7 @@ class Obstacles( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Obstacles"    
+            self.node_next = "Obstacles"    
 
         self.update_user()
 
@@ -1953,7 +1953,7 @@ class Priorities( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Priorities" 
+            self.node_next = "Priorities" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -1969,7 +1969,7 @@ class Priorities( Template):
                 ]))
 
             self.answer_facts.append("asks_for_committment")
-            self.next_node = "Committment"
+            self.node_next = "Committment"
 
         elif(
             "has_negation" in self.message_facts
@@ -1984,7 +1984,7 @@ class Priorities( Template):
                 ]))
 
             self.answer_facts.append("asks_about_more_options")
-            self.next_node = "OptionsOne"
+            self.node_next = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -1996,7 +1996,7 @@ class Priorities( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Priorities"    
+            self.node_next = "Priorities"    
 
 
         self.update_user()
@@ -2054,7 +2054,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Committment" 
+            self.node_next = "Committment" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -2065,7 +2065,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("asks_for_next_step")
-            self.next_node = "Action"
+            self.node_next = "Action"
 
         elif(
             "has_negation" in self.message_facts
@@ -2086,7 +2086,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("encourages_by_envisioning")
-            self.next_node = "Committment"
+            self.node_next = "Committment"
 
         elif(
             "has_negation" in self.message_facts
@@ -2102,7 +2102,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("asks_for_options")
-            self.next_node = "OptionsOne"
+            self.node_next = "OptionsOne"
 
         else:
             self.answer.append(random.choice([
@@ -2114,7 +2114,7 @@ class Committment( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Committment"    
+            self.node_next = "Committment"    
 
 
         self.update_user()
@@ -2168,7 +2168,7 @@ class Action( Template):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Action" 
+            self.node_next = "Action" 
 
         elif(
             "has_specific_time" in self.message_facts
@@ -2183,7 +2183,7 @@ class Action( Template):
                 ]))
 
             self.answer_facts.append("gives_advice_for_goal_orientation")
-            self.next_node = "Terminator"
+            self.node_next = "Terminator"
 
         else:
             self.answer.append(random.choice([
@@ -2195,7 +2195,7 @@ class Action( Template):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Action"    
+            self.node_next = "Action"    
 
 
         self.update_user()
@@ -2261,7 +2261,7 @@ class Good( Opening):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Good" 
+            self.node_next = "Good" 
 
         elif(
             "has_negation" in self.message_facts
@@ -2275,7 +2275,7 @@ class Good( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_lowlight")
-            self.next_node = "Bad"
+            self.node_next = "Bad"
 
         elif(
             "has_story" in self.message_facts
@@ -2291,7 +2291,7 @@ class Good( Opening):
                 ]))            
 
             self.answer_facts.append("asks_to_confirm_highlight")
-            self.next_node = "Highlight"
+            self.node_next = "Highlight"
 
         else:
             self.answer.append(random.choice([
@@ -2301,7 +2301,7 @@ class Good( Opening):
 
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Good"    
+            self.node_next = "Good"    
 
 
         self.update_user()
@@ -2370,7 +2370,7 @@ class Highlight( Opening):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Highlight" 
+            self.node_next = "Highlight" 
 
         elif(
             "has_affirmation" in self.message_facts
@@ -2385,7 +2385,7 @@ class Highlight( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_lowlight")
-            self.next_node = "Bad"
+            self.node_next = "Bad"
 
         elif(
             "has_negation" in self.message_facts
@@ -2397,7 +2397,7 @@ class Highlight( Opening):
                 ]))            
 
             self.answer_facts.append("asks_about_other_highlight")
-            self.next_node = "Good"
+            self.node_next = "Good"
 
         elif(
             "has_story" in self.message_facts
@@ -2408,7 +2408,7 @@ class Highlight( Opening):
                 ]))            
 
             self.answer_facts.append("asks_to_confirm_other_highlight")
-            self.next_node = "Highlight"
+            self.node_next = "Highlight"
 
         else:
             self.answer.append(random.choice([
@@ -2416,7 +2416,7 @@ class Highlight( Opening):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Highlight"    
+            self.node_next = "Highlight"    
 
 
         self.update_user()
@@ -2477,7 +2477,7 @@ class Bad( Opening):
                 ]))
 
             self.answer_facts.append("has_explanation_for_question")
-            self.next_node = "Bad" 
+            self.node_next = "Bad" 
 
         elif(
             "has_story" in self.message_facts
@@ -2496,7 +2496,7 @@ class Bad( Opening):
                 ]))
 
             self.answer_facts.append("asks_for_background_problem")
-            self.next_node = "Problem"
+            self.node_next = "Problem"
 
         elif(
             "has_negation" in self.message_facts
@@ -2510,7 +2510,7 @@ class Bad( Opening):
                 ]))
 
             self.answer_facts.append("asks_for_significant_event")
-            self.next_node = "HowAreYou"
+            self.node_next = "HowAreYou"
 
         else:
             self.answer.append(random.choice([
@@ -2518,7 +2518,7 @@ class Bad( Opening):
                 ]))
 
             self.answer_facts.append("uses_fallback_repetition")  
-            self.next_node = "Bad"    
+            self.node_next = "Bad"    
 
 
         self.update_user()

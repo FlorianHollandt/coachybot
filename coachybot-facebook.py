@@ -111,15 +111,18 @@ def webhook():
                             "message_first"    : facebook_timestamp,
                             "message_previous" : facebook_timestamp,
                             "message_current"  : facebook_timestamp,
-                            "node_current"     : "Welcome"
+                            "node_current"     : "Welcome",
+                            "node_previous"    : "None"
                             })
 
                     print "User dump before evaluating node: " + str(user)
 
+                    node_previous = user["node_previous"]
+
                     node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
 
                     answer    = node_main.answer
-                    next_node = node_main.next_node
+                    node_next = node_main.node_next
                     user      = node_main.user
 
                     print "User dump after evaluating node: " + str(user)
@@ -142,7 +145,18 @@ def webhook():
                             pass
                         elif user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                            db.execute(r"UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+
+                    db.execute( "INSERT INTO logs (" + 
+                        "messange_timestamp, user_id, message, node_previous, node_current, node_next" +
+                        ") VALUES (%s);",
+                     (messaging_event["timestamp"],
+                        user_id,
+                        messaging_event["message"]["text"],
+                        node_previous,
+                        user.node_previous,
+                        user.node_next
+                        ))
 
                     if(
                         user["node_previous"]  == "Terminator"

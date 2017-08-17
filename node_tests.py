@@ -61,11 +61,11 @@ class Test_Template(unittest.TestCase):
         with self.assertRaises( TypeError):
             test_node = Template( ".", {"timezone", "Berlin/Europe"}, verbose=False)
 
-    def test_returns_answer_and_next_node_and_user( self):
+    def test_returns_answer_and_node_next_and_user( self):
         test_node = Template( ".", dict(), verbose=False)
         self.failUnless( 
             isinstance(test_node.answer, list) 
-            and isinstance(test_node.next_node, str)
+            and isinstance(test_node.node_next, str)
             and isinstance(test_node.user, dict) 
             )
 
@@ -73,7 +73,7 @@ class Test_Template(unittest.TestCase):
         test_node = Template( ".", verbose=False)
         self.failUnless( 
             isinstance(test_node.answer, list) 
-            and isinstance(test_node.next_node, str)
+            and isinstance(test_node.node_next, str)
             and isinstance(test_node.user, dict) 
             )
 
@@ -95,7 +95,7 @@ class Test_Template(unittest.TestCase):
 
     def test_returns_how_are_you_node( self):
         test_node = Template( ".", verbose=False)
-        self.assertEqual( test_node.next_node, "HowAreYou")
+        self.assertEqual( test_node.node_next, "HowAreYou")
 
     # This is a valid test, but it clutters the test output...
     #
@@ -231,7 +231,7 @@ class Test_Template(unittest.TestCase):
         test_node = Template( message, test_user, verbose=False)
         self.failUnless( 
             "has_greeting" not in test_node.answer_facts
-            and not test_node.next_node == "HowAreYou")         
+            and not test_node.node_next == "HowAreYou")         
 
     def test_perform_no_greeting_after_short_interruption_without_user_greeting( self):
         test_user = {
@@ -242,7 +242,7 @@ class Test_Template(unittest.TestCase):
         test_node = Template( ".", test_user, verbose=False)
         self.failUnless( 
             "has_greeting" not in test_node.answer_facts
-            and not test_node.next_node == "HowAreYou")  
+            and not test_node.node_next == "HowAreYou")  
 
     def test_perform_greeting_after_short_interruption_with_user_greeting( self):
         message = "Hello, little robot! :)"
@@ -254,7 +254,7 @@ class Test_Template(unittest.TestCase):
         test_node = Template( message, test_user, verbose=False)
         self.failUnless( 
             "has_greeting" in test_node.answer_facts
-            and not test_node.next_node == "HowAreYou")     
+            and not test_node.node_next == "HowAreYou")     
 
     def test_respond_to_first_time_how_are_you( self):
         message = "Hey there, how are you doing? :)"
@@ -292,7 +292,7 @@ class Test_Template(unittest.TestCase):
             "has_greeting" in test_node.message_facts
             and "has_greeting" in test_node.answer_facts
             and "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")  
+            and test_node.node_next == "HowAreYou")  
 
     def test_ask_how_are_you_after_long_interruption_with_timezone( self):
         message = "Hello there, little robot!"
@@ -308,7 +308,7 @@ class Test_Template(unittest.TestCase):
             and "has_greeting" in test_node.answer_facts
             and "has_interruption_long" in test_node.message_facts
             and "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")          
+            and test_node.node_next == "HowAreYou")          
 
     def test_ask_how_are_you_after_medium_interruption_with_greeting( self):
         message = "Why, hello! So good to see YOU again!"
@@ -324,7 +324,7 @@ class Test_Template(unittest.TestCase):
             and "has_greeting" in test_node.answer_facts
             and "has_interruption_medium" in test_node.message_facts
             and "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")  
+            and test_node.node_next == "HowAreYou")  
 
     def test_not_ask_how_are_you_after_medium_interruption_without_greeting( self):
         message = "Sorry, I just got distracted from our conversation..."
@@ -344,11 +344,11 @@ class Test_Template(unittest.TestCase):
         self.failUnless( 
             test_node.user["node_previous"] == "None")   
 
-    def test_next_node_how_are_you_if_no_current_node( self):
+    def test_node_next_how_are_you_if_no_current_node( self):
         test_node = Template( ".", dict(), verbose=False)
         self.failUnless( 
             test_node.user["node_current"] == "HowAreYou"
-            and test_node.next_node == "HowAreYou")   
+            and test_node.node_next == "HowAreYou")   
 
     def test_recognize_danger_to_self( self):
         message = "I am going to kill myself anyway..."
@@ -367,7 +367,7 @@ class Test_Template(unittest.TestCase):
         self.failUnless(
             "has_hesitation" in test_node.message_facts
             and "is_waiting_for_answer" in test_node.answer_facts
-            and test_node.next_node == "Template")            
+            and test_node.node_next == "Template")            
 
 
 
@@ -407,7 +407,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -420,7 +420,7 @@ class Test_Opening_template( unittest.TestCase):
         test_node = Opening( message, test_user, verbose=False)
         self.failUnless( 
             "has_story" in test_node.message_facts
-            and test_node.next_node == "Terminator")
+            and test_node.node_next == "Terminator")
 
     def test_respond_to_negative_story( self):
         message = "i failed my driving test! :'("
@@ -428,7 +428,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_story_negative" in test_node.message_facts
             and "asks_for_background_problem" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_dislike( self):
         message = "i hate driving in the city!"
@@ -436,7 +436,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_dislike" in test_node.message_facts
             and "asks_for_source_of_dislike" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_negative_feeling( self):
         message = "i am so unbelievably disappointed of myself!"
@@ -444,7 +444,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_feeling_negative" in test_node.message_facts
             and "asks_for_source_of_negative_feeling" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_problem_statement( self):
         message = "i spend too much time on netflix instead of learning."
@@ -452,7 +452,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_problem_statement" in test_node.message_facts
             and "asks_for_relevance" in test_node.answer_facts
-            and test_node.next_node == "Relevance")
+            and test_node.node_next == "Relevance")
 
     def test_respond_to_desire( self):
         message = "i wish i had learned to drive a car when i was younger"
@@ -460,7 +460,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_desire" in test_node.message_facts
             and "asks_for_source_of_desire" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_fear( self):
         message = "i am so afraid of failing this test!"
@@ -468,7 +468,7 @@ class Test_Opening_template( unittest.TestCase):
         self.failUnless( 
             "has_fear" in test_node.message_facts
             and "asks_for_source_of_fear" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
  #######                                                          
     #    ###### #####  #    # # #    #   ##   #####  ####  #####  
@@ -495,7 +495,7 @@ class Test_Terminator(unittest.TestCase):
         self.failUnless(
             "has_thanks" in test_node.message_facts
             and "welcomes"  in test_node.answer_facts
-            and test_node.next_node == "Welcome")
+            and test_node.node_next == "Welcome")
 
     def test_terminate_action_path( self):
         message = "Alright, let's see how that goes."
@@ -505,7 +505,7 @@ class Test_Terminator(unittest.TestCase):
         test_node = Terminator( message, test_user, verbose=False)
         self.failUnless(
             "asks_for_new_topics"  in test_node.answer_facts
-            and test_node.next_node == "Welcome")
+            and test_node.node_next == "Welcome")
 
  #     #                                           
  #  #  # ###### #       ####   ####  #    # ###### 
@@ -546,10 +546,10 @@ class Test_Welcome( unittest.TestCase):
         self.failUnless(
             "has_answer_how_are_you" in test_node.answer_facts)   
 
-    def test_next_node_is_how_are_you_by_default( self):
+    def test_node_next_is_how_are_you_by_default( self):
         test_node = Welcome( ".", dict(), verbose=False)
         self.failUnless(
-            "HowAreYou" in test_node.next_node
+            "HowAreYou" in test_node.node_next
             and test_node.user["node_current"] == "HowAreYou"
             and test_node.user["node_previous"] == "Welcome")   
 
@@ -564,7 +564,7 @@ class Test_Welcome( unittest.TestCase):
         }
         test_node = Welcome( message, test_user, verbose=False)        
         self.failUnless(
-            "HowAreYou" in test_node.next_node
+            "HowAreYou" in test_node.node_next
             and "has_introduction" in test_node.answer_facts
             and "has_greeting" not in test_node.answer_facts
             and "has_question_how_are_you" in test_node.answer_facts
@@ -583,7 +583,7 @@ class Test_Welcome( unittest.TestCase):
         }
         test_node = Welcome( message, test_user, verbose=False)        
         self.failUnless(
-            "HowAreYou" in test_node.next_node
+            "HowAreYou" in test_node.node_next
             and "has_introduction" in test_node.answer_facts
             and "has_greeting" not in test_node.answer_facts
             and "has_question_how_are_you" in test_node.answer_facts
@@ -617,7 +617,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_realistic_data_recognize_danger_to_self( self): # General Template response
         test_user = {
@@ -638,7 +638,7 @@ class Test_HowAreYou(unittest.TestCase):
         test_node = HowAreYou( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_question" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_repeat_at_first_fallback( self): # Standard behavior with node-specific text
         message = "Lorem ipsum dolor sit amet..."
@@ -651,7 +651,7 @@ class Test_HowAreYou(unittest.TestCase):
         test_node = HowAreYou( message, test_user, verbose=False)
         self.failUnless(
             "uses_fallback_question" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Inherited bahavior from Opening ----------------------
 
@@ -661,7 +661,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_desire" in test_node.message_facts
             and "asks_for_source_of_desire" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_fear( self):
         message = "I'm afraid to loose a good friend because of this boy thing."
@@ -669,7 +669,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_fear" in test_node.message_facts
             and "asks_for_source_of_fear" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_dislike( self):
         message = "I hate to be the one who has to apologize!"
@@ -677,7 +677,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_dislike" in test_node.message_facts
             and "asks_for_source_of_dislike" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_negative_feeling( self):
         message = "I am so incredibly sad and disappointed about this situation!"
@@ -685,7 +685,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_feeling_negative" in test_node.message_facts
             and "asks_for_source_of_negative_feeling" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_negative_story( self):
         message = "I forgot my wallet at work and had to go all the way back!"
@@ -693,7 +693,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_story_negative" in test_node.message_facts
             and "asks_for_background_problem" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_problem_statement( self):
         message = "This is just too much for me to handle."
@@ -701,7 +701,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "has_problem_statement" in test_node.message_facts
             and "asks_for_relevance" in test_node.answer_facts
-            and test_node.next_node == "Relevance")
+            and test_node.node_next == "Relevance")
 
 
     # -------- Node-specific behavior -------------------------------
@@ -717,7 +717,7 @@ class Test_HowAreYou(unittest.TestCase):
     #     test_node = HowAreYou( message, test_user, verbose=False)
     #     self.failUnless(
     #         "uses_fallback_exit" in test_node.answer_facts
-    #         and test_node.next_node == "Terminator")
+    #         and test_node.node_next == "Terminator")
 
     def test_respond_to_plain_positive_answer( self):
         message = "Quite good."
@@ -726,7 +726,7 @@ class Test_HowAreYou(unittest.TestCase):
             "is_positive" in test_node.message_facts
             and "has_story" not  in test_node.message_facts
             and "asks_about_highlight" in test_node.answer_facts
-            and test_node.next_node == "Good")
+            and test_node.node_next == "Good")
 
     def test_respond_to_positive_answer_with_story( self): 
         message = "Excellent! Tom invited me for dinner! :)"
@@ -735,7 +735,7 @@ class Test_HowAreYou(unittest.TestCase):
             "is_positive" in test_node.message_facts
             and "has_story" in test_node.message_facts
             and "asks_to_confirm_highlight" in test_node.answer_facts
-            and test_node.next_node == "Highlight")
+            and test_node.node_next == "Highlight")
 
     def test_respond_to_plain_negative_answer( self): 
         message = "Not so good, acutally..."
@@ -743,7 +743,7 @@ class Test_HowAreYou(unittest.TestCase):
         self.failUnless(
             "is_negative" in test_node.message_facts
             and "asks_about_reason" in test_node.answer_facts
-            and test_node.next_node == "Bad")
+            and test_node.node_next == "Bad")
 
     def test_respond_to_negative_answer_with_story( self): 
         message = "Horrible! I had a fight with my best friend..."
@@ -752,7 +752,7 @@ class Test_HowAreYou(unittest.TestCase):
             "is_negative" in test_node.message_facts
             and "has_story" in test_node.message_facts
             and "asks_about_impact" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
  ######                                            
  #     # #####   ####  #####  #      ###### #    # 
@@ -785,7 +785,7 @@ class Test_Problem( unittest.TestCase):
         test_node = Problem( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -796,7 +796,7 @@ class Test_Problem( unittest.TestCase):
         test_node = Problem( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -806,7 +806,7 @@ class Test_Problem( unittest.TestCase):
         self.failUnless(
             "has_problem_statement" in test_node.message_facts
             and "has_question_about_relevance" in test_node.answer_facts
-            and test_node.next_node == "Relevance")
+            and test_node.node_next == "Relevance")
 
     # These are good ideas for the next extension
     #
@@ -819,7 +819,7 @@ class Test_Problem( unittest.TestCase):
     #     self.failUnless(
     #         "has_protest_to_question" in test_node.message_facts
     #         and "asks_for_significant_event" in test_node.answer_facts
-    #         and test_node.next_node == "HowAreYou")
+    #         and test_node.node_next == "HowAreYou")
 
     # def test_repeat_on_initial_protest( self):
     #     message = "Fuck this stupid questioning about options!"
@@ -830,7 +830,7 @@ class Test_Problem( unittest.TestCase):
     #     self.failUnless(
     #         "has_protest_to_question" in test_node.message_facts
     #         and "explains_definition_of_problem" in test_node.answer_facts
-    #         and test_node.next_node == "Problem")
+    #         and test_node.node_next == "Problem")
 
     # def test_exit_on_iterated_negation( self):
     #     message = "What? No."
@@ -841,7 +841,7 @@ class Test_Problem( unittest.TestCase):
     #     self.failUnless(
     #         "has_negation" in test_node.message_facts
     #         and "asks_for_significant_event" in test_node.answer_facts
-    #         and test_node.next_node == "HowAreYou")
+    #         and test_node.node_next == "HowAreYou")
 
 
  ######                                                          
@@ -866,7 +866,7 @@ class Test_Relevance(unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Relevance")        
+            and test_node.node_next == "Relevance")        
 
     def test_repeat_at_fallback( self):
         message = "Blah blah blah..."
@@ -877,7 +877,7 @@ class Test_Relevance(unittest.TestCase):
         test_node = Relevance( message, test_user, verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Relevance")   
+            and test_node.node_next == "Relevance")   
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -888,7 +888,7 @@ class Test_Relevance(unittest.TestCase):
         test_node = Relevance( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_affirmation( self):
         message = "Well... I would say so, sure."
@@ -896,7 +896,7 @@ class Test_Relevance(unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "has_question_about_feasability"  in test_node.answer_facts
-            and test_node.next_node == "Feasability")
+            and test_node.node_next == "Feasability")
 
     def test_respond_to_negation( self):
         message = "Nah, not really.."
@@ -904,7 +904,7 @@ class Test_Relevance(unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "has_question_about_fix"  in test_node.answer_facts
-            and test_node.next_node == "Fix")
+            and test_node.node_next == "Fix")
 
 
 
@@ -930,14 +930,14 @@ class Test_Fix( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Fix")        
+            and test_node.node_next == "Fix")        
 
     def test_repeat_at_fallback( self):
         message = "Lorem ipsum dolor sit amet..."
         test_node = Fix( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Fix")  
+            and test_node.node_next == "Fix")  
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -948,7 +948,7 @@ class Test_Fix( unittest.TestCase):
         test_node = Fix( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_negation( self):
         message = "I dont think so."
@@ -956,7 +956,7 @@ class Test_Fix( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "has_change_of_topic"  in test_node.answer_facts
-            and test_node.next_node == "Terminator")                    
+            and test_node.node_next == "Terminator")                    
 
     def test_respond_to_affirmation( self):
         message = "Well... Sounds quite okay to me."
@@ -964,7 +964,7 @@ class Test_Fix( unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "has_question_about_timeframe"  in test_node.answer_facts
-            and test_node.next_node == "Timeframe")                    
+            and test_node.node_next == "Timeframe")                    
 
 
 
@@ -990,7 +990,7 @@ class Test_Timeframe( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Timeframe")        
+            and test_node.node_next == "Timeframe")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1001,7 +1001,7 @@ class Test_Timeframe( unittest.TestCase):
         test_node = Timeframe( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_recognize_preference_for_short_term_solution( self):
         message = "I guess the quick solution would be best for me right now."
@@ -1009,7 +1009,7 @@ class Test_Timeframe( unittest.TestCase):
         self.failUnless(
             "prefers_timeframe_short" in test_node.message_facts
             and "asks_for_short_term_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")        
+            and test_node.node_next == "OptionsOne")        
 
     def test_recognize_preference_for_long_term_solution( self):
         message = "Both would be good, but I'd rather pursue the sustainable one."
@@ -1017,7 +1017,7 @@ class Test_Timeframe( unittest.TestCase):
         self.failUnless(
             "prefers_timeframe_long" in test_node.message_facts
             and "asks_for_mid_term_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
         
     def test_ignore_if_no_preference_for_timeframe( self):
         message = "the quick solution is good, and the sustainable one  as well."
@@ -1026,7 +1026,7 @@ class Test_Timeframe( unittest.TestCase):
             "prefers_timeframe_long" in test_node.message_facts
             and "prefers_timeframe_short" in test_node.message_facts
             and "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Timeframe")        
+            and test_node.node_next == "Timeframe")        
 
 
 
@@ -1052,7 +1052,7 @@ class Test_Feasability(unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Feasability")        
+            and test_node.node_next == "Feasability")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1063,7 +1063,7 @@ class Test_Feasability(unittest.TestCase):
         test_node = Feasability( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_affirmation( self):
         message = "Sure!"
@@ -1071,7 +1071,7 @@ class Test_Feasability(unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "has_question_about_options"  in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")                    
+            and test_node.node_next == "OptionsOne")                    
 
     def test_respond_to_negation( self):
         message = "Probably not."
@@ -1079,7 +1079,7 @@ class Test_Feasability(unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "has_question_about_fix"  in test_node.answer_facts
-            and test_node.next_node == "Fix")
+            and test_node.node_next == "Fix")
 
 
 
@@ -1110,14 +1110,14 @@ class Test_OptionsOne( unittest.TestCase):
         test_node = OptionsOne( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_use_fallback_repetition( self):
         message = "Gumba lumba wumbaba!"
         test_node = OptionsOne( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -1132,7 +1132,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question_in_feasability_context" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")        
+            and test_node.node_next == "OptionsOne")        
 
     def test_respond_to_request_to_explain_in_timeframe_context( self):
         message = "What?"
@@ -1145,7 +1145,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question_in_timeframe_context" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_request_to_explain_in_options_context( self):
         message = "What?"
@@ -1158,7 +1158,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question_in_options_context" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_request_to_explain_in_choice_context( self):
         message = "Sorry?"
@@ -1171,7 +1171,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question_in_choice_context" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_request_to_explain_in_committment_context( self):
         message = "Sorry?"
@@ -1184,7 +1184,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question_in_committment_context" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_single_option( self):
         message = "I could go to the gym once a week."
@@ -1192,7 +1192,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_option" in test_node.message_facts
             and "confirms_single_option" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_multiple_options( self):
         message = "I might ask to be on the Big Data project. Or even apply for a different job..."
@@ -1200,7 +1200,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_option" in test_node.message_facts
             and "confirms_multiple_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_respond_to_option_on_iteration( self):
         message = "Meeting more of my old friends would also be good for me."
@@ -1213,7 +1213,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_option" in test_node.message_facts
             and "confirms_option_on_iteration" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_explain_after_negation_on_iteration( self):
         message = "I really can't think of anything else."
@@ -1226,7 +1226,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "explains_exploration_of_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsTwo")
+            and test_node.node_next == "OptionsTwo")
 
     def test_repeat_after_initial_negation( self):
         message = "Nothing really..."
@@ -1239,7 +1239,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
     def test_explain_after_protest_on_iteration( self):
         message = "Fuck this stupid questioning about options!"
@@ -1252,7 +1252,7 @@ class Test_OptionsOne( unittest.TestCase):
         self.failUnless(
             "has_protest_to_question" in test_node.message_facts
             and "explains_exploration_of_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsTwo")
+            and test_node.node_next == "OptionsTwo")
 
 
 class Test_OptionsTwo( unittest.TestCase):
@@ -1273,14 +1273,14 @@ class Test_OptionsTwo( unittest.TestCase):
         test_node = OptionsTwo( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_use_fallback_repetition( self):
         message = "Gumba lumba wumbaba!"
         test_node = OptionsTwo( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "OptionsTwo")
+            and test_node.node_next == "OptionsTwo")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -1290,7 +1290,7 @@ class Test_OptionsTwo( unittest.TestCase):
         self.failUnless(
             "has_option" in test_node.message_facts
             and "confirms_option" in test_node.answer_facts
-            and test_node.next_node == "OptionsTwo")
+            and test_node.node_next == "OptionsTwo")
 
     def test_exit_on_negation( self):
         message = "Sorry, but really no more option comes to my mind."
@@ -1298,7 +1298,7 @@ class Test_OptionsTwo( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_for_best_option" in test_node.answer_facts
-            and test_node.next_node == "Choice")
+            and test_node.node_next == "Choice")
 
   #####                                
  #     # #    #  ####  #  ####  ###### 
@@ -1322,7 +1322,7 @@ class Test_Choice( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Choice")        
+            and test_node.node_next == "Choice")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1333,7 +1333,7 @@ class Test_Choice( unittest.TestCase):
         test_node = Choice( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_accept_choice_of_single_option( self):
         message = "The last one sounded quite exciting!"
@@ -1341,7 +1341,7 @@ class Test_Choice( unittest.TestCase):
         self.failUnless(
             "has_choice_of_enumerated_item" in test_node.message_facts
             and "asks_about_obstacles" in test_node.answer_facts
-            and test_node.next_node == "Obstacles")        
+            and test_node.node_next == "Obstacles")        
 
     def test_reject_choice_of_multiple_options( self):
         message = "The second one sounded good. But I also like the last one."
@@ -1349,7 +1349,7 @@ class Test_Choice( unittest.TestCase):
         self.failUnless(
             "has_choice_of_enumerated_item" in test_node.message_facts
             and "asks_about_single_option" in test_node.answer_facts
-            and test_node.next_node == "Choice")
+            and test_node.node_next == "Choice")
                                        
     def test_redirect_to_options_if_none_selected( self):
         message = "I don't know, neither of them sound realistic."
@@ -1357,7 +1357,7 @@ class Test_Choice( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_about_more_options" in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")                                       
+            and test_node.node_next == "OptionsOne")                                       
 
 
 
@@ -1383,7 +1383,7 @@ class Test_Obstacles( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Obstacles")        
+            and test_node.node_next == "Obstacles")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1394,7 +1394,7 @@ class Test_Obstacles( unittest.TestCase):
         test_node = Obstacles( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_problem_statement( self):
         message = "I don't have time to deal with this!"
@@ -1402,7 +1402,7 @@ class Test_Obstacles( unittest.TestCase):
         self.failUnless(
             "has_problem_statement" in test_node.message_facts
             and "has_suggestion_to_shift_priorities" in test_node.answer_facts
-            and test_node.next_node == "Priorities")
+            and test_node.node_next == "Priorities")
 
     def test_respond_to_negation( self):
         message = "No, I could actually start doing this right now."
@@ -1410,7 +1410,7 @@ class Test_Obstacles( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "ask_for_committment" in test_node.answer_facts
-            and test_node.next_node == "Committment")   
+            and test_node.node_next == "Committment")   
 
 
 
@@ -1436,7 +1436,7 @@ class Test_Priorities( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Priorities")        
+            and test_node.node_next == "Priorities")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1447,7 +1447,7 @@ class Test_Priorities( unittest.TestCase):
         test_node = Priorities( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_affirmation( self):
         message = "Well... Probably yes."
@@ -1455,7 +1455,7 @@ class Test_Priorities( unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "asks_for_committment"  in test_node.answer_facts
-            and test_node.next_node == "Committment")                    
+            and test_node.node_next == "Committment")                    
 
     def test_respond_to_negation( self):
         message = "Quite certainly not!"
@@ -1463,7 +1463,7 @@ class Test_Priorities( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_about_more_options"  in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
                              
 
@@ -1489,7 +1489,7 @@ class Test_Committment( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Committment")        
+            and test_node.node_next == "Committment")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1500,7 +1500,7 @@ class Test_Committment( unittest.TestCase):
         test_node = Committment( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_affirmation( self):
         message = "Absolutely!"
@@ -1508,7 +1508,7 @@ class Test_Committment( unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "asks_for_next_step"  in test_node.answer_facts
-            and test_node.next_node == "Action")                    
+            and test_node.node_next == "Action")                    
 
     def test_respond_to_negation_first_time( self):
         message = "Well... Somehow not really."
@@ -1516,7 +1516,7 @@ class Test_Committment( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "encourages_by_envisioning"  in test_node.answer_facts
-            and test_node.next_node == "Committment")
+            and test_node.node_next == "Committment")
 
     def test_respond_to_negation_second_time( self):
         message = "No, still not."
@@ -1529,7 +1529,7 @@ class Test_Committment( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_for_options"  in test_node.answer_facts
-            and test_node.next_node == "OptionsOne")
+            and test_node.node_next == "OptionsOne")
 
 
 
@@ -1555,7 +1555,7 @@ class Test_Action( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Action")        
+            and test_node.node_next == "Action")        
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1566,7 +1566,7 @@ class Test_Action( unittest.TestCase):
         test_node = Action( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     def test_respond_to_specific_time( self):
         message = "Right tomorrow morning."
@@ -1574,7 +1574,7 @@ class Test_Action( unittest.TestCase):
         self.failUnless(
             "has_specific_time" in test_node.message_facts
             and "gives_advice_for_goal_orientation"  in test_node.answer_facts
-            and test_node.next_node == "Terminator")                    
+            and test_node.node_next == "Terminator")                    
 
 
 
@@ -1602,14 +1602,14 @@ class Test_Good( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Good")        
+            and test_node.node_next == "Good")        
 
     def test_repeat_at_fallback( self):
         message = "Gobbledigook!"
         test_node = Good( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Good")
+            and test_node.node_next == "Good")
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1620,7 +1620,7 @@ class Test_Good( unittest.TestCase):
         test_node = Good( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Inherited bahavior from Opening ----------------------
 
@@ -1630,7 +1630,7 @@ class Test_Good( unittest.TestCase):
         self.failUnless(
             "has_story_negative" in test_node.message_facts
             and "asks_for_background_problem" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_problem_statement( self):
         message = "I have too much stress to enjoy any highlights"
@@ -1638,7 +1638,7 @@ class Test_Good( unittest.TestCase):
         self.failUnless(
             "has_problem_statement" in test_node.message_facts
             and "asks_for_relevance"  in test_node.answer_facts
-            and test_node.next_node == "Relevance")      
+            and test_node.node_next == "Relevance")      
 
     # -------- Node-specific behavior -------------------------------
 
@@ -1648,7 +1648,7 @@ class Test_Good( unittest.TestCase):
         self.failUnless(
             "has_story" in test_node.message_facts
             and "asks_to_confirm_highlight"  in test_node.answer_facts
-            and test_node.next_node == "Highlight")                    
+            and test_node.node_next == "Highlight")                    
 
     def test_respond_to_negation( self):
         message = "I didn't have any particular highlight..."
@@ -1656,7 +1656,7 @@ class Test_Good( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_about_lowlight"  in test_node.answer_facts
-            and test_node.next_node == "Bad")                   
+            and test_node.node_next == "Bad")                   
 
 
  #     #                                              
@@ -1683,14 +1683,14 @@ class Test_Highlight( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Highlight")        
+            and test_node.node_next == "Highlight")        
 
     def test_repeat_at_fallback( self):
         message = "Yadda yadda..."
         test_node = Highlight( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Highlight")
+            and test_node.node_next == "Highlight")
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1701,7 +1701,7 @@ class Test_Highlight( unittest.TestCase):
         test_node = Highlight( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -1711,7 +1711,7 @@ class Test_Highlight( unittest.TestCase):
         self.failUnless(
             "has_affirmation" in test_node.message_facts
             and "asks_about_lowlight"  in test_node.answer_facts
-            and test_node.next_node == "Bad")                    
+            and test_node.node_next == "Bad")                    
 
     def test_respond_to_plain_negation( self):
         #message = "Well... No, not my absolute highlight." <- TODO
@@ -1720,7 +1720,7 @@ class Test_Highlight( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_about_other_highlight"  in test_node.answer_facts
-            and test_node.next_node == "Good")
+            and test_node.node_next == "Good")
 
     def test_respond_to_negation_with_story( self):
         message = "No. My highlight was that I found 5 Euros on the street!"
@@ -1729,7 +1729,7 @@ class Test_Highlight( unittest.TestCase):
             "has_negation" in test_node.message_facts
             and "has_story" in test_node.message_facts
             and "asks_to_confirm_other_highlight"  in test_node.answer_facts
-            and test_node.next_node == "Highlight")
+            and test_node.node_next == "Highlight")
 
     def test_respond_to_plain_story( self):
         message = "Well... My actual highlight was meeting my friend for coffee."
@@ -1737,7 +1737,7 @@ class Test_Highlight( unittest.TestCase):
         self.failUnless(
             "has_story" in test_node.message_facts
             and "asks_to_confirm_other_highlight"  in test_node.answer_facts
-            and test_node.next_node == "Highlight")
+            and test_node.node_next == "Highlight")
 
 
 
@@ -1765,14 +1765,14 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_request_to_explain" in test_node.message_facts
             and "has_explanation_for_question" in test_node.answer_facts
-            and test_node.next_node == "Bad")        
+            and test_node.node_next == "Bad")        
 
     def test_repeat_at_fallback( self):
         message = "Yadda yadda..."
         test_node = Bad( message, "dev_standard_user", verbose=False)
         self.failUnless(
             "uses_fallback_repetition" in test_node.answer_facts
-            and test_node.next_node == "Bad")
+            and test_node.node_next == "Bad")
 
     def test_return_to_how_are_you_after_long_interruption( self):
         message = "What did we just talk about?"
@@ -1783,7 +1783,7 @@ class Test_Bad( unittest.TestCase):
         test_node = Bad( message, test_user, verbose=False)
         self.failUnless(
             "has_question_how_are_you" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
     # -------- Inherited bahavior from Opening ----------------------
 
@@ -1793,7 +1793,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_story_negative" in test_node.message_facts
             and "asks_for_background_problem"  in test_node.answer_facts
-            and test_node.next_node == "Problem")                    
+            and test_node.node_next == "Problem")                    
 
     def test_respond_to_problem_statement( self):
         message = "I did not have enough time for my girlfriend today."
@@ -1801,7 +1801,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_problem_statement" in test_node.message_facts
             and "asks_for_relevance"  in test_node.answer_facts
-            and test_node.next_node == "Relevance")
+            and test_node.node_next == "Relevance")
 
     def test_respond_to_dislike( self):
         message = "i hate this town!"
@@ -1809,7 +1809,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_dislike" in test_node.message_facts
             and "asks_for_source_of_dislike"  in test_node.answer_facts
-            and test_node.next_node == "Problem")                    
+            and test_node.node_next == "Problem")                    
 
     def test_respond_to_negative_feeling( self):
         message = "i am so incredibly tired!"
@@ -1817,7 +1817,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_feeling_negative" in test_node.message_facts
             and "asks_for_source_of_negative_feeling"  in test_node.answer_facts
-            and test_node.next_node == "Problem")                       
+            and test_node.node_next == "Problem")                       
 
     def test_respond_to_desire( self):
         message = "if only i was twenty years younger..."
@@ -1825,7 +1825,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_desire" in test_node.message_facts
             and "asks_for_source_of_desire"  in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_fear( self):
         message = "i am afraid to fail the driver license test."
@@ -1833,7 +1833,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_fear" in test_node.message_facts
             and "asks_for_source_of_fear"  in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     # -------- Node-specific behavior -------------------------------
 
@@ -1843,7 +1843,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_story" in test_node.message_facts
             and "asks_for_background_problem" in test_node.answer_facts
-            and test_node.next_node == "Problem")
+            and test_node.node_next == "Problem")
 
     def test_respond_to_negation( self):
         message = "Nothing..."
@@ -1851,7 +1851,7 @@ class Test_Bad( unittest.TestCase):
         self.failUnless(
             "has_negation" in test_node.message_facts
             and "asks_for_significant_event" in test_node.answer_facts
-            and test_node.next_node == "HowAreYou")
+            and test_node.node_next == "HowAreYou")
 
 
 # ===========================================================================================
