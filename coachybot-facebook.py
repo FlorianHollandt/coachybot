@@ -230,18 +230,10 @@ def send_action_typing_in_miliseconds(recipient_id, time_in_ms=1000):
     headers = {
         "Content-Type": "application/json"
     }
-    typing_on = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "sender_action":"typing_on"
-    })
-    typing_off = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "sender_action":"typing_off"
-    })    
+    typing_on = json.dumps({"recipient": {"id": recipient_id},
+        "sender_action":"typing_on"})
+    typing_off = json.dumps({"recipient": {"id": recipient_id},
+        "sender_action":"typing_off"})    
     r = requests.post(
         "https://graph.facebook.com/v2.6/me/messages", 
         params=params, 
