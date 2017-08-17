@@ -97,18 +97,18 @@ def webhook():
                         print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
                         print "User localization : '" + str(facebook_user["locale"]) + "'"   
 
-                        user.update({
-                            "user_id"          : user_id,
-                            "firstname"        : facebook_user["first_name"],
-                            "lastname"         : facebook_user["last_name"],
-                            "timezone"         : facebook_user["timezone"],
-                            "locale"           : facebook_user["locale"],
-                            "profile_pic"      : facebook_user["profile_pic"],
-                            "message_first"    : facebook_timestamp,
-                            "message_previous" : facebook_timestamp,
-                            "message_current"  : facebook_timestamp,
-                            "node_current"     : "Welcome"
-                            })
+                    user.update({
+                        "user_id"          : user_id,
+                        "firstname"        : facebook_user["first_name"],
+                        "lastname"         : facebook_user["last_name"],
+                        "timezone"         : facebook_user["timezone"],
+                        "locale"           : facebook_user["locale"],
+                        "profile_pic"      : facebook_user["profile_pic"],
+                        "message_first"    : facebook_timestamp,
+                        "message_previous" : facebook_timestamp,
+                        "message_current"  : facebook_timestamp,
+                        "node_current"     : "Welcome"
+                        })
 
                     print "User dump before evaluating node: " + str(user)
 
@@ -127,15 +127,14 @@ def webhook():
                     if (
                         "unknown_user" in connection_facts
                             ):  
-                        db.execute( "INSERT INTO users (user_id) VALUES (%s );", (user_id,))
+                        db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
 
                     for key in user.keys():
                         if key=="user_id":
                             pass
                         elif user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                            #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
-                            db.execute("UPDATE users SET %s = %s WHERE 'user_id' = %s;", (str(key), str(user[key]), str(user_id)))
+                            db.execute(r"UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
 
                     if(
                         user["node_previous"]  == "Terminator"
