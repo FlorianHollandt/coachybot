@@ -11,6 +11,7 @@ import random
 from time import sleep
 
 import psycopg2
+from psycopg2.extensions import AsIs
 import urlparse
 
 from node_objects import *
@@ -146,7 +147,8 @@ def webhook():
                             pass
                         elif user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (AsIs(user[key]), AsIs(user_id)))
 
 
                     db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
