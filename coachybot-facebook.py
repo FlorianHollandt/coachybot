@@ -148,7 +148,7 @@ def webhook():
                         elif user[key]:
                             print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
-                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), AsIs(user[key]), AsIs(user_id)))
+                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
 
 
                     db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
