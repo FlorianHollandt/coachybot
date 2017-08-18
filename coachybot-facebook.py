@@ -43,7 +43,9 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
 
-    # endpoint for processing incoming messaging events
+    #####################################################################
+    ###     Connecting
+    #####################################################################
 
     print "Establishing database connection..."
     conn = psycopg2.connect(
@@ -72,6 +74,11 @@ def webhook():
                     user_id            = messaging_event["sender"]["id"]
 
                     mark_message_as_seen( user_id)
+
+
+                    #####################################################################
+                    ###     User Lookup + Update
+                    #####################################################################
 
                     db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
                     user_keys = [column[0] for column in db.description]
@@ -116,6 +123,11 @@ def webhook():
                             "node_previous"    : "None"
                             })
 
+
+                    #####################################################################
+                    ###     Evaluating node
+                    #####################################################################
+
                     print "User dump before evaluating node: " + str(user)
 
                     node_current  = str(user["node_current"])
@@ -129,12 +141,21 @@ def webhook():
 
                     print "User dump after evaluating node: " + str(user)
 
+
+                    #####################################################################
+                    ###     Sending message
+                    #####################################################################
+
                     for line in answer:
                         type_time = random.randint( 25, 40)*len(line)
                         display_typing_in_miliseconds( user_id, type_time)
                         send_message( user_id, line)
                         sleep( random.randint( 350, 650)/1000. )
-                        
+
+
+                    #####################################################################
+                    ###     Updating database
+                    #####################################################################
 
                     print "Inserting user data to database"
                     if (
@@ -150,6 +171,15 @@ def webhook():
                             #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
                             db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
 
+                    if(
+                        user["node_previous"]  == "Terminator"
+                        ):
+                        db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+
+
+                    #####################################################################
+                    ###     Updating message log
+                    #####################################################################
 
                     db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
                     log_values = db.fetchone()
@@ -165,46 +195,50 @@ def webhook():
                             node_next
                             ))
 
-                    if(
-                        user["node_previous"]  == "Terminator"
-                        ):
-                        db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+                    #####################################################################
+                    ###     Finishing activity on database and app
+                    #####################################################################
 
                     conn.commit()
                     db.close()
                     conn.close()
 
-                    if False: # Explore the data at hand...
-                        (w1, w2) = (12, 36)
-                        print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
-                            "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
-                        for key in messaging_event.keys():
-                            if type(messaging_event[key]).__name__ != "dict":
-                                print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                                    key, 
-                                    "", 
-                                    messaging_event[key], 
-                                    type(messaging_event[key]).__name__, 
-                                    w1=w1, 
-                                    w2=w2)
-                            else:
-                                for subkey in messaging_event[key].keys():
-                                    print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                                        key,
-                                        subkey,
-                                        messaging_event[key][subkey],
-                                        type(messaging_event[key][subkey]).__name__,
-                                        w1=w1,
-                                        w2=w2)
-                        user_information = get_user_information( messaging_event["sender"]["id"])
-                        for key in user_information.keys():
-                            print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                                "user", 
-                                key, 
-                                user_information[key], 
-                                type(user_information[key]).__name__, 
-                                w1=w1, 
-                                w2=w2)                            
+
+                    #####################################################################
+                    ###     Explore user and message data
+                    #####################################################################
+
+                    # if False: # Explore the data at hand...
+                    #     (w1, w2) = (12, 36)
+                    #     print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
+                    #         "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
+                    #     for key in messaging_event.keys():
+                    #         if type(messaging_event[key]).__name__ != "dict":
+                    #             print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                    #                 key, 
+                    #                 "", 
+                    #                 messaging_event[key], 
+                    #                 type(messaging_event[key]).__name__, 
+                    #                 w1=w1, 
+                    #                 w2=w2)
+                    #         else:
+                    #             for subkey in messaging_event[key].keys():
+                    #                 print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                    #                     key,
+                    #                     subkey,
+                    #                     messaging_event[key][subkey],
+                    #                     type(messaging_event[key][subkey]).__name__,
+                    #                     w1=w1,
+                    #                     w2=w2)
+                    #     user_information = get_user_information( messaging_event["sender"]["id"])
+                    #     for key in user_information.keys():
+                    #         print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
+                    #             "user", 
+                    #             key, 
+                    #             user_information[key], 
+                    #             type(user_information[key]).__name__, 
+                    #             w1=w1, 
+                    #             w2=w2)                            
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
@@ -218,6 +252,9 @@ def webhook():
     return Response(status=200)
 
 
+#####################################################################
+###     Sending functions
+#####################################################################
 
 def send_message(recipient_id, message_text):
     params = {
@@ -291,13 +328,9 @@ def get_user_information( recipient_id):
 # ===========================================================================================
 
 
- #     #                       #                                                               
- ##   ##   ##   # #    #      # #   #####  #####  #      #  ####    ##   ##### #  ####  #    # 
- # # # #  #  #  # ##   #     #   #  #    # #    # #      # #    #  #  #    #   # #    # ##   # 
- #  #  # #    # # # #  #    #     # #    # #    # #      # #      #    #   #   # #    # # #  # 
- #     # ###### # #  # #    ####### #####  #####  #      # #      ######   #   # #    # #  # # 
- #     # #    # # #   ##    #     # #      #      #      # #    # #    #   #   # #    # #   ## 
- #     # #    # # #    #    #     # #      #      ###### #  ####  #    #   #   #  ####  #    #                                                                                             
+#####################################################################
+###     Main application
+#####################################################################
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

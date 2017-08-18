@@ -33,9 +33,6 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
 # ===========================================================================================
 
-global history
-history = dict()
-
 epoch = datetime.utcfromtimestamp(0)
 def epoch_timestamp(dt):
     return (dt - epoch).total_seconds() * 1000.0
@@ -44,21 +41,15 @@ def generate_timestring_from_timestamp(timestamp):
     time = datetime.fromtimestamp(float(timestamp))
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
-sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-
 # ===========================================================================================
 
 @app.route('/', methods=['POST'])
 def incoming():
 
-      #####                                                           
-     #     #  ####  #    # #    # ######  ####  ##### # #    #  ####  
-     #       #    # ##   # ##   # #      #    #   #   # ##   # #    # 
-     #       #    # # #  # # #  # #####  #        #   # # #  # #      
-     #       #    # #  # # #  # # #      #        #   # #  # # #  ### 
-     #     # #    # #   ## #   ## #      #    #   #   # #   ## #    # 
-      #####   ####  #    # #    # ######  ####    #   # #    #  ####  
-                                                                      
+
+    #####################################################################
+    ###     Connecting
+    #####################################################################
 
     if not kik.verify_signature(request.headers.get('X-Kik-Signature'), request.get_data()):
 
@@ -81,38 +72,23 @@ def incoming():
 
             connection_facts = []
 
-
-            #     #                         #     #                                    
-            #     #  ####  ###### #####     #     # #  ####  #####  ####  #####  #   # 
-            #     # #      #      #    #    #     # # #        #   #    # #    #  # #  
-            #     #  ####  #####  #    #    ####### #  ####    #   #    # #    #   #   
-            #     #      # #      #####     #     # #      #   #   #    # #####    #   
-            #     # #    # #      #   #     #     # # #    #   #   #    # #   #    #   
-             #####   ####  ###### #    #    #     # #  ####    #    ####  #    #   #   
+            #####################################################################
+            ###     User Lookup + Update
+            #####################################################################
                                                                             
 
+            user_id = message.from_user
             system_time = epoch_timestamp(datetime.now())/1000
             kik_time = message.timestamp/1000
             print "System time : " + '{:.0f}'.format(system_time) + "   (" + generate_timestring_from_timestamp(system_time) + ")"
             print "Kik    time : " + str(kik_time) + "   (" + generate_timestring_from_timestamp(kik_time) + ")"
-            print "Looking up Kik user '" + message.from_user + "' in database..."
+            print "Looking up Kik user '" + user_id + "' in database..."
 
-            user_attributes = [
-                "username" ,
-                "firstname", 
-                "lastname", 
-                "timezone",                 
-                "message_first",
-                "message_previous",
-                #"message_count",
-                "message_current",                
-                "how_are_you_last",
-                "node_previous",
-                "node_current"
-            ]
 
-            db.execute("SELECT " + ', '.join(user_attributes) + " FROM users WHERE username = %s;", (message.from_user,))
+            db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
+            user_keys = [column[0] for column in db.description]
             user_values = db.fetchone()
+
 
             user = defaultdict(bool)
 
@@ -121,16 +97,18 @@ def incoming():
                 #print "Found user data: " + str(user_values)
                 connection_facts.append("known_user") 
 
-                user.update(dict(zip(user_attributes, user_values)))
+                user.update( dict( zip( user_keys, user_values)))
                 #user["message_count"] += 1
                 user["message_current"] = kik_time
+
+                node_previous = user["node_previous"]
 
             else:
 
                 connection_facts.append("unknown_user") 
-                print "No user data in database. Looking up " + message.from_user + " in Kik..."
+                print "No user data in database. Looking up " + user_id + " in Kik..."
 
-                kik_user = kik.get_user(message.from_user)
+                kik_user = kik.get_user(user_id)
                 print "Username          : '" + str(kik_user.first_name) + "'"
                 print "User firstname    : '" + str(kik_user.first_name) + "'"
                 print "User lastname     : '" + str(kik_user.last_name) + "'"
@@ -138,33 +116,29 @@ def incoming():
                 print "Message timestamp : '" + str(message.timestamp) + "'"
 
                 user.update({
-                    "username" : message.from_user,
+                    "user_id" : user_id,
                     "firstname" : str(kik_user.first_name),
                     "lastname" : str(kik_user.last_name),
-                    "timezone" : str(kik_user.timezone),
+                    "timezone" : kik_user.timezone,
                     #"message_count" : 1,
                     "message_first" : kik_time,
                     "message_current" : kik_time,
                     "node_current" : "Welcome"
                     })
 
-            if user["timezone"]=="None":
-                user["timezone"] = "Europe/Berlin"
+                node_previous = "None"
+
+            if user["timezone"] is None:
+                user["timezone"] = 2
 
 
 
-             #######                                                               #     #                      
-             #       #    #   ##   #      # #    #   ##   ##### # #    #  ####     ##    #  ####  #####  ###### 
-             #       #    #  #  #  #      # #    #  #  #    #   # ##   # #    #    # #   # #    # #    # #      
-             #####   #    # #    # #      # #    # #    #   #   # # #  # #         #  #  # #    # #    # #####  
-             #       #    # ###### #      # #    # ######   #   # #  # # #  ###    #   # # #    # #    # #      
-             #        #  #  #    # #      # #    # #    #   #   # #   ## #    #    #    ## #    # #    # #      
-             #######   ##   #    # ###### #  ####  #    #   #   # #    #  ####     #     #  ####  #####  ###### 
-                                                  
+            #####################################################################
+            ###     Evaluating node
+            #####################################################################
 
             #print "Message: " + message.body
 
-            #answer, next_node, user = eval(user["node_current"])(sentences, user)
             node_main = eval(user["node_current"])(message.body, user)
 
             answer    = node_main.answer
@@ -175,17 +149,9 @@ def incoming():
             #print "Next node: " + next_node
 
 
-
-              #####                                          #     #                                           
-             #     # ###### #    # #####  # #    #  ####     ##   ## ######  ####   ####    ##    ####  ###### 
-             #       #      ##   # #    # # ##   # #    #    # # # # #      #      #       #  #  #    # #      
-              #####  #####  # #  # #    # # # #  # #         #  #  # #####   ####   ####  #    # #      #####  
-                   # #      #  # # #    # # #  # # #  ###    #     # #           #      # ###### #  ### #      
-             #     # #      #   ## #    # # #   ## #    #    #     # #      #    # #    # #    # #    # #      
-              #####  ###### #    # #####  # #    #  ####     #     # ######  ####   ####  #    #  ####  ###### 
-                                                                                                   
-
-            #print " | ".join(answer)
+            #####################################################################
+            ###     Sending message
+            #####################################################################
 
             for line in answer:
                 #type_time = random.randint(1100,3500)
@@ -193,39 +159,49 @@ def incoming():
                 # random number is miliseconds per character, giving coachybot a superhuman typing speed
                 kik.send_messages([
                     TextMessage(
-                        to        = message.from_user,
+                        to        = user_id,
                         chat_id   = message.chat_id,
                         body      = line,
                         type_time = type_time)
                 ])        
                 sleep(int( round( type_time + float(random.randint( 350, 650)))/1000.))              
 
-
-         #     #                                               ######                                                  
-         #     # #####  #####    ##   ##### # #    #  ####     #     #   ##   #####   ##   #####    ##    ####  ###### 
-         #     # #    # #    #  #  #    #   # ##   # #    #    #     #  #  #    #    #  #  #    #  #  #  #      #      
-         #     # #    # #    # #    #   #   # # #  # #         #     # #    #   #   #    # #####  #    #  ####  #####  
-         #     # #####  #    # ######   #   # #  # # #  ###    #     # ######   #   ###### #    # ######      # #      
-         #     # #      #    # #    #   #   # #   ## #    #    #     # #    #   #   #    # #    # #    # #    # #      
-          #####  #      #####  #    #   #   # #    #  ####     ######  #    #   #   #    # #####  #    #  ####  ###### 
+        #####################################################################
+        ###     Updating database
+        #####################################################################
                                                                                                                        
-
-        user_attributes = user.keys()
-        user_values = user.values()
-
         if (
             "unknown_user" in connection_facts
             ):  
-            db.execute( "INSERT INTO users (username) VALUES (%s );", (message.from_user,))
+            db.execute( "INSERT INTO users (user_id) VALUES (%s );", ( user_id,))
 
         for key in user.keys():
             if user[key]:
-                db.execute("UPDATE users SET " + key + " = %s WHERE username = %s;", (user[key], message.from_user))
+                db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
 
         if(
             user["node_previous"]  == "Terminator"
             ):
-            db.execute( "DELETE FROM users WHERE username = %s;", (message.from_user,))
+            db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+
+
+        #####################################################################
+        ###     Updating message log
+        #####################################################################
+
+        db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (message.timestamp,))
+        log_values = db.fetchone()
+        if not log_values:
+            db.execute( "INSERT INTO logs (" + 
+                "message_timestamp, user_id, message, node_previous, node_current, node_next" +
+                ") VALUES (%s, %s, %s, %s, %s, %s);",
+             (message.timestamp,
+                user_id,
+                message.body,
+                node_previous,
+                user["node_previous"],
+                user["node_current"]
+                ))
 
 
     #####################################################################
@@ -241,13 +217,9 @@ def incoming():
 # ===========================================================================================
 
 
- #     #                       #                                                               
- ##   ##   ##   # #    #      # #   #####  #####  #      #  ####    ##   ##### #  ####  #    # 
- # # # #  #  #  # ##   #     #   #  #    # #    # #      # #    #  #  #    #   # #    # ##   # 
- #  #  # #    # # # #  #    #     # #    # #    # #      # #      #    #   #   # #    # # #  # 
- #     # ###### # #  # #    ####### #####  #####  #      # #      ######   #   # #    # #  # # 
- #     # #    # # #   ##    #     # #      #      #      # #    # #    #   #   # #    # #   ## 
- #     # #    # # #    #    #     # #      #      ###### #  ####  #    #   #   #  ####  #    #                                                                                             
+#####################################################################
+###     Main application
+#####################################################################
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
