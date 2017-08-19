@@ -1,1 +1,1 @@
-web: python coachybot-kik.py
+web: python coachybot-facebook.py
