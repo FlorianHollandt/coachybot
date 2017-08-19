@@ -103,11 +103,11 @@ def webhook():
 
                         facebook_user = get_user_information( user_id)
 
-                        print "User ID           : '" + str(user_id) + "'"
-                        print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
-                        print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
-                        print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
-                        print "User localization : '" + str(facebook_user["locale"]) + "'"   
+                        #print "User ID           : '" + str(user_id) + "'"
+                        #print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
+                        #print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
+                        #print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
+                        #print "User localization : '" + str(facebook_user["locale"]) + "'"   
 
                         user.update({
                             "user_id"          : user_id,
@@ -167,8 +167,7 @@ def webhook():
                         if key=="user_id":
                             pass
                         elif user[key]:
-                            print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                            #db.execute("UPDATE users SET " + key + " = %s WHERE user_id = %s;", (user[key], user_id))
+                            #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                             db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
 
                     if(
