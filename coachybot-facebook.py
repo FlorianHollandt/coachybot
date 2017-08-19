@@ -90,14 +90,18 @@ def webhook():
                         print "Found user data in database."
 
                         user.update( dict( zip( user_keys, user_values)))
-                        del user["lastname"]
-                        del user["profile_pic"]
-                        del user["locale"]
+
                         user["message_current"] = facebook_timestamp
                         if user["message_previous"] == facebook_timestamp:
                             connection_facts.append( "duplicate_message") 
+                            print "Duplicate message, skipping evaluation and user data updates..."
                         if not user["message_previous"]:
                             user["message_previous"] = facebook_timestamp                 
+
+                        # Those attributes are currently unused
+                        del user["lastname"]
+                        del user["profile_pic"]
+                        del user["locale"]
 
                     else: # User is unknown
                         connection_facts.append("unknown_user") 
