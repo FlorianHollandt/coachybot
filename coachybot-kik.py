@@ -143,7 +143,7 @@ def incoming():
             node_main = eval(user["node_current"])(message.body, user)
 
             answer    = node_main.answer
-            next_node = node_main.next_node
+            next_node = node_main.node_next
             user      = node_main.user
 
             #print "Answer: " + " | ".join(answer)
