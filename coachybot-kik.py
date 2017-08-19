@@ -12,6 +12,7 @@ from collections import defaultdict
 import random
 
 import psycopg2
+from psycopg2.extensions import AsIs
 import urlparse
 
 from node_objects import *
