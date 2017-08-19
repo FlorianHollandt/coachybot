@@ -47,7 +47,7 @@ def webhook():
     ###     Connecting
     #####################################################################
 
-    print "Establishing database connection..."
+    #print "Establishing database connection..."
     conn = psycopg2.connect(
         database=url.path[1:],
         user=url.username,
@@ -56,7 +56,7 @@ def webhook():
         port=url.port
     )
     db = conn.cursor()   
-    print "Database connection established :)"
+    #print "Database connection established :)"
 
     data = request.get_json()
 
@@ -94,6 +94,8 @@ def webhook():
                         del user["profile_pic"]
                         del user["locale"]
                         user["message_current"] = facebook_timestamp
+                        if user["message_previous"] == facebook_timestamp:
+                            connection_facts.append( "duplicate_message") 
                         if not user["message_previous"]:
                             user["message_previous"] = facebook_timestamp                 
 
@@ -123,76 +125,77 @@ def webhook():
                             "node_previous"    : "None"
                             })
 
+                    if "duplicate_message" not in connection_facts: 
 
-                    #####################################################################
-                    ###     Evaluating node
-                    #####################################################################
+                        #####################################################################
+                        ###     Evaluating node
+                        #####################################################################
 
-                    print "User dump before evaluating node: " + str(user)
+                        print "User dump before evaluating node: " + str(user)
 
-                    node_current  = str(user["node_current"])
-                    node_previous = str(user["node_previous"])
+                        node_current  = str(user["node_current"])
+                        node_previous = str(user["node_previous"])
 
-                    node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
+                        node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
 
-                    answer    = node_main.answer
-                    node_next = node_main.node_next
-                    user      = node_main.user
+                        answer    = node_main.answer
+                        node_next = node_main.node_next
+                        user      = node_main.user
 
-                    print "User dump after evaluating node: " + str(user)
-
-
-                    #####################################################################
-                    ###     Sending message
-                    #####################################################################
-
-                    for line in answer:
-                        type_time = random.randint( 25, 40)*len(line)
-                        display_typing_in_miliseconds( user_id, type_time)
-                        send_message( user_id, line)
-                        sleep( random.randint( 350, 650)/1000. )
+                        print "User dump after evaluating node: " + str(user)
 
 
-                    #####################################################################
-                    ###     Updating database
-                    #####################################################################
+                        #####################################################################
+                        ###     Sending message
+                        #####################################################################
 
-                    print "Inserting user data to database"
-                    if (
-                        "unknown_user" in connection_facts
-                            ):  
-                        db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
-
-                    for key in user.keys():
-                        if key=="user_id":
-                            pass
-                        elif user[key]:
-                            #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                            db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
-
-                    if(
-                        user["node_previous"]  == "Terminator"
-                        ):
-                        db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+                        for line in answer:
+                            type_time = random.randint( 25, 40)*len(line)
+                            display_typing_in_miliseconds( user_id, type_time)
+                            send_message( user_id, line)
+                            sleep( random.randint( 350, 650)/1000. )
 
 
-                    #####################################################################
-                    ###     Updating message log
-                    #####################################################################
+                        #####################################################################
+                        ###     Updating database
+                        #####################################################################
 
-                    db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
-                    log_values = db.fetchone()
-                    if not log_values:
-                        db.execute( "INSERT INTO logs (" + 
-                            "message_timestamp, user_id, message, node_previous, node_current, node_next" +
-                            ") VALUES (%s, %s, %s, %s, %s, %s);",
-                         (messaging_event["timestamp"],
-                            user_id,
-                            messaging_event["message"]["text"],
-                            node_previous,
-                            node_current,
-                            node_next
-                            ))
+                        print "Inserting user data to database"
+                        if (
+                            "unknown_user" in connection_facts
+                                ):  
+                            db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
+
+                        for key in user.keys():
+                            if key=="user_id":
+                                pass
+                            elif user[key]:
+                                #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
+                                db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
+
+                        if(
+                            user["node_previous"]  == "Terminator"
+                            ):
+                            db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+
+
+                        #####################################################################
+                        ###     Updating message log
+                        #####################################################################
+
+                        db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
+                        log_values = db.fetchone()
+                        if not log_values:
+                            db.execute( "INSERT INTO logs (" + 
+                                "message_timestamp, user_id, message, node_previous, node_current, node_next" +
+                                ") VALUES (%s, %s, %s, %s, %s, %s);",
+                             (messaging_event["timestamp"],
+                                user_id,
+                                messaging_event["message"]["text"],
+                                node_previous,
+                                node_current,
+                                node_next
+                                ))
 
                     #####################################################################
                     ###     Finishing activity on database and app
