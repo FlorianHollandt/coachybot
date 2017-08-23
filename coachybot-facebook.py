@@ -18,6 +18,8 @@ from node_objects import *
 
 # ===========================================================================================
 
+debug_mode = True
+
 page_access_token = os.environ['FACEBOOK_PAGE_ACCESS_TOKEN']
 verify_token      = os.environ['FACEBOOK_VERIFY_TOKEN']
 
@@ -47,7 +49,8 @@ def webhook():
     ###     Connecting
     #####################################################################
 
-    #print "Establishing database connection..."
+    if debug_mode: print "01) Establishing database connection... ",
+
     conn = psycopg2.connect(
         database=url.path[1:],
         user=url.username,
@@ -56,14 +59,20 @@ def webhook():
         port=url.port
     )
     db = conn.cursor()   
-    #print "Database connection established :)"
+    
+    if debug_mode: print "Established :)"
 
     data = request.get_json()
 
+    if debug_mode: print "02) Receiving data...",
+
     if data["object"] == "page":
+
+        if debug_mode: print "Of type 'page'...",
 
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
+                if debug_mode: print "Including a message..."
 
                 user = defaultdict(bool)
                 connection_facts = []
@@ -72,8 +81,11 @@ def webhook():
 
                     facebook_timestamp = messaging_event["timestamp"]/1000
                     user_id            = messaging_event["sender"]["id"]
+                    if debug_mode: print "03) At Facebook time " + str(facebook_timestamp),
+                    if debug_mode: print " from user with ID" + str(user_id)
 
                     mark_message_as_seen( user_id)
+                    if debug_mode: print "04) Marked message as seen."
 
 
                     #####################################################################
@@ -87,47 +99,28 @@ def webhook():
 
                     if user_values:
                         connection_facts.append( "known_user") 
-                        print "Found user data in database."
+                        print "05) Found user data in database... ",
 
-                        user.update( dict( zip( user_keys, user_values)))
-
-                        user["message_current"] = facebook_timestamp
                         if user["message_previous"] == facebook_timestamp:
                             connection_facts.append( "duplicate_message") 
-                            print "Duplicate message, skipping evaluation and user data updates..."
-                        if not user["message_previous"]:
-                            user["message_previous"] = facebook_timestamp                 
-
-                        # Those attributes are currently unused
-                        del user["lastname"]
-                        del user["profile_pic"]
-                        del user["locale"]
+                            if debug_mode: print "Duplicate message, skipping evaluation and user data updates!"
+                        else:
+                            user = update_user_from_database( user, facebook_timestamp, user_keys, user_values)
+                            if debug_mode: print "Updated user with database records."
 
                     else: # User is unknown
-                        connection_facts.append("unknown_user") 
-                        print "No user data in database. Looking up user profile..."
+                        connection_facts.append( "unknown_user") 
+                        print "05) No user data in database. Looking up user profile..."
 
                         facebook_user = get_user_information( user_id)
+                        user = update_user_from_profile_data( user, facebook_timestamp, facebook_user)
 
-                        #print "User ID           : '" + str(user_id) + "'"
-                        #print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
-                        #print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
-                        #print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
-                        #print "User localization : '" + str(facebook_user["locale"]) + "'"   
-
-                        user.update({
-                            "user_id"          : user_id,
-                            "firstname"        : facebook_user["first_name"],
-                            "lastname"         : facebook_user["last_name"],
-                            "timezone"         : facebook_user["timezone"],
-                            "locale"           : facebook_user["locale"],
-                            "profile_pic"      : facebook_user["profile_pic"],
-                            "message_first"    : facebook_timestamp,
-                            "message_previous" : facebook_timestamp,
-                            "message_current"  : facebook_timestamp,
-                            "node_current"     : "Welcome",
-                            "node_previous"    : "None"
-                            })
+                        if debug_mode:
+                            print "User ID           : '" + str(user_id) + "'"
+                            print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
+                            print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
+                            print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
+                            print "User localization : '" + str(facebook_user["locale"]) + "'"   
 
                     if "duplicate_message" not in connection_facts: 
 
@@ -321,6 +314,33 @@ def mark_message_as_seen(recipient_id):
         params=params, 
         headers=headers, 
         data=mark_seen)
+
+def update_user_from_database( user, facebook_timestamp, user_keys, user_values):
+    user.update( dict( zip( user_keys, user_values)))
+    user["message_current"] = facebook_timestamp
+    if not user["message_previous"]:
+        user["message_previous"] = facebook_timestamp                 
+    # Those attributes are currently unused
+    del user["lastname"]
+    del user["profile_pic"]
+    del user["locale"]
+    return user
+
+def update_user_from_profile_data( user, facebook_timestamp, facebook_user):
+    user.update({
+        "user_id"          : facebook_user["id"],
+        "firstname"        : facebook_user["first_name"],
+        "lastname"         : facebook_user["last_name"],
+        "timezone"         : facebook_user["timezone"],
+        "locale"           : facebook_user["locale"],
+        "profile_pic"      : facebook_user["profile_pic"],
+        "message_first"    : facebook_timestamp,
+        "message_previous" : facebook_timestamp,
+        "message_current"  : facebook_timestamp,
+        "node_current"     : "Welcome",
+        "node_previous"    : "None"
+        })
+    return user
 
 @app.route('/', methods=['GET'])
 def get_user_information( recipient_id):

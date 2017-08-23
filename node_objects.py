@@ -2019,12 +2019,12 @@ class Committment( Template):
     Committment node
 
     From Obstacles:
-    "In my experience, most obstacles can be overcome by mobilizing enough"
-    " ressources, like time, energy, money or manpower."
-    "Is it an option for you to shift your priorities towards this issue and"
-    " to devote some more ressources to it?"
-    "Maybe you could block some time for it, or invest some money into a solution,"
-    " or ask someone you trust for support?"
+    "Amazing! Sounds like we have totally developed a plan"
+    " to change your life for the better! :)"
+    "Are you committed and positive about executing this plan?"
+    " Or are you still unsure?"
+
+
     """                
 
     def __init__(self, text, user=defaultdict(bool), verbose=True):
