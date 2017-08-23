@@ -784,6 +784,7 @@ class HowAreYou( Opening):
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
             or "has_hesitation" in self.message_facts
+            or "has_question_how_are_you" in self.message_facts
             or "has_story_negative" in self.message_facts
             or "has_dislike" in self.message_facts
             or "has_feeling_negative" in self.message_facts
