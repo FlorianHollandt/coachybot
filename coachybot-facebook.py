@@ -180,7 +180,7 @@ def webhook():
                                 "unknown_user" in connection_facts
                                     ):  
                                 db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
-                                 if debug_mode: print "As new dataset...",
+                                if debug_mode: print "As new dataset...",
 
                             for key in user.keys():
                                 if key=="user_id":
