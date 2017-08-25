@@ -82,11 +82,9 @@ def webhook():
                     if debug_mode: print "03) Checking for duplication... ", 
                     db.execute("""
                         SELECT * FROM logs
-                         WHERE message_timestamp = %s
-                         AND user_id = %s;
+                         WHERE message_id = %s;
                         """,
-                     ( messaging_event["timestamp"],
-                        messaging_event["sender"]["id"]))
+                     ( messaging_event["message"]["mid"],))
 
                     log_values = db.fetchone()
                     if log_values:
@@ -114,7 +112,7 @@ def webhook():
 
                         if user_values:
                             connection_facts.append( "known_user") 
-                            print "06) Found user data in database... ",
+                            print "06) Found user data in database... "
 
                             if user["message_previous"] == facebook_timestamp:
                                 connection_facts.append( "duplicate_message") 
@@ -190,7 +188,6 @@ def webhook():
                                 if key=="user_id":
                                     pass
                                 elif user[key]:
-                                    #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
                                     db.execute("""
                                         UPDATE users 
                                         SET %s = %s 
@@ -199,7 +196,7 @@ def webhook():
                                         (AsIs(key), 
                                             user[key], 
                                             user_id))
-                                    if debug_mode: print "Done!"
+                            if debug_mode: print "Done!"
 
                             if(
                                 user["node_previous"]  == "Terminator"
@@ -220,15 +217,17 @@ def webhook():
 
                             db.execute( """
                                 INSERT INTO logs (
-                                message_timestamp, 
+                                message_timestamp,
+                                message_id, 
                                 user_id, 
                                 message, 
                                 node_previous, 
                                 node_current, 
                                 node_next
-                                ) VALUES (%s, %s, %s, %s, %s, %s);
+                                ) VALUES (%s, %s %s, %s, %s, %s, %s);
                                 """,
                              (messaging_event["timestamp"],
+                                messaging_event["message"]["mid"],
                                 user_id,
                                 messaging_event["message"]["text"],
                                 node_previous,
