@@ -551,13 +551,19 @@ action_verbs = r"|".join([
     r"investigat(e|ing)",
     r"giv(e|ing)",
     r"donat(e|ing)",
-    r"lov(e|ing)?)"
+    r"lov(e|ing)?)",
+    r"ignor(e|ing)",
+    r"deal(ing)?",
+    r"mind(ing)?",
+    r"do(ing)"
     ])
 
 def has_option( sentence):
     if(
         re2.search( action_verbs, sentence)
-        and not has_negation( sentence)
+        and (
+            not has_negation( sentence)
+            or re.search( r"no matter (what)?", sentence))
         and not has_quantifier_excessive( sentence)
         and not has_quantifier_insufficient( sentence)
         and not re.search( r"(too late)", sentence)

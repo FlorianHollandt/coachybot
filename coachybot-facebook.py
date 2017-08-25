@@ -74,118 +74,145 @@ def webhook():
             for messaging_event in entry["messaging"]:
                 if debug_mode: print "Including a message..."
 
-                user = defaultdict(bool)
+                user = defaultdict( bool)
                 connection_facts = []
 
-                if messaging_event.get("message"):  # someone sent us a message
+                if messaging_event.get( "message"):  # someone sent us a message
 
-                    facebook_timestamp = messaging_event["timestamp"]/1000
-                    user_id            = messaging_event["sender"]["id"]
-                    if debug_mode: print "03) At Facebook time " + str(facebook_timestamp),
-                    if debug_mode: print " from user with ID" + str(user_id)
+                    if debug_mode: print "03) Checking for duplication... ", 
+                    db.execute("""
+                        SELECT * FROM logs
+                         WHERE message_timestamp = %s
+                         AND user_id = %s;
+                        """,
+                     ( messaging_event["timestamp"],
+                        messaging_event["sender"]["id"]))
 
-                    mark_message_as_seen( user_id)
-                    if debug_mode: print "04) Marked message as seen."
+                    log_values = db.fetchone()
+                    if log_value:
+                        if debug_mode: print "Positive! Skipping evaluation :|"               
+                    if not log_values: 
+                        if debug_mode: print "Negative! Proceeding evaluation... :)"              
 
+                        facebook_timestamp = messaging_event["timestamp"]/1000
+                        user_id            = messaging_event["sender"]["id"]
+                        if debug_mode: print "04) Facebook time " + str(facebook_timestamp),
+                        if debug_mode: print ", user ID " + str(user_id)
 
-                    #####################################################################
-                    ###     User Lookup + Update
-                    #####################################################################
-
-                    db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
-                    user_keys = [column[0] for column in db.description]
-                    user_values = db.fetchone()
-                    #print "Retrieved user keys: " + str(user_keys) + " and values:" + str(user_values)
-
-                    if user_values:
-                        connection_facts.append( "known_user") 
-                        print "05) Found user data in database... ",
-
-                        if user["message_previous"] == facebook_timestamp:
-                            connection_facts.append( "duplicate_message") 
-                            if debug_mode: print "Duplicate message, skipping evaluation and user data updates!"
-                        else:
-                            user = update_user_from_database( user, facebook_timestamp, user_keys, user_values)
-                            if debug_mode: print "Updated user with database records."
-
-                    else: # User is unknown
-                        connection_facts.append( "unknown_user") 
-                        print "05) No user data in database. Looking up user profile..."
-
-                        facebook_user = get_user_information( user_id)
-                        user = update_user_from_profile_data( user, facebook_timestamp, facebook_user)
-
-                        if debug_mode:
-                            print "User ID           : '" + str(user_id) + "'"
-                            print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
-                            print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
-                            print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
-                            print "User localization : '" + str(facebook_user["locale"]) + "'"   
-
-                    if "duplicate_message" not in connection_facts: 
-
-                        #####################################################################
-                        ###     Evaluating node
-                        #####################################################################
-
-                        print "User dump before evaluating node: " + str(user)
-
-                        node_current  = str(user["node_current"])
-                        node_previous = str(user["node_previous"])
-
-                        node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
-
-                        answer    = node_main.answer
-                        node_next = node_main.node_next
-                        user      = node_main.user
-
-                        print "User dump after evaluating node: " + str(user)
+                        mark_message_as_seen( user_id)
+                        if debug_mode: print "05) Marked message as seen."
 
 
                         #####################################################################
-                        ###     Sending message
+                        ###     User Lookup + Update
                         #####################################################################
 
-                        for line in answer:
-                            type_time = random.randint( 25, 40)*len(line)
-                            display_typing_in_miliseconds( user_id, type_time)
-                            send_message( user_id, line)
-                            sleep( random.randint( 350, 650)/1000. )
+                        db.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
+                        user_keys = [column[0] for column in db.description]
+                        user_values = db.fetchone()
+                        #print "Retrieved user keys: " + str(user_keys) + " and values:" + str(user_values)
+
+                        if user_values:
+                            connection_facts.append( "known_user") 
+                            print "06) Found user data in database... ",
+
+                            if user["message_previous"] == facebook_timestamp:
+                                connection_facts.append( "duplicate_message") 
+                                if debug_mode: print "07) Duplicate message, skipping evaluation and user data updates!"
+                            else:
+                                user = update_user_from_database( user, facebook_timestamp, user_keys, user_values)
+                                if debug_mode: print "07) Updated user with database records."
+
+                        else: # User is unknown
+                            connection_facts.append( "unknown_user") 
+                            print "06) No user data in database. Looking up user profile..."
+
+                            facebook_user = get_user_information( user_id)
+                            user = update_user_from_profile_data( user, facebook_timestamp, facebook_user)
+                            print "07) Updating user data..."
+
+                            if debug_mode:
+                                print "User ID           : '" + str(user_id) + "'"
+                                print "User firstname    : '" + str(facebook_user["first_name"]) + "'"
+                                print "User lastname     : '" + str(facebook_user["last_name"]) + "'"
+                                print "User timezone     : '" + str(facebook_user["timezone"]) + "'"   
+                                print "User localization : '" + str(facebook_user["locale"]) + "'"   
+
+                        if "duplicate_message" not in connection_facts: 
+
+                            #####################################################################
+                            ###     Evaluating node
+                            #####################################################################
+
+                            if debug_mode: print "08) User dump before evaluating node: " + str(user)
+
+                            node_current  = str(user["node_current"])
+                            node_previous = str(user["node_previous"])
+
+                            if debug_mode: print "09) Evaluating node " + user["node_current"]
+                            node_main = eval(user["node_current"])(messaging_event["message"]["text"], user, True)
+
+                            answer    = node_main.answer
+                            node_next = node_main.node_next
+                            user      = node_main.user
+
+                            if debug_mode: print "10) User dump after evaluating node: " + str(user)
 
 
-                        #####################################################################
-                        ###     Updating database
-                        #####################################################################
+                            #####################################################################
+                            ###     Sending message
+                            #####################################################################
 
-                        print "Inserting user data to database"
-                        if (
-                            "unknown_user" in connection_facts
-                                ):  
-                            db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
-
-                        for key in user.keys():
-                            if key=="user_id":
-                                pass
-                            elif user[key]:
-                                #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                                db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
-
-                        if(
-                            user["node_previous"]  == "Terminator"
-                            ):
-                            db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+                            if debug_mode: print "11) Sending message..."
+                            for line in answer:
+                                type_time = random.randint( 25, 40)*len(line)
+                                display_typing_in_miliseconds( user_id, type_time)
+                                send_message( user_id, line)
+                                sleep( random.randint( 350, 650)/1000. )
 
 
-                        #####################################################################
-                        ###     Updating message log
-                        #####################################################################
+                            #####################################################################
+                            ###     Updating database
+                            #####################################################################
 
-                        db.execute("SELECT * FROM logs WHERE message_timestamp = %s;", (messaging_event["timestamp"],))
-                        log_values = db.fetchone()
-                        if not log_values:
-                            db.execute( "INSERT INTO logs (" + 
-                                "message_timestamp, user_id, message, node_previous, node_current, node_next" +
-                                ") VALUES (%s, %s, %s, %s, %s, %s);",
+                            if debug_mode: print "12) Inserting user data to database... ",
+                            if (
+                                "unknown_user" in connection_facts
+                                    ):  
+                                db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
+                                 if debug_mode: print "As new dataset...",
+
+                            for key in user.keys():
+                                if key=="user_id":
+                                    pass
+                                elif user[key]:
+                                    #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
+                                    db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
+                                    if debug_mode: print "Done!"
+
+                            if(
+                                user["node_previous"]  == "Terminator"
+                                ):
+                                db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+                                if debug_mode: print "11a) Deleting user from database... "
+
+
+                            #####################################################################
+                            ###     Updating message log
+                            #####################################################################
+
+                            if debug_mode: print "13) Updating message log... ",
+
+                            db.execute( """
+                                INSERT INTO logs (" + 
+                                "message_timestamp, 
+                                user_id, 
+                                message, 
+                                node_previous, 
+                                node_current, 
+                                node_next" +
+                                ") VALUES (%s, %s, %s, %s, %s, %s);
+                                """,
                              (messaging_event["timestamp"],
                                 user_id,
                                 messaging_event["message"]["text"],
@@ -193,6 +220,7 @@ def webhook():
                                 node_current,
                                 node_next
                                 ))
+                            if debug_mode: print "Done!"
 
                     #####################################################################
                     ###     Finishing activity on database and app
@@ -201,6 +229,7 @@ def webhook():
                     conn.commit()
                     db.close()
                     conn.close()
+                    if debug_mode: print "14) Connection closed."
 
 
                     #####################################################################
@@ -360,6 +389,6 @@ def get_user_information( recipient_id):
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
-    print "Starting the app... " 
+    print "00) Starting the app... " 
     port = int( os.environ.get('PORT', 5000))
     app.run( host='0.0.0.0', port=port)

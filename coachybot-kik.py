@@ -26,7 +26,7 @@ api_key = os.environ['KIK_BOT_API_KEY']
 app = Flask(__name__)
 kik = KikApi(username, api_key)
 
-config = Configuration(webhook=os.environ['KIK_WEBHOOK'])
+config = Configuration(webhook=os.environ['WEBHOOK'])
 kik.set_configuration(config)
 
 urlparse.uses_netloc.append("postgres")

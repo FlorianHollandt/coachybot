@@ -834,7 +834,8 @@ class HowAreYou( Opening):
             self.answer.append(random.choice([
                 "Wow, sounds good! :)",
                 "That's great to hear!",
-                "Oh, wonderful!"
+                "Oh, wonderful!",
+                "Nice! :)"
                 ]))
             self.answer.append(random.choice([
                 "Was that the highlight of your " + previous_daytime(self.current_hour) + "?",
@@ -2283,12 +2284,12 @@ class Good( Opening):
             ):
 
             self.answer.append(random.choice([
-                "Wow, sounds good! :)",
-                "That's great to hear!",
-                "Oh, wonderful!"
+                "Aww, nice! :)",
+                "That sounds wonderful!",
+                "Sweet! :)"
                 ]))
             self.answer.append(random.choice([
-                "So that was the highlight of your " + previous_daytime(self.current_hour) + "?",
+                "And that was your highlight, you say?",
                 ]))            
 
             self.answer_facts.append("asks_to_confirm_highlight")

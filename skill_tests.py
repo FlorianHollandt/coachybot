@@ -306,7 +306,9 @@ class Test_Skills(unittest.TestCase):
 		"and meet my friends more often.",
 		"to be more open and positive would also be great.",
 		"i know i should stick to the things i start.",
-		"being a more helpful colleague."
+		"being a more helpful colleague.",
+		"haha, just ignoring it.",
+		"doing what i think is best, no matter what everyone says."
 		]
 		self.failUnless( all( has_option( message) for message in messages))
 
@@ -316,7 +318,8 @@ class Test_Skills(unittest.TestCase):
 		"i can not think of anything.",
 		"nothing comes to my mind",
 		"nothing really",
-		"it is too late for me to fix this."
+		"it is too late for me to fix this.",
+		"it does not matter what i do."
 		]
 		self.failUnless(not any( has_option( message) for message in messages))		
 
