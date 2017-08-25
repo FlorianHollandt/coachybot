@@ -204,14 +204,14 @@ def webhook():
                             if debug_mode: print "13) Updating message log... ",
 
                             db.execute( """
-                                INSERT INTO logs (" + 
-                                "message_timestamp, 
+                                INSERT INTO logs (
+                                message_timestamp, 
                                 user_id, 
                                 message, 
                                 node_previous, 
                                 node_current, 
-                                node_next" +
-                                ") VALUES (%s, %s, %s, %s, %s, %s);
+                                node_next +
+                                ) VALUES (%s, %s, %s, %s, %s, %s);
                                 """,
                              (messaging_event["timestamp"],
                                 user_id,
