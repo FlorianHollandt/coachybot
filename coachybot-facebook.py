@@ -89,9 +89,9 @@ def webhook():
                         messaging_event["sender"]["id"]))
 
                     log_values = db.fetchone()
-                    if log_value:
+                    if log_values:
                         if debug_mode: print "Positive! Skipping evaluation :|"               
-                    if not log_values: 
+                    else: 
                         if debug_mode: print "Negative! Proceeding evaluation... :)"              
 
                         facebook_timestamp = messaging_event["timestamp"]/1000
