@@ -179,7 +179,11 @@ def webhook():
                             if (
                                 "unknown_user" in connection_facts
                                     ):  
-                                db.execute( "INSERT INTO users (user_id) VALUES (%s);", (user_id,))
+                                db.execute( """
+                                    INSERT INTO users (user_id) 
+                                    VALUES (%s);
+                                    """, 
+                                    (user_id,))
                                 if debug_mode: print "As new dataset...",
 
                             for key in user.keys():
@@ -187,13 +191,24 @@ def webhook():
                                     pass
                                 elif user[key]:
                                     #print "Updating column '" + key + "' with value '" + str(user[key]) + "'"
-                                    db.execute("UPDATE users SET %s = %s WHERE user_id = %s;", (AsIs(key), user[key], user_id))
+                                    db.execute("""
+                                        UPDATE users 
+                                        SET %s = %s 
+                                        WHERE user_id = %s;
+                                        """, 
+                                        (AsIs(key), 
+                                            user[key], 
+                                            user_id))
                                     if debug_mode: print "Done!"
 
                             if(
                                 user["node_previous"]  == "Terminator"
                                 ):
-                                db.execute( "DELETE FROM users WHERE user_id = %s;", (user_id,))
+                                db.execute( """
+                                    DELETE FROM users 
+                                    WHERE user_id = %s;
+                                    """,
+                                    (user_id,))
                                 if debug_mode: print "11a) Deleting user from database... "
 
 
@@ -210,7 +225,7 @@ def webhook():
                                 message, 
                                 node_previous, 
                                 node_current, 
-                                node_next +
+                                node_next
                                 ) VALUES (%s, %s, %s, %s, %s, %s);
                                 """,
                              (messaging_event["timestamp"],
