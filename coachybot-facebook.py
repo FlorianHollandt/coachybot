@@ -224,7 +224,7 @@ def webhook():
                                 node_previous, 
                                 node_current, 
                                 node_next
-                                ) VALUES (%s, %s %s, %s, %s, %s, %s);
+                                ) VALUES (%s, %s, %s, %s, %s, %s, %s);
                                 """,
                              (messaging_event["timestamp"],
                                 messaging_event["message"]["mid"],
