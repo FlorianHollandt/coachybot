@@ -8,8 +8,8 @@ from pytz import timezone
 from ngrams.ngrams import corrections, Pw
 
 import nltk
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-vader = SentimentIntensityAnalyzer()
+#from nltk.sentiment.vader import SentimentIntensityAnalyzer
+#vader = SentimentIntensityAnalyzer()
 
 firstnames = nltk.corpus.names
 
@@ -1169,66 +1169,6 @@ def has_danger_to_self(sentence):
         return False
 
 
-       #                                                        
-       # #    # #####   ####  ###### #    # ###### #    # ##### 
-       # #    # #    # #    # #      ##  ## #      ##   #   #   
-       # #    # #    # #      #####  # ## # #####  # #  #   #   
- #     # #    # #    # #  ### #      #    # #      #  # #   #   
- #     # #    # #    # #    # #      #    # #      #   ##   #   
-  #####   ####  #####   ####  ###### #    # ###### #    #   #   
-                                                                
-judgement_grammar = """
-        S_and_V: {((((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>))|<PRP>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
-        Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
-        Judgement : {<.*>* <S_and_V> <Object>}
-    """
-judgement_chunker = nltk.RegexpParser(judgement_grammar)
-
-def is_judgement_positive(sentence):
-    return_value = False
-    equivalence = False    
-    sentence = re.sub(r"(\,)",r"",sentence)
-    sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
-    tree = judgement_chunker.parse(sentence_pos)
-    if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
-        for subtree in tree.subtrees():
-            if subtree.label() == unicode("Object"):
-                vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
-            if subtree.label() == unicode("S_and_V"):
-                if re.search(r"(is|are|was|were|has been|have been)",sentence):
-                    equivalence = True
-        if (
-            vader_score["pos"] >= max(vader_score["neg"],vader_score["neu"])
-            and equivalence
-        ):
-            return_value = True
-    return return_value
-
-def is_judgement_negative(sentence):
-    return_value = False
-    equivalence = False
-    sentence = re.sub( r"(\,)",r"", sentence)
-    sentence = re.sub( r"(\.|\!|\?|\)|\(|\:|\-)*$", r"!", sentence)    
-    sentence = re.sub( r"!+", r"!", sentence)   
-    sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
-    tree = judgement_chunker.parse(sentence_pos)
-    if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
-        for subtree in tree.subtrees():
-            if subtree.label() == unicode("Object"):
-                vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
-            if subtree.label() == unicode("S_and_V"):
-                if re.search(r"(is|are|was|were|has been|have been)",sentence):
-                    equivalence = True
-        if (
-            vader_score["neg"] >= max(vader_score["neu"],vader_score["pos"])
-            and equivalence
-        ):
-            return_value = True
-    if re.search(r"(suck|full of .*shit|nothing but .*shit)",sentence):
-        return_value = True
-    return return_value
-
-
 
   #####                                             
  #     #  ####  #    # ###### #      #  ####  ##### 
@@ -1286,45 +1226,6 @@ def reflect_rationale(sentence):
         perform_pronoun_reflection(
             reason))
 
-
- #     #                                #######                                      
- ##    #   ##   #    # ###### #####     #       #    # ##### # ##### # ######  ####  
- # #   #  #  #  ##  ## #      #    #    #       ##   #   #   #   #   # #      #      
- #  #  # #    # # ## # #####  #    #    #####   # #  #   #   #   #   # #####   ####  
- #   # # ###### #    # #      #    #    #       #  # #   #   #   #   # #           # 
- #    ## #    # #    # #      #    #    #       #   ##   #   #   #   # #      #    # 
- #     # #    # #    # ###### #####     ####### #    #   #   #   #   # ######  ####  
-                                                                                     
-                                                                
-def extract_persons(text):
-    target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
-    tokens = nltk.tokenize.word_tokenize(text)
-    pos = nltk.pos_tag(tokens)
-    sentt = nltk.ne_chunk(pos, binary = False)
-    persons = []
-    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
-        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
-        for i in range(len((persons))):
-            if re.search(persons[i],name):
-                persons[i] = re.sub(persons[i],name,persons[i])
-        if not any(re.search(name,person) for person in persons):
-            persons.append(name)            
-
-    return (persons)
-
-
-def extract_named_entities(text):
-    target = re.compile(r"(PERSON|ORGANIZATION|GPE|LOCATION)")
-    tokens = nltk.tokenize.word_tokenize(text)
-    pos = nltk.pos_tag(tokens)
-    sentt = nltk.ne_chunk(pos, binary = False)
-    entities = []
-    for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
-        name = ' '.join([leaf[0] for leaf in subtree.leaves()])
-        if name not in entities:
-            entities.append(name)            
-
-    return (entities)
 
 
  ######                                          
@@ -1868,12 +1769,120 @@ def expand_contractions(text):
     return text
 
 
+
+ #     #                                #######                                      
+ ##    #   ##   #    # ###### #####     #       #    # ##### # ##### # ######  ####  
+ # #   #  #  #  ##  ## #      #    #    #       ##   #   #   #   #   # #      #      
+ #  #  # #    # # ## # #####  #    #    #####   # #  #   #   #   #   # #####   ####  
+ #   # # ###### #    # #      #    #    #       #  # #   #   #   #   # #           # 
+ #    ## #    # #    # #      #    #    #       #   ##   #   #   #   # #      #    # 
+ #     # #    # #    # ###### #####     ####### #    #   #   #   #   # ######  ####  
+                                                                                     
+# Works well, but currently not required
+                                                                
+# def extract_persons(text):
+#     target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
+#     tokens = nltk.tokenize.word_tokenize(text)
+#     pos = nltk.pos_tag(tokens)
+#     sentt = nltk.ne_chunk(pos, binary = False)
+#     persons = []
+#     for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
+#         name = ' '.join([leaf[0] for leaf in subtree.leaves()])
+#         for i in range(len((persons))):
+#             if re.search(persons[i],name):
+#                 persons[i] = re.sub(persons[i],name,persons[i])
+#         if not any(re.search(name,person) for person in persons):
+#             persons.append(name)            
+
+#     return (persons)
+
+
+# def extract_named_entities(text):
+#     target = re.compile(r"(PERSON|ORGANIZATION|GPE|LOCATION)")
+#     tokens = nltk.tokenize.word_tokenize(text)
+#     pos = nltk.pos_tag(tokens)
+#     sentt = nltk.ne_chunk(pos, binary = False)
+#     entities = []
+#     for subtree in sentt.subtrees(filter=lambda t: target.match(t.label())):
+#         name = ' '.join([leaf[0] for leaf in subtree.leaves()])
+#         if name not in entities:
+#             entities.append(name)            
+
+#     return (entities)
+
+
+       #                                                        
+       # #    # #####   ####  ###### #    # ###### #    # ##### 
+       # #    # #    # #    # #      ##  ## #      ##   #   #   
+       # #    # #    # #      #####  # ## # #####  # #  #   #   
+ #     # #    # #    # #  ### #      #    # #      #  # #   #   
+ #     # #    # #    # #    # #      #    # #      #   ##   #   
+  #####   ####  #####   ####  ###### #    # ###### #    #   #   
+                         
+# Suspended because of bad performance
+
+# judgement_grammar = """
+#         S_and_V: {((((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>))|<PRP>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
+#         Object : {<DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)* (<CC> <DT>* (<R.*>|<J.*>|<VBG> )* (<NNS>|<NN>)*)? <.>}  
+#         Judgement : {<.*>* <S_and_V> <Object>}
+#     """
+# judgement_chunker = nltk.RegexpParser(judgement_grammar)
+
+# def is_judgement_positive(sentence):
+#     return_value = False
+#     equivalence = False    
+#     sentence = re.sub(r"(\,)",r"",sentence)
+#     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
+#     tree = judgement_chunker.parse(sentence_pos)
+#     if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
+#         for subtree in tree.subtrees():
+#             if subtree.label() == unicode("Object"):
+#                 vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
+#             if subtree.label() == unicode("S_and_V"):
+#                 if re.search(r"(is|are|was|were|has been|have been)",sentence):
+#                     equivalence = True
+#         if (
+#             vader_score["pos"] >= max(vader_score["neg"],vader_score["neu"])
+#             and equivalence
+#         ):
+#             return_value = True
+#     return return_value
+
+# def is_judgement_negative(sentence):
+#     return_value = False
+#     equivalence = False
+#     sentence = re.sub( r"(\,)",r"", sentence)
+#     sentence = re.sub( r"(\.|\!|\?|\)|\(|\:|\-)*$", r"!", sentence)    
+#     sentence = re.sub( r"!+", r"!", sentence)   
+#     sentence_pos = nltk.pos_tag(nltk.word_tokenize(sentence))
+#     tree = judgement_chunker.parse(sentence_pos)
+#     if unicode("Judgement") in [subtree.label() for subtree in tree.subtrees()]:
+#         for subtree in tree.subtrees():
+#             if subtree.label() == unicode("Object"):
+#                 vader_score = vader.polarity_scores("You are " + " ".join([word for (word,tag) in subtree.leaves()]))
+#             if subtree.label() == unicode("S_and_V"):
+#                 if re.search(r"(is|are|was|were|has been|have been)",sentence):
+#                     equivalence = True
+#         if (
+#             vader_score["neg"] >= max(vader_score["neu"],vader_score["pos"])
+#             and equivalence
+#         ):
+#             return_value = True
+#     if re.search(r"(suck|full of .*shit|nothing but .*shit)",sentence):
+#         return_value = True
+#     return return_value
+
+
+
+
  # #    # ##### #####   ####  #####  #    #  ####  ##### #  ####  #    # 
  # ##   #   #   #    # #    # #    # #    # #    #   #   # #    # ##   # 
  # # #  #   #   #    # #    # #    # #    # #        #   # #    # # #  # 
  # #  # #   #   #####  #    # #    # #    # #        #   # #    # #  # # 
  # #   ##   #   #   #  #    # #    # #    # #    #   #   # #    # #   ## 
  # #    #   #   #    #  ####  #####   ####   ####    #   #  ####  #    # 
+
+# Draft
 
 # simple_sentence_grammar = """
 #         noun_phrase: {((((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>))|<PRP>)}
