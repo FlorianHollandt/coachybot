@@ -1257,7 +1257,7 @@ def has_protest_to_question(sentence):
   #### #  ####  ######  ####    #   #  ####  #    #  ####  
                                                            
 
-def has_request_to_explain(sentence):
+def has_request_to_explain( sentence):
     if(
         ( # why are you asking this? / why would you want to know this?
             re.search(r"(why|(what.*(for|reason|purpose)))", sentence)

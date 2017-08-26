@@ -1853,6 +1853,10 @@ class Test_Bad( unittest.TestCase):
             and "asks_for_significant_event" in test_node.answer_facts
             and test_node.node_next == "HowAreYou")
 
+# ===========================================================================================
+
+# IDEA: Implement "check_if_statement( string, string)" method with dictionary of skills (https://stackoverflow.com/a/7937987/561423)
+# IDEA: Do the same for nodes to get rid of the eval statement in the main function :)
 
 # ===========================================================================================
 

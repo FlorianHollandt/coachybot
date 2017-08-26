@@ -136,11 +136,7 @@ class Template(object):
         # Checking for generic statements / intentions
 
         if verbose: print("\n{:20}".format("Preprocessed sentences"))
-
-        for answer_fact in self.answer_facts:
             
-
-
         for sentence in self.sentences:
             if verbose: print("{:20}- {}".format( "", sentence))
             if has_request_to_explain(sentence):
@@ -699,7 +695,10 @@ class Welcome( Template):
                 ])) 
 
             self.answer.insert(1, random.choice([
-                "My name is Coachybot, but you can call me Coachy.\n"
+                "My name is Coachybot, but you can call me Coachy."
+            ]))  
+
+            self.answer.insert(2, random.choice([
                 "I have been programmed to improve your life"
                 " by providing some basic coaching. So..."
             ]))             
