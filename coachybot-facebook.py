@@ -162,11 +162,10 @@ def webhook():
                             #####################################################################
 
                             if debug_mode: print "11) Sending message..."
-                            for line in answer:
-                                type_time = random.randint( 25, 40)*len(line)
-                                display_typing_in_miliseconds( user_id, type_time)
-                                send_message( user_id, line)
-                                sleep( random.randint( 350, 650)/1000. )
+
+                            typing_ms_per_character_min = 25
+                            typing_ms_per_character_max = 40                            
+                            send_answer( user_id, answer, typing_ms_per_character_min, typing_ms_per_character_max)
 
 
                             #####################################################################
@@ -244,43 +243,7 @@ def webhook():
                     db.close()
                     conn.close()
                     if debug_mode: print "14) Connection closed."
-
-
-                    #####################################################################
-                    ###     Explore user and message data
-                    #####################################################################
-
-                    # if False: # Explore the data at hand...
-                    #     (w1, w2) = (12, 36)
-                    #     print " {:{w1}}| {:{w1}}| {:{w2}}| {:{w1}}".format(
-                    #         "Key", "Subkey", "Value", "Type", w1=w1, w2=w2)
-                    #     for key in messaging_event.keys():
-                    #         if type(messaging_event[key]).__name__ != "dict":
-                    #             print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                    #                 key, 
-                    #                 "", 
-                    #                 messaging_event[key], 
-                    #                 type(messaging_event[key]).__name__, 
-                    #                 w1=w1, 
-                    #                 w2=w2)
-                    #         else:
-                    #             for subkey in messaging_event[key].keys():
-                    #                 print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                    #                     key,
-                    #                     subkey,
-                    #                     messaging_event[key][subkey],
-                    #                     type(messaging_event[key][subkey]).__name__,
-                    #                     w1=w1,
-                    #                     w2=w2)
-                    #     user_information = get_user_information( messaging_event["sender"]["id"])
-                    #     for key in user_information.keys():
-                    #         print " {:<{w1}}| {:<{w1}}| {:<{w2}}| {:<{w1}}".format(
-                    #             "user", 
-                    #             key, 
-                    #             user_information[key], 
-                    #             type(user_information[key]).__name__, 
-                    #             w1=w1, 
-                    #             w2=w2)                            
+                         
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
@@ -298,7 +261,15 @@ def webhook():
 ###     Sending functions
 #####################################################################
 
-def send_message(recipient_id, message_text):
+def send_answer( recipient_id, answer, typing_ms_per_character_min=25, typing_ms_per_character_max=40)
+    for line in answer:
+        type_time = random.randint( typing_ms_per_character_min, typing_ms_per_character_max)*len(line)
+        display_typing_in_milliseconds( user_id, type_time)
+        send_message_text( user_id, line)
+        sleep( random.randint( 350, 650)/1000. )
+
+
+def send_message_text(recipient_id, message_text):
     params = {
         "access_token": page_access_token
     }
@@ -320,7 +291,7 @@ def send_message(recipient_id, message_text):
         data=data)
 
 
-def display_typing_in_miliseconds(recipient_id, time_in_ms=1000):
+def display_typing_in_milliseconds(recipient_id, time_in_ms=1000):
     params = {
         "access_token": page_access_token
     }
