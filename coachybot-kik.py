@@ -7,7 +7,6 @@ import os
 
 from datetime import datetime
 from time import sleep
-from pytz import timezone
 from collections import defaultdict
 import random
 
@@ -17,7 +16,6 @@ import urlparse
 
 from node_objects import *
 
-# http://patorjk.com/software/taag/#p=display&f=Banner&t=Connecting
 # ===========================================================================================
 
 username = os.environ['BOT_USERNAME'] 

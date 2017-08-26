@@ -3,13 +3,10 @@ import regex as re2
 from regex import sub as sub2
 
 from datetime import datetime
-from pytz import timezone
 
 from ngrams.ngrams import corrections, Pw
 
 import nltk
-#from nltk.sentiment.vader import SentimentIntensityAnalyzer
-#vader = SentimentIntensityAnalyzer()
 
 firstnames = nltk.corpus.names
 
@@ -1820,6 +1817,9 @@ def expand_contractions(text):
   #####   ####  #####   ####  ###### #    # ###### #    #   #   
                          
 # Suspended because of bad performance
+
+#from nltk.sentiment.vader import SentimentIntensityAnalyzer
+#vader = SentimentIntensityAnalyzer()
 
 # judgement_grammar = """
 #         S_and_V: {((((<PRP\$>|<DT>)? (<R.*>|<J.*>)*)? <NN>? (<NNS>|<NN>))|<PRP>) (<VBZ>|<VBP>|<VBD>) <VBN>?}
