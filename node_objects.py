@@ -135,12 +135,14 @@ class Template(object):
 
         # Checking for generic statements / intentions
 
-        if verbose:("{:30}:".format("Preprocessed sentences"))
-        if verbose: sentence_counter = 1
+        if verbose: print("\n{:20}".format("Preprocessed sentences"))
+
+        for answer_fact in self.answer_facts:
+            
+
 
         for sentence in self.sentences:
-            if verbose: print str(sentence_counter) + ".: " + sentence
-            if verbose: sentence_counter += 1
+            if verbose: print("{:20}- {}".format( "", sentence))
             if has_request_to_explain(sentence):
                 self.message_facts.append("has_request_to_explain")  
             if has_protest_to_question(sentence):
@@ -414,12 +416,12 @@ class Template(object):
     def summary(self):
 
         # Printing message facts
-        print("\n{:20}:".format("Message facts"))
+        print("\n{:20}".format("Message facts"))
         for message_fact in self.message_facts:
             print("{:20}- {}".format("",message_fact.replace( "_", " ")))
 
         # Printing answer facts
-        print("\n{:20}:".format("Answer facts"))
+        print("\n{:20}".format("Answer facts"))
         for answer_fact in self.answer_facts:
             print("{:20}- {}".format("",answer_fact.replace( "_", " ")))
 
@@ -434,7 +436,7 @@ class Template(object):
         print( "{:20}: {}".format("Answer"," ".join(self.answer)))
 
         # Printing user data updates
-        print "\nUser data updates   :"
+        print "\nUser data updates   "
         for key in self.user.keys():
             if key not in self.user_backup.keys():
                 print "{:20}: {:12} --> {:12}".format(key,"",str(self.user[key]))

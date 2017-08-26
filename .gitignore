@@ -1,5 +1,9 @@
-nlp_functions.pyc
-venv*
-cheatsheet.sql
-ngrams.pyc
 *.pyc
+venv*
+cheatsheet*
+.ipynb_checkpoints/
+*.draft
+logfile*
+database_debugging.py
+example_statements.txt
+notes_for_readme.txt
