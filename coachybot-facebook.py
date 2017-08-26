@@ -261,7 +261,7 @@ def webhook():
 ###     Sending functions
 #####################################################################
 
-def send_answer( recipient_id, answer, typing_ms_per_character_min=25, typing_ms_per_character_max=40)
+def send_answer( recipient_id, answer, typing_ms_per_character_min=25, typing_ms_per_character_max=40):
     for line in answer:
         type_time = random.randint( typing_ms_per_character_min, typing_ms_per_character_max)*len(line)
         display_typing_in_milliseconds( user_id, type_time)
