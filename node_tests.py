@@ -1,5 +1,6 @@
 import unittest
 import inspect
+import warnings
 
 from datetime import datetime
 
@@ -46,8 +47,38 @@ class Test_Template(unittest.TestCase):
 
     def test_has_method_summary( self):
         self.failUnless(
-            "summary" in dir(Template)
-            and inspect.ismethod(Template.summary))
+            "summary" in dir( Template)
+            and inspect.ismethod( Template.summary))
+
+    def test_has_method_check_if_statement( self):
+        self.failUnless(
+            "check_if_statement" in dir( Template)
+            and inspect.ismethod( Template.check_if_statement))
+
+    def test_check_if_statement_expects_string_as_first_argument( self):
+        with self.assertRaises( TypeError):
+            test_node = Template( ".", verbose=False)
+            test_node.check_if_statement( ["Hello!"], "has_greeting", verbose=False)
+
+    def test_check_if_statement_expects_string_as_second_argument( self):
+        with self.assertRaises( TypeError):
+            test_node = Template( ".", verbose=False)
+            test_node.check_if_statement( "Hello!", ["has_greeting"],verbose=False)
+
+    def test_check_if_statement_expects_known_skill_as_second_argument( self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            test_node = Template( ".", verbose=False)
+            test_node.check_if_statement( "Hello!", "is_drunk", verbose=False)
+            assert len(w) == 1
+            assert issubclass(w[-1].category, Warning)
+
+    def test_check_if_statement_tests_for_fear_statement( self):
+        test_node = Template( ".", verbose=False)
+        statement = "i am afraid that this test might fail"
+        test_node.check_if_statement( statement, "has_fear", verbose=True)
+        self.failUnless(
+            "has_fear" in test_node.message_facts)
 
     def test_expects_string_as_first_argument( self):
         with self.assertRaises( TypeError):
@@ -172,6 +203,8 @@ class Test_Template(unittest.TestCase):
         message = "Hey there! How are you?"
         test_node = Template( message, verbose=False)
         self.failUnless(len(test_node.sentences) == 2)
+
+    # -------- Standard behavior to be inherited ---------------------
 
     def test_recognize_request_to_explain( self):
         message = "Why would you ask that?"

@@ -1,14 +1,13 @@
 import re
 import regex as re2
 from regex import sub as sub2
+from collections import defaultdict
 
 from datetime import datetime
 
 from ngrams.ngrams import corrections, Pw
 
 import nltk
-
-firstnames = nltk.corpus.names
 
 # ===========================================================================================
 
@@ -1392,7 +1391,7 @@ greeting = r"^(" + "|".join([r"^(oh\,? ",
     ]) + r"($|\,| |\.|\!|\;))|(hey there!)"
 
 
-def is_greeting(sentence):
+def has_greeting(sentence):
     if re.search( greeting, sentence):
         return True
     else:
@@ -1459,19 +1458,19 @@ you_had_good_time = r"(?<!(why  |how  |who  |what |when ))" + "|".join([r"(did y
     r"some",
     r"a few)" ]) + "\s" + intensifiers + r"?\s?" + positives + r"\s" + temporal_units + r"((\s|\,)[\,\s\w]+)?\?"
 
-def is_question_how_are_you(sentence):
+def has_question_how_are_you(sentence):
     if re.search( how_are_you, sentence):
         return True
     else:
         return False
 
-def is_question_how_was_your_time(sentence):
+def has_question_how_was_your_time(sentence):
     if re.search( how_was_your_time, sentence):
         return True
     else:
         return False
 
-def is_question_you_had_good_time(sentence):
+def has_question_you_had_good_time(sentence):
     sentence = sentence.replace( "why did", "why  did")
     sentence = sentence.replace( "how did", "how  did")
     sentence = sentence.replace( "who did", "who  did")
@@ -1767,6 +1766,83 @@ def expand_contractions(text):
 
 
 
+hypothesis_map = defaultdict( lambda: lambda x: False)
+# If an unknown hypothesis is queried, hypothesis_map will
+# use an anonymous lambda function to evaluate it with False
+hypothesis_map.update({
+    "has_affirmation"                   : has_affirmation,
+    "has_negation"                      : has_negation,
+    "has_greeting"                      : has_greeting,
+    "has_request_to_explain"            : has_request_to_explain,
+    "has_protest_to_question"           : has_protest_to_question,
+    "has_question_how_are_you"          : has_question_how_are_you,
+    "has_question_how_was_your_time"    : has_question_how_was_your_time,
+    "has_question_you_had_good_time"    : has_question_you_had_good_time,
+    "has_danger_to_self"                : has_danger_to_self,
+    "has_hesitation"                    : has_hesitation,
+    "has_story"                         : has_story,
+    "has_story_negative"                : has_story_negative,
+    "has_problem_statement"             : has_problem_statement,
+    "has_desire"                        : has_desire,
+    "has_fear"                          : has_fear,
+    "has_feeling_negative"              : has_feeling_negative,
+    "has_dislike"                       : has_dislike,
+    "is_positive"                       : is_positive,
+    "is_negative"                       : is_negative,
+    "has_problem_statement"             : has_problem_statement,
+    "prefers_timeframe_long"            : prefers_timeframe_long,
+    "prefers_timeframe_short"           : prefers_timeframe_short,
+    "has_option"                        : has_option,
+    "has_choice_of_enumerated_item"     : has_choice_of_enumerated_item,
+    "has_specific_time"                 : has_specific_time
+    })
+
+def check_if_statement( statement, hypothesis, verbose=True):
+    """
+    Evaluates if a hypothesis about a statement is true.
+
+    Arguments:
+    statement       -- A string for which the hypothesis should be tested,
+                        e.g. "Hello world!"
+    hypothesis      -- A string that contains the hypothesis to be tested,
+                        e.g. "has_greeting". The hypothesis is tested by a
+                        function with the same name as the hypothesis. If no
+                        such function exists, it will issue a warning and
+                        evaluate as False.
+    verbose         -- (default: True) 'False' silences Error messages. This
+                        is useful mainly for de-cluttering unit tests.
+    """
+
+    if not(
+        isinstance( statement, str)
+        or isinstance( statement, unicode)
+        ):
+        if verbose: print "Argument 'statement' must be a (unicode) string."
+        if verbose: print "Instead, statement argument of type '" + type(statement).__name__ + "' was given."
+        raise TypeError
+
+
+    if not(
+        isinstance( hypothesis, str)
+        or isinstance( hypothesis, unicode)
+        ):
+        if verbose: print "Argument 'hypothesis' must be a (unicode) string."
+        if verbose: print "Instead, hypothesis argument of type '" + type(hypothesis).__name__ + "' was given."
+        raise TypeError
+
+    if not(
+        hypothesis in hypothesis_map.keys()
+        ):
+        warning_message = None
+        if verbose:
+            warning_message = "'hypothesis' argument '" + hypothesis + "'' is not a known skill / function."
+        warnings.warn( warning_message, Warning)
+
+
+    return hypothesis_map[hypothesis]( statement)
+
+
+
  #     #                                #######                                      
  ##    #   ##   #    # ###### #####     #       #    # ##### # ##### # ######  ####  
  # #   #  #  #  ##  ## #      #    #    #       ##   #   #   #   #   # #      #      
@@ -1776,7 +1852,7 @@ def expand_contractions(text):
  #     # #    # #    # ###### #####     ####### #    #   #   #   #   # ######  ####  
                                                                                      
 # Works well, but currently not required
-                                                                
+
 # def extract_persons(text):
 #     target = re.compile(r"(PERSON")#|ORGANIZATION|FACILITY)")
 #     tokens = nltk.tokenize.word_tokenize(text)

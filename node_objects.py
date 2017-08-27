@@ -2,7 +2,7 @@ import random
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
-
+import warnings
 
 from skills import *
 
@@ -139,22 +139,14 @@ class Template(object):
             
         for sentence in self.sentences:
             if verbose: print("{:20}- {}".format( "", sentence))
-            if has_request_to_explain(sentence):
-                self.message_facts.append("has_request_to_explain")  
-            if has_protest_to_question(sentence):
-                self.message_facts.append("has_protest_to_question")
-            if is_question_how_are_you(sentence):
-                self.message_facts.append("has_question_how_are_you")        
-            if is_question_how_was_your_time(sentence):
-                self.message_facts.append("has_question_how_was_your_time")       
-            if is_question_you_had_good_time(sentence):
-                self.message_facts.append("has_question_you_had_good_time")                       
-            if is_greeting(sentence):
-                self.message_facts.append("has_greeting")   
-            if has_danger_to_self(sentence):
-                self.message_facts.append("has_danger_to_self") 
-        if has_hesitation( text.lower()):
-            self.message_facts.append("has_hesitation")   
+            self.check_if_statement( sentence, "has_request_to_explain")
+            self.check_if_statement( sentence, "has_protest_to_question")
+            self.check_if_statement( sentence, "has_question_how_are_you")
+            self.check_if_statement( sentence, "has_question_how_was_your_time")
+            self.check_if_statement( sentence, "has_question_you_had_good_time")
+            self.check_if_statement( sentence, "has_greeting")
+            self.check_if_statement( sentence, "has_danger_to_self")
+        self.check_if_statement( text.lower(), "has_hesitation")
 
 
         # Greeting logic (without "How are you?")
@@ -372,9 +364,63 @@ class Template(object):
 
 
     # ===========================================================================================
-    
 
-    def update_user(self):
+
+    def check_if_statement( self, statement, hypothesis, verbose=True):
+        """
+        Evaluates if a hypothesis about a statement is true,
+        and if so, appends the hypothesis to the `message_facts` list.
+
+        The variable 'hypothesis_map' is imported from the skills module,
+        and maps a hypothesis string to a skill function of the same name.
+
+        Arguments:
+        statement       -- A string for which the hypothesis should be tested,
+                            e.g. "Hello world!"
+        hypothesis      -- A string that contains the hypothesis to be tested,
+                            e.g. "has_greeting". The hypothesis is tested by a
+                            function with the same name as the hypothesis. If no
+                            such function exists, it will issue a warning and
+                            evaluate as False.
+        verbose         -- (default: True) 'False' silences Error messages. This
+                            is useful mainly for de-cluttering unit tests.
+        """
+
+        if not(
+            isinstance( statement, str)
+            or isinstance( statement, unicode)
+            ):
+            if verbose: print "Argument 'statement' must be a (unicode) string."
+            if verbose: print "Instead, statement argument of type '" + type(statement).__name__ + "' was given."
+            raise TypeError
+
+
+        if not(
+            isinstance( hypothesis, str)
+            or isinstance( hypothesis, unicode)
+            ):
+            if verbose: print "Argument 'hypothesis' must be a (unicode) string."
+            if verbose: print "Instead, hypothesis argument of type '" + type(hypothesis).__name__ + "' was given."
+            raise TypeError
+
+        if not(
+            hypothesis in hypothesis_map.keys()
+            ):
+            warning_message = None
+            if verbose:
+                warning_message = "'hypothesis' argument '" + hypothesis + "'' is not a known skill / function."
+            warnings.warn( warning_message, Warning)
+
+
+        if hypothesis_map[hypothesis]( statement):
+            self.message_facts.append( hypothesis)
+            return True
+        else:
+            return False
+
+ 
+
+    def update_user( self):
 
         #if self.verbose: self.print_user()
 
@@ -387,7 +433,7 @@ class Template(object):
                 ):
                 self.user["node_previous"] = "None"
             else:
-                self.user["node_previous"] = type(self).__name__
+                self.user["node_previous"] = type( self).__name__
         else:
             self.user["node_previous"] = self.user["node_current"]
         
@@ -402,24 +448,24 @@ class Template(object):
         #if self.verbose: self.print_user()
 
 
-    def print_user(self):
+    def print_user( self):
 
         print "\nUser data           :"
         for key in self.user.keys():
-            print "{:20}: {:12}".format(key,str(self.user[key]))
+            print "{:20}: {:12}".format( key, str( self.user[key]))
 
 
-    def summary(self):
+    def summary( self):
 
         # Printing message facts
-        print("\n{:20}".format("Message facts"))
+        print("\n{:20}".format( "Message facts"))
         for message_fact in self.message_facts:
-            print("{:20}- {}".format("",message_fact.replace( "_", " ")))
+            print("{:20}- {}".format( "", message_fact.replace( "_", " ")))
 
         # Printing answer facts
-        print("\n{:20}".format("Answer facts"))
+        print("\n{:20}".format( "Answer facts"))
         for answer_fact in self.answer_facts:
-            print("{:20}- {}".format("",answer_fact.replace( "_", " ")))
+            print("{:20}- {}".format( "", answer_fact.replace( "_", " ")))
 
         # Printing dialogue
         if self.user["username"]:
@@ -428,16 +474,16 @@ class Template(object):
             username = "User"
 
         print ""
-        print( "{:20}: {}".format(username,self.message))
-        print( "{:20}: {}".format("Answer"," ".join(self.answer)))
+        print( "{:20}: {}".format( username, self.message))
+        print( "{:20}: {}".format( "Answer"," ".join( self.answer)))
 
         # Printing user data updates
         print "\nUser data updates   "
         for key in self.user.keys():
             if key not in self.user_backup.keys():
-                print "{:20}: {:12} --> {:12}".format(key,"",str(self.user[key]))
+                print "{:20}: {:12} --> {:12}".format( key, "", str( self.user[key]))
             elif self.user_backup[key] != self.user[key]:
-                print "{:20}: {:12} --> {:12}".format(key,self.user_backup[key],str(self.user[key]))
+                print "{:20}: {:12} --> {:12}".format( key, self.user_backup[key], str(self.user[key]))
 
 
 
@@ -460,20 +506,13 @@ class Opening( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_story( sentence):
-                self.message_facts.append( "has_story") 
-            if has_story_negative( sentence):
-                self.message_facts.append( "has_story_negative") 
-            if has_problem_statement( sentence):
-                self.message_facts.append("has_problem_statement")
-            if has_desire( sentence):
-                self.message_facts.append("has_desire")
-            if has_fear( sentence):
-                self.message_facts.append("has_fear")
-            if has_feeling_negative( sentence):
-                self.message_facts.append("has_feeling_negative")
-            if has_dislike( sentence):
-                self.message_facts.append("has_dislike")                
+            self.check_if_statement( sentence, "has_story")
+            self.check_if_statement( sentence, "has_story_negative")
+            self.check_if_statement( sentence, "has_problem_statement")
+            self.check_if_statement( sentence, "has_desire")
+            self.check_if_statement( sentence, "has_fear")
+            self.check_if_statement( sentence, "has_feeling_negative")
+            self.check_if_statement( sentence, "has_dislike")
 
 
         if(
@@ -775,10 +814,8 @@ class HowAreYou( Opening):
         Opening.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if is_positive( sentence):
-                self.message_facts.append("is_positive")  
-            if is_negative( sentence):
-                self.message_facts.append("is_negative")  
+            self.check_if_statement( sentence, "is_positive")
+            self.check_if_statement( sentence, "is_negative")
                              
 
         if(     # Standard cases
@@ -938,8 +975,8 @@ class Problem( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_problem_statement( sentence):
-                self.message_facts.append("has_problem_statement")  
+            self.check_if_statement( sentence, "has_problem_statement")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1036,10 +1073,9 @@ class Relevance(Template):
 
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation")         
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation")
+        
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1125,10 +1161,8 @@ class Fix( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)                
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation") 
        
 
         if(     # Standard cases
@@ -1225,10 +1259,8 @@ class Timeframe( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if prefers_timeframe_long( sentence):
-                self.message_facts.append("prefers_timeframe_long") 
-            if prefers_timeframe_short( sentence):
-                self.message_facts.append("prefers_timeframe_short") 
+            self.check_if_statement( sentence, "prefers_timeframe_long")
+            self.check_if_statement( sentence, "prefers_timeframe_short")
        
 
         if(     # Standard cases
@@ -1318,10 +1350,9 @@ class Feasability(Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1428,10 +1459,9 @@ class OptionsOne(Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_option( sentence):
-                self.message_facts.append("has_option") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_option")
+            self.check_if_statement( sentence, "has_negation")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1621,10 +1651,9 @@ class OptionsTwo( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_option( sentence):
-                self.message_facts.append("has_option") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_option")
+            self.check_if_statement( sentence, "has_negation")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1710,14 +1739,14 @@ class Choice( Template):
         counter_selected_items = 0
 
         for sentence in self.sentences:
-            if has_option( sentence):
-                self.message_facts.append("has_option")
+            
+            self.check_if_statement( sentence, "has_negation")
+            if(
+                self.check_if_statement( sentence, "has_option")
+                or self.check_if_statement( sentence, "has_choice_of_enumerated_item")
+                ):
                 counter_selected_items += 1
-            if has_choice_of_enumerated_item( sentence):
-                self.message_facts.append("has_choice_of_enumerated_item")                 
-                counter_selected_items += 1
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1829,10 +1858,9 @@ class Obstacles( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)                
 
         for sentence in self.sentences:
-            if has_problem_statement( sentence):
-                self.message_facts.append("has_problem_statement")
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_problem_statement")
+            self.check_if_statement( sentence, "has_negation")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -1933,10 +1961,9 @@ class Priorities( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation")
+
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -2034,10 +2061,8 @@ class Committment( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation") 
-            if has_negation( sentence):
-                self.message_facts.append("has_negation") 
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation")
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -2147,8 +2172,7 @@ class Action( Template):
         Template.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_specific_time( sentence):
-                self.message_facts.append("has_specific_time") 
+            self.check_if_statement( sentence, "has_specific_time") 
 
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
@@ -2233,8 +2257,7 @@ class Good( Opening):
         Opening.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_negation( sentence):
-                self.message_facts.append("has_negation")
+            self.check_if_statement( sentence, "has_negation")
                               
 
         if(     # Standard cases
@@ -2337,10 +2360,8 @@ class Highlight( Opening):
         Opening.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_affirmation( sentence):
-                self.message_facts.append("has_affirmation")
-            if has_negation( sentence):
-                self.message_facts.append("has_negation")
+            self.check_if_statement( sentence, "has_affirmation")
+            self.check_if_statement( sentence, "has_negation")
             if has_story( sentence) and not has_negation( sentence):
                 # Background: "No, it was not my highlight" has story + negation!
                 self.message_facts.append("has_story")
@@ -2449,8 +2470,7 @@ class Bad( Opening):
         Opening.__init__(self, text=text, user=user, verbose=verbose)
 
         for sentence in self.sentences:
-            if has_negation( sentence):
-                self.message_facts.append("has_negation")
+            self.check_if_statement( sentence, "has_negation")
         
         if(     # Standard cases
             "has_danger_to_self" in self.message_facts
