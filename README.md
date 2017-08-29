@@ -18,7 +18,7 @@ Coachybot is a chatbot that leads you through a coaching conversation. During th
 - Brainstorm various possible solutions with you
 - Try to get a commitment from you for implementing a solution
 
-Do you think it's hopeless/insane/wrong/fascinating to 'teach' coaching, a skill highly based on empathy and wisdom, to a bot? Sometimes I do, too. [On this background page](https://github.com/botmaker-florian/coachybot/blob/master/BACKGROUND.md), you can find some thoughts on why I stink this is valuable and worth trying.
+Do you think it's hopeless/insane/wrong/fascinating to 'teach' coaching, a skill highly based on empathy and wisdom, to a bot? Sometimes I do, too. [On this background page](https://github.com/botmaker-florian/coachybot/blob/master/BACKGROUND.md), you can find some thoughts on why I still think this is valuable and worth trying.
 
 Technically, each state of the coaching conversation is represented as a node class that uses the user's history and current message as arguments and returns the updated user history, the answer and the name of the next node.
 
