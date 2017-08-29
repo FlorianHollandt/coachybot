@@ -21,10 +21,11 @@ import nltk
  #     #  ####  #    # #    # #    # ###### # ###### #    #   #   #  ####  #    # 
                                                                                   
 
-sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+#sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-def preprocess_message(statement):
-    sentences = sentence_tokenizer.tokenize(statement)
+def preprocess_message( statement):
+    #sentences = sentence_tokenizer.tokenize(statement)
+    sentences = nltk.sent_tokenize( statement)
     return [
         cleanup_sentence(
             remove_fluff(
@@ -36,7 +37,7 @@ def preprocess_message(statement):
         in sentences
         ]
 
-def stemmer(word,pos):
+def stemmer( word, pos):
     if pos=="NOUN" and  word[-1]=="s":
         return word[:-1]
     elif pos=="VERB" and  word[-1]=="s":
