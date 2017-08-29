@@ -21,10 +21,7 @@ import nltk
  #     #  ####  #    # #    # #    # ###### # ###### #    #   #   #  ####  #    # 
                                                                                   
 
-#sentence_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-
 def preprocess_message( statement):
-    #sentences = sentence_tokenizer.tokenize(statement)
     sentences = nltk.sent_tokenize( statement)
     return [
         cleanup_sentence(
