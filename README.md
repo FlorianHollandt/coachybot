@@ -16,9 +16,9 @@ Coachybot is a chatbot that leads you through a coaching conversation. During th
 - Probe for open issues and problems
 - Ask you to evaluate how relevant and solvable a given problem is
 - Brainstorm various possible solutions with you
-- Try to get a committment from you for implementing a solution
+- Try to get a commitment from you for implementing a solution
 
-Do you think it's hopeless/insane/wrong/fascinating to 'teach' coaching, a skill highly based on empathy and wisdom, to a bot? Sometimes I do, too. [On this background page](https://github.com/botmaker-florian/coachybot/master/BACKGROUND.md), you can find some thoughts on why I stink this is valuable and worth trying.
+Do you think it's hopeless/insane/wrong/fascinating to 'teach' coaching, a skill highly based on empathy and wisdom, to a bot? Sometimes I do, too. [On this background page](https://github.com/botmaker-florian/coachybot/blob/master/BACKGROUND.md), you can find some thoughts on why I stink this is valuable and worth trying.
 
 Technically, each state of the coaching conversation is represented as a node class that uses the user's history and current message as arguments and returns the updated user history, the answer and the name of the next node.
 
@@ -50,7 +50,7 @@ The natural language processing facilities (dubbed 'skills') of Coachybot are ba
 True
 ```
 
-Coachybot is curently hosted on the cloud service Heroku, uses Heroku's postgreSQL database and runs on Facebook Messenger. This repository contains the scripts for running Coachybot on Kik Messenger as well, where the setup process is somewhat easier.
+Coachybot is currently hosted on the cloud service Heroku, uses Heroku's postgreSQL database and runs on Facebook Messenger. This repository contains the scripts for running Coachybot on Kik Messenger as well, where the setup process is somewhat easier.
 
 In terms of maturity, Coachybot is in minimum viable product / alpha stage. Chances that you will have a satisfying conversation with Coachybot on Facebook Messenger are not quite bad! The scope of the conversation is limited, and you might well encounter some points where the conversation doesn't flow smoothly.
 
@@ -72,7 +72,7 @@ pip install nltk
 pip install regex
 ```
 
-To have a conversation with Coachybot in your browser and to get a first impresson of how he works, open the repository's notebook file:
+To have a conversation with Coachybot in your browser and to get a first impression of how he works, open the repository's notebook file:
 
 ```bash
 jupyter notebook coachybot_notebook.ipynb
@@ -86,13 +86,13 @@ python coachybot_terminal.py
 
 ### Full installation
 
-You can find the installation guide [here](https://github.com/botmaker-florian/coachybot/master/INSTALL.md). It contains instructions to run Coachybot at the cloud hosting service Heroku and to register your bot at Kik and Facebook.
+You can find the installation guide [here](https://github.com/botmaker-florian/coachybot/blob/master/INSTALLATION.md). It contains instructions to run Coachybot at the cloud hosting service Heroku and to register your bot at Kik and Facebook.
 
 ## Testing
 
 ### Nodes
 
-Coachybot node classes were developed using rigorous Test-Driven Developemt. The test suite
+Coachybot node classes were developed using rigorous Test-Driven Development. The test suite
 for the node classes can be run by
 
 ```bash
@@ -121,12 +121,15 @@ and hints are welcome!
 
 This is my first open source project, and every form of positive engagement and contribution is welcome!
 
-Please check [CONTRIBUTING.md](https://github.com/botmaker-florian/coachybot/master/CONTRIBUTING.md) for ideas about how and what to contribute. To make engagement in this project a positive experience for everyone involved, please take not of and adhere to the [Contributor Covenant code of conduct](https://github.com/botmaker-florian/coachybot/master/CODE_OF_CONDUCT.md).
+Please check [CONTRIBUTING.md](https://github.com/botmaker-florian/coachybot/blob/master/CONTRIBUTING.md) for ideas about how and what to contribute. To make engagement in this project a positive experience for everyone involved, please take not of and adhere to the [Contributor Covenant code of conduct](https://github.com/botmaker-florian/coachybot/blob/master/CODE_OF_CONDUCT.md).
 
+## Notes
+
+This repository contains a local version of [Peter Norvig's](https://github.com/norvig) [ngram-based spell correction program](http://norvig.com/ngrams/) that I manually tweaked to perform better for my use case. It is [on my To Do list](https://github.com/botmaker-florian/coachybot/blob/master/CONTRIBUTING.md) to replace it with a current, crowdsourced version.
 
 ## License
 
-Coachybot is published under the [MIT license](https://github.com/botmaker-florian/coachybot/master/LICENSE.md).
+Coachybot is published under the [MIT license](https://github.com/botmaker-florian/coachybot/blob/master/LICENSE.md).
 
 ## Contact
 
